@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteLayout } from "@/components/SiteLayout";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,10 +23,5 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader />
-      <main className="paper-cream flex-1" />
-    </div>
-  );
+  return <SiteLayout />;
 }
