@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { Search, Heart, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { HijabMark } from "@/components/HijabMark";
 
 const navItems = [
-  { label: "الرئيسيـة", href: "#" },
-  { label: "الفساتين", href: "#" },
-  { label: "الإسدالات", href: "#" },
-  { label: "الخمار", href: "#" },
-  { label: "العبايات", href: "#" },
-  { label: "الإكسسوارات", href: "#" },
-  { label: "مستلزمات الحجاب", href: "#" },
-  { label: "تخفيضات", href: "#" },
-];
+  { label: "الرئيسيـة", to: "/" },
+  { label: "الفساتين", to: "/dresses" },
+  { label: "الإسدالات", to: "/isdal" },
+  { label: "الخمار", to: "/khimar" },
+  { label: "العبايات", to: "/abayas" },
+  { label: "الإكسسوارات", to: "/accessories" },
+  { label: "مستلزمات الحجاب", to: "/hijab-essentials" },
+  { label: "أحذية شرعية", to: "/footwear" },
+] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
 
   return (
     <header className="paper-dark w-full bg-header text-header-foreground">
@@ -79,10 +78,10 @@ export function SiteHeader() {
           </button>
           <button
             aria-label="القائمة"
-            onClick={() => setOpen((v) => !v)}
+            onClick={onMenuClick}
             className="transition-opacity hover:opacity-70 lg:hidden"
           >
-            {open ? <X className="h-5 w-5" strokeWidth={1.25} /> : <Menu className="h-5 w-5" strokeWidth={1.25} />}
+            <Menu className="h-5 w-5" strokeWidth={1.25} />
           </button>
         </div>
       </div>
@@ -108,43 +107,19 @@ export function SiteHeader() {
       {/* Nav */}
       <nav aria-label="التصنيفات" className="mx-auto w-full max-w-[1400px] px-4 sm:px-6">
         <ul className="hidden items-center justify-center gap-7 pb-2 pt-1 lg:flex xl:gap-10">
-          {navItems.map((item, i) => (
+          {navItems.map((item) => (
             <li key={item.label}>
-              <a
-                href={item.href}
-                onClick={() => setActive(i)}
-                className={`block border-b pb-1 text-[13px] transition-colors ${
-                  active === i
-                    ? "border-accent text-accent"
-                    : "border-transparent text-header-foreground hover:text-accent"
-                }`}
+              <Link
+                to={item.to}
+                className="block border-b border-transparent pb-1 text-[13px] text-header-foreground transition-colors hover:text-accent"
+                activeProps={{ className: "border-accent text-accent" }}
+                activeOptions={{ exact: item.to === "/" }}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
-
-        {open && (
-          <ul className="flex flex-col gap-1 pb-4 pt-2 lg:hidden">
-            {navItems.map((item, i) => (
-              <li key={item.label}>
-                <a
-                  href={item.href}
-                  onClick={() => {
-                    setActive(i);
-                    setOpen(false);
-                  }}
-                  className={`block py-2 text-sm transition-colors ${
-                    active === i ? "text-accent" : "text-header-foreground hover:text-accent"
-                  }`}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
       </nav>
     </header>
   );
