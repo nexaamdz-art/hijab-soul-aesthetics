@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Heart, User, ShoppingBag, Menu, X } from "lucide-react";
-import hijabMark from "@/assets/hijab-silhouette.png";
+import { HijabMark } from "@/components/HijabMark";
 
 const navItems = [
   { label: "الرئيسيـة", href: "#" },
@@ -23,11 +23,7 @@ export function SiteHeader() {
       <div className="mx-auto flex w-full max-w-[1400px] items-start gap-4 px-4 pt-3 sm:px-6 lg:gap-8">
         {/* Brand */}
         <a href="#" className="flex min-w-0 shrink-0 items-start gap-2">
-          <img
-            src={hijabMark}
-            alt="شعار حجاب سول"
-            className="h-14 w-14 shrink-0 object-contain opacity-90 sm:h-16 sm:w-16"
-          />
+          <HijabMark className="h-14 w-12 shrink-0 text-header-foreground/85 sm:h-16 sm:w-14" />
           <span className="min-w-0 text-right">
             <span className="flex items-center gap-1">
               <span className="font-display text-2xl leading-none tracking-wide sm:text-3xl">
