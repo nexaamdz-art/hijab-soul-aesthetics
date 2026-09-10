@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { Search, Heart, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { HijabMark } from "@/components/HijabMark";
 
 const navItems = [
-  { label: "الرئيسيـة", href: "#" },
-  { label: "الفساتين", href: "#" },
-  { label: "الإسدالات", href: "#" },
-  { label: "الخمار", href: "#" },
-  { label: "العبايات", href: "#" },
-  { label: "الإكسسوارات", href: "#" },
-  { label: "مستلزمات الحجاب", href: "#" },
-  { label: "تخفيضات", href: "#" },
-];
+  { label: "الرئيسيـة", to: "/" },
+  { label: "الفساتين", to: "/dresses" },
+  { label: "الإسدالات", to: "/isdal" },
+  { label: "الخمار", to: "/khimar" },
+  { label: "العبايات", to: "/abayas" },
+  { label: "الإكسسوارات", to: "/accessories" },
+  { label: "مستلزمات الحجاب", to: "/hijab-essentials" },
+  { label: "أحذية شرعية", to: "/footwear" },
+] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
 
   return (
     <header className="paper-dark w-full bg-header text-header-foreground">

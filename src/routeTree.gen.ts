@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AbayasRouteImport } from './routes/abayas'
+import { Route as AccessoriesRouteImport } from './routes/accessories'
+import { Route as ArticlesRouteImport } from './routes/articles'
+import { Route as DressesRouteImport } from './routes/dresses'
+import { Route as FootwearRouteImport } from './routes/footwear'
+import { Route as HijabEssentialsRouteImport } from './routes/hijab-essentials'
+import { Route as IsdalRouteImport } from './routes/isdal'
+import { Route as KhimarRouteImport } from './routes/khimar'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AbayasRoute = AbayasRouteImport.update({
+  id: '/abayas',
+  path: '/abayas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessoriesRoute = AccessoriesRouteImport.update({
+  id: '/accessories',
+  path: '/accessories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesRoute = ArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DressesRoute = DressesRouteImport.update({
+  id: '/dresses',
+  path: '/dresses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FootwearRoute = FootwearRouteImport.update({
+  id: '/footwear',
+  path: '/footwear',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HijabEssentialsRoute = HijabEssentialsRouteImport.update({
+  id: '/hijab-essentials',
+  path: '/hijab-essentials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IsdalRoute = IsdalRouteImport.update({
+  id: '/isdal',
+  path: '/isdal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KhimarRoute = KhimarRouteImport.update({
+  id: '/khimar',
+  path: '/khimar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/abayas': typeof AbayasRoute
+  '/accessories': typeof AccessoriesRoute
+  '/articles': typeof ArticlesRoute
+  '/dresses': typeof DressesRoute
+  '/footwear': typeof FootwearRoute
+  '/hijab-essentials': typeof HijabEssentialsRoute
+  '/isdal': typeof IsdalRoute
+  '/khimar': typeof KhimarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/abayas': typeof AbayasRoute
+  '/accessories': typeof AccessoriesRoute
+  '/articles': typeof ArticlesRoute
+  '/dresses': typeof DressesRoute
+  '/footwear': typeof FootwearRoute
+  '/hijab-essentials': typeof HijabEssentialsRoute
+  '/isdal': typeof IsdalRoute
+  '/khimar': typeof KhimarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/abayas': typeof AbayasRoute
+  '/accessories': typeof AccessoriesRoute
+  '/articles': typeof ArticlesRoute
+  '/dresses': typeof DressesRoute
+  '/footwear': typeof FootwearRoute
+  '/hijab-essentials': typeof HijabEssentialsRoute
+  '/isdal': typeof IsdalRoute
+  '/khimar': typeof KhimarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/abayas'
+    | '/accessories'
+    | '/articles'
+    | '/dresses'
+    | '/footwear'
+    | '/hijab-essentials'
+    | '/isdal'
+    | '/khimar'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/abayas'
+    | '/accessories'
+    | '/articles'
+    | '/dresses'
+    | '/footwear'
+    | '/hijab-essentials'
+    | '/isdal'
+    | '/khimar'
+  id:
+    | '__root__'
+    | '/'
+    | '/abayas'
+    | '/accessories'
+    | '/articles'
+    | '/dresses'
+    | '/footwear'
+    | '/hijab-essentials'
+    | '/isdal'
+    | '/khimar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AbayasRoute: typeof AbayasRoute
+  AccessoriesRoute: typeof AccessoriesRoute
+  ArticlesRoute: typeof ArticlesRoute
+  DressesRoute: typeof DressesRoute
+  FootwearRoute: typeof FootwearRoute
+  HijabEssentialsRoute: typeof HijabEssentialsRoute
+  IsdalRoute: typeof IsdalRoute
+  KhimarRoute: typeof KhimarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/abayas': {
+      id: '/abayas'
+      path: '/abayas'
+      fullPath: '/abayas'
+      preLoaderRoute: typeof AbayasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accessories': {
+      id: '/accessories'
+      path: '/accessories'
+      fullPath: '/accessories'
+      preLoaderRoute: typeof AccessoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles': {
+      id: '/articles'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dresses': {
+      id: '/dresses'
+      path: '/dresses'
+      fullPath: '/dresses'
+      preLoaderRoute: typeof DressesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/footwear': {
+      id: '/footwear'
+      path: '/footwear'
+      fullPath: '/footwear'
+      preLoaderRoute: typeof FootwearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hijab-essentials': {
+      id: '/hijab-essentials'
+      path: '/hijab-essentials'
+      fullPath: '/hijab-essentials'
+      preLoaderRoute: typeof HijabEssentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/isdal': {
+      id: '/isdal'
+      path: '/isdal'
+      fullPath: '/isdal'
+      preLoaderRoute: typeof IsdalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/khimar': {
+      id: '/khimar'
+      path: '/khimar'
+      fullPath: '/khimar'
+      preLoaderRoute: typeof KhimarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AbayasRoute: AbayasRoute,
+  AccessoriesRoute: AccessoriesRoute,
+  ArticlesRoute: ArticlesRoute,
+  DressesRoute: DressesRoute,
+  FootwearRoute: FootwearRoute,
+  HijabEssentialsRoute: HijabEssentialsRoute,
+  IsdalRoute: IsdalRoute,
+  KhimarRoute: KhimarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
