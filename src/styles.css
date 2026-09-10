@@ -67,6 +67,7 @@
   --color-burgundy: var(--burgundy);
   --font-sans: "Noto Kufi Arabic", "Tajawal", ui-sans-serif, sans-serif;
   --font-display: "Marck Script", "Noto Kufi Arabic", cursive;
+  --font-hand: "Aref Ruqaa", "Noto Kufi Arabic", serif;
 }
 
 @utility paper-dark {

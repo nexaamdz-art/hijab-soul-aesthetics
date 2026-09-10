@@ -35,7 +35,7 @@ export function VintageSidebar({ onNavigate }: { onNavigate?: () => void }) {
             key={c.to}
             to={c.to}
             onClick={onNavigate}
-            className="font-display text-2xl leading-none text-ink/90 transition-colors hover:text-burgundy sm:text-[26px]"
+            className="font-hand text-xl leading-none text-ink/90 transition-colors hover:text-burgundy sm:text-2xl"
             activeProps={{ className: "text-burgundy" }}
           >
             {c.label}
