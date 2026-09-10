@@ -59,11 +59,42 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
+  --color-header-muted: var(--header-muted);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-burgundy: var(--burgundy);
+  --font-sans: "Noto Kufi Arabic", "Tajawal", ui-sans-serif, sans-serif;
+  --font-display: "Marck Script", "Noto Kufi Arabic", cursive;
+}
+
+@utility paper-dark {
+  background-image:
+    radial-gradient(circle at 18% 22%, oklch(1 0 0 / 3.5%) 0 1px, transparent 1px),
+    radial-gradient(circle at 72% 68%, oklch(1 0 0 / 2.5%) 0 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+}
+
+@utility paper-cream {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 25% 30%, oklch(0.55 0.03 70 / 5%) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 65%, oklch(0.55 0.03 70 / 4%) 0 1px, transparent 1px);
+  background-size: 6px 6px, 9px 9px;
+}
+
+@utility torn-paper {
+  clip-path: polygon(
+    0% 12%, 2% 4%, 6% 10%, 12% 3%, 20% 9%, 30% 2%, 42% 8%, 55% 2%, 68% 9%,
+    80% 3%, 90% 9%, 96% 3%, 100% 11%, 99% 88%, 95% 96%, 88% 90%, 78% 97%,
+    66% 91%, 54% 98%, 42% 91%, 30% 97%, 20% 90%, 10% 97%, 4% 90%, 0% 89%
+  );
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.945 0.022 85);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
@@ -95,6 +126,13 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+
+  --header: oklch(0.19 0.006 60);
+  --header-foreground: oklch(0.94 0.015 85);
+  --header-muted: oklch(0.85 0.02 85);
+  --paper: oklch(0.945 0.022 85);
+  --ink: oklch(0.28 0.015 60);
+  --burgundy: oklch(0.45 0.11 15);
 }
 
 .dark {
@@ -140,5 +178,6 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
   }
 }
