@@ -38,7 +38,7 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
             >
               <X className="h-4 w-4" strokeWidth={1.5} />
             </button>
-            <VintageSidebar onNavigate={() => setDrawerOpen(false)} />
+            <VintageSidebar fillHeight onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
       )}
