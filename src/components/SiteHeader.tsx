@@ -70,12 +70,13 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
         {/* Brand (left in RTL) */}
         <Link to="/" className="mr-auto flex min-w-0 shrink-0 items-center gap-2 md:mr-0">
           <span className="min-w-0 text-left">
-            <span className="flex items-center gap-1">
+            <span dir="ltr" className="flex items-center gap-1">
               <span className="font-display text-2xl leading-none tracking-wide sm:text-3xl">
                 Hijab Soul
               </span>
               <Heart className="h-3.5 w-3.5 shrink-0 fill-accent text-accent" strokeWidth={1.25} />
             </span>
+
             <span className="mt-1 hidden text-right text-[11px] leading-5 text-header-muted sm:block">
               أكثر من مجرد ملابس ..
               <br />
