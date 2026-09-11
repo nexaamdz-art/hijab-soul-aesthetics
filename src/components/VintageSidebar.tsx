@@ -12,15 +12,31 @@ export const sidebarCategories = [
   { label: "مقالات و نصائح", to: "/articles" },
 ] as const;
 
-export function VintageSidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function VintageSidebar({
+  onNavigate,
+  fillHeight = false,
+}: {
+  onNavigate?: () => void;
+  fillHeight?: boolean;
+}) {
   return (
-    <div className="h-full w-full overflow-y-auto bg-paper">
+    <div
+      className={
+        fillHeight
+          ? "h-[100dvh] w-fit max-w-[92vw] overflow-x-hidden overflow-y-auto bg-paper"
+          : "h-full w-full overflow-y-auto bg-paper"
+      }
+    >
       {/* the artwork itself — never cropped, never stretched */}
-      <div className="relative w-full">
+      <div className="relative h-full w-full">
         <img
           src={sidebarArt}
           alt="لوحة أقسام حجاب سول"
-          className="block h-auto w-full select-none"
+          className={
+            fillHeight
+              ? "block h-[100dvh] w-auto max-w-none select-none"
+              : "block h-auto w-full select-none"
+          }
         />
 
         {/* invisible clickable zones sitting over the paper area of the artwork */}

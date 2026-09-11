@@ -30,7 +30,7 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/50 animate-in fade-in"
           />
-          <div className="absolute inset-y-0 right-0 w-[88vw] max-w-[420px] overflow-y-auto bg-paper shadow-2xl animate-in slide-in-from-right duration-300">
+          <div className="absolute inset-y-0 right-0 h-[100dvh] max-h-[100dvh] w-fit max-w-[92vw] overflow-y-auto bg-paper shadow-2xl animate-in slide-in-from-right duration-300">
             <button
               aria-label="إغلاق"
               onClick={() => setDrawerOpen(false)}
