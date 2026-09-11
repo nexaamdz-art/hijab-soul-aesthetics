@@ -1,47 +1,46 @@
 import { Link } from "@tanstack/react-router";
-import sidebarArt from "@/assets/vintage-sidebar.png.asset.json";
+import sidebarArt from "@/assets/vintage-sidebar-art.png";
 
 export const sidebarCategories = [
   { label: "فساتين", to: "/dresses" },
-  { label: "اسدالات", to: "/isdal" },
+  { label: "اسدالات", to: "/isdalat" },
   { label: "خمار", to: "/khimar" },
   { label: "عبايات", to: "/abayas" },
-  { label: "مستلزمات الحجاب", to: "/hijab-essentials" },
+  { label: "مستلزمات الحجاب", to: "/hijab-supplies" },
   { label: "إكسسوارات", to: "/accessories" },
-  { label: "أحذية شرعية", to: "/footwear" },
+  { label: "أحذية شرعية", to: "/shoes" },
   { label: "مقالات و نصائح", to: "/articles" },
 ] as const;
 
 export function VintageSidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <div
-      className="relative h-full w-full overflow-y-auto bg-paper"
-      style={{
-        backgroundImage: `url(${sidebarArt.url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "top center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* keeps the artwork proportions while allowing scroll */}
-      <div className="pointer-events-none aspect-[826/1780] w-full" />
+    <div className="h-full w-full overflow-y-auto bg-paper">
+      {/* the artwork itself — never cropped, never stretched */}
+      <div className="relative w-full">
+        <img
+          src={sidebarArt}
+          alt="لوحة أقسام حجاب سول"
+          className="block h-auto w-full select-none"
+        />
 
-      <nav
-        aria-label="أقسام المتجر"
-        className="absolute inset-x-0 top-0 flex flex-col items-center gap-3 px-6 pt-16 sm:pt-20"
-      >
-        {sidebarCategories.map((c) => (
-          <Link
-            key={c.to}
-            to={c.to}
-            onClick={onNavigate}
-            className="font-hand text-xl leading-none text-ink/90 transition-colors hover:text-burgundy sm:text-2xl"
-            activeProps={{ className: "text-burgundy" }}
-          >
-            {c.label}
-          </Link>
-        ))}
-      </nav>
+        {/* invisible clickable zones sitting over the paper area of the artwork */}
+        <nav
+          aria-label="أقسام المتجر"
+          className="absolute inset-x-0 top-[11%] flex flex-col items-end gap-[1.6%] pl-[26%] pr-[10%]"
+        >
+          {sidebarCategories.map((c) => (
+            <Link
+              key={c.to}
+              to={c.to}
+              onClick={onNavigate}
+              className="font-hand text-[clamp(1rem,2.2cqw,1.6rem)] leading-tight text-ink/90 transition-colors hover:text-burgundy"
+              activeProps={{ className: "text-burgundy" }}
+            >
+              {c.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }

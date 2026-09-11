@@ -11,17 +11,18 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
       <SiteHeader onMenuClick={() => setDrawerOpen(true)} />
 
       <div className="flex min-h-0 flex-1">
-        {/* Desktop permanent sidebar */}
-        <aside className="hidden w-[280px] shrink-0 border-l border-ink/10 lg:block xl:w-[320px]">
+        {/* main content (right in RTL) */}
+        <main className="paper-cream min-w-0 flex-1">{children}</main>
+
+        {/* permanent vintage sidebar on the LEFT (desktop only) */}
+        <aside className="hidden w-[280px] shrink-0 border-r border-ink/10 lg:block xl:w-[320px]">
           <div className="sticky top-0 h-screen">
             <VintageSidebar />
           </div>
         </aside>
-
-        <main className="paper-cream min-w-0 flex-1">{children}</main>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — slides in from the right */}
       {drawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
@@ -29,11 +30,11 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/50 animate-in fade-in"
           />
-          <div className="absolute inset-y-0 right-0 w-[85%] max-w-[380px] shadow-2xl animate-in slide-in-from-right duration-300">
+          <div className="absolute inset-y-0 right-0 w-[88vw] max-w-[420px] overflow-y-auto bg-paper shadow-2xl animate-in slide-in-from-right duration-300">
             <button
               aria-label="إغلاق"
               onClick={() => setDrawerOpen(false)}
-              className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-header/80 text-header-foreground"
+              className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-header/80 text-header-foreground"
             >
               <X className="h-4 w-4" strokeWidth={1.5} />
             </button>

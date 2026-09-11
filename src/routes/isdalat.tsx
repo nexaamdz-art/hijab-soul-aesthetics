@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CategoryPage } from "@/components/CategoryPage";
 
-export const Route = createFileRoute("/isdal")({
+export const Route = createFileRoute("/isdalat")({
   head: () => ({
     meta: [
       { title: "اسدالات | حجاب سول" },

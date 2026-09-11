@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { CategoryPage } from "@/components/CategoryPage";
 
-export const Route = createFileRoute("/hijab-essentials")({
+export const Route = createFileRoute("/hijab-supplies")({
   head: () => ({
     meta: [
       { title: "مستلزمات الحجاب | حجاب سول" },
