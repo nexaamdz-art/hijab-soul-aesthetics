@@ -17,6 +17,7 @@ import { Route as DressesRouteImport } from './routes/dresses'
 import { Route as HijabSuppliesRouteImport } from './routes/hijab-supplies'
 import { Route as IsdalatRouteImport } from './routes/isdalat'
 import { Route as KhimarRouteImport } from './routes/khimar'
+import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ShoesRouteImport } from './routes/shoes'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const KhimarRoute = KhimarRouteImport.update({
   path: '/khimar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SalesRoute = SalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShoesRoute = ShoesRouteImport.update({
   id: '/shoes',
   path: '/shoes',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/hijab-supplies': typeof HijabSuppliesRoute
   '/isdalat': typeof IsdalatRoute
   '/khimar': typeof KhimarRoute
+  '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/hijab-supplies': typeof HijabSuppliesRoute
   '/isdalat': typeof IsdalatRoute
   '/khimar': typeof KhimarRoute
+  '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/hijab-supplies': typeof HijabSuppliesRoute
   '/isdalat': typeof IsdalatRoute
   '/khimar': typeof KhimarRoute
+  '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/hijab-supplies'
     | '/isdalat'
     | '/khimar'
+    | '/sales'
     | '/shoes'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/hijab-supplies'
     | '/isdalat'
     | '/khimar'
+    | '/sales'
     | '/shoes'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/hijab-supplies'
     | '/isdalat'
     | '/khimar'
+    | '/sales'
     | '/shoes'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   HijabSuppliesRoute: typeof HijabSuppliesRoute
   IsdalatRoute: typeof IsdalatRoute
   KhimarRoute: typeof KhimarRoute
+  SalesRoute: typeof SalesRoute
   ShoesRoute: typeof ShoesRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KhimarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sales': {
+      id: '/sales'
+      path: '/sales'
+      fullPath: '/sales'
+      preLoaderRoute: typeof SalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shoes': {
       id: '/shoes'
       path: '/shoes'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   HijabSuppliesRoute: HijabSuppliesRoute,
   IsdalatRoute: IsdalatRoute,
   KhimarRoute: KhimarRoute,
+  SalesRoute: SalesRoute,
   ShoesRoute: ShoesRoute,
 }
 export const routeTree = rootRouteImport
