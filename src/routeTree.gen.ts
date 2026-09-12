@@ -19,6 +19,7 @@ import { Route as IsdalatRouteImport } from './routes/isdalat'
 import { Route as KhimarRouteImport } from './routes/khimar'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ShoesRouteImport } from './routes/shoes'
+import { Route as ShopRouteImport } from './routes/shop'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const ShoesRoute = ShoesRouteImport.update({
   path: '/shoes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/khimar': typeof KhimarRoute
   '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/khimar': typeof KhimarRoute
   '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/khimar': typeof KhimarRoute
   '/sales': typeof SalesRoute
   '/shoes': typeof ShoesRoute
+  '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/khimar'
     | '/sales'
     | '/shoes'
+    | '/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/khimar'
     | '/sales'
     | '/shoes'
+    | '/shop'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/khimar'
     | '/sales'
     | '/shoes'
+    | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   KhimarRoute: typeof KhimarRoute
   SalesRoute: typeof SalesRoute
   ShoesRoute: typeof ShoesRoute
+  ShopRoute: typeof ShopRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShoesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   KhimarRoute: KhimarRoute,
   SalesRoute: SalesRoute,
   ShoesRoute: ShoesRoute,
+  ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
