@@ -28,7 +28,6 @@ function Index() {
   return (
     <SiteLayout>
       <HeroArtwork />
-      <FeaturesSection />
     </SiteLayout>
   );
 }
