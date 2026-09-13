@@ -31,6 +31,10 @@ function Index() {
   return (
     <SiteLayout>
       <HeroArtwork />
+      <CategoriesSection />
+      <LatestProducts />
+      <FeaturesSection />
+      <SiteFooter />
     </SiteLayout>
   );
 }
