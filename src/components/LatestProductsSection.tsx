@@ -169,10 +169,7 @@ function generateSmoothTornPolygon(
   return `polygon(${pts.join(", ")})`;
 }
 
-// Deterministic unique seeds for title, cards, and buttons
-const TITLE_SEED = 10333;
-const TITLE_POLYGON = generateSmoothTornPolygon(TITLE_SEED, 120, 0.7, 10);
-
+// Deterministic unique seeds for cards and buttons
 const CARD_SEEDS = [1409, 2521, 3637, 4751, 5867, 6983, 8101, 9221];
 const CARD_POLYGONS = CARD_SEEDS.map((s) => generateSmoothTornPolygon(s, 220, 0.5, 12));
 
@@ -236,32 +233,139 @@ export function LatestProductsSection() {
         } as React.CSSProperties
       }
     >
-      {/* SECTION TITLE: Aligned to RTL start (right side) with black brush-stroke paper label and Crown icon */}
+      {/* SECTION TITLE: Aligned to RTL start (right side) with black brush-stroke background, small white crown on the right, and bold white text */}
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 mb-4 sm:mb-5">
         <div className="flex items-center justify-start">
           <div
-            className="inline-flex items-center gap-2.5 px-4.5 sm:px-6 py-2 sm:py-2.5 select-none transition-transform duration-200 hover:scale-[1.01]"
+            dir="rtl"
+            className="relative inline-flex items-center justify-center px-6 sm:px-8 py-2.5 sm:py-3 select-none transition-transform duration-200 hover:scale-[1.01]"
             style={{
-              clipPath: TITLE_POLYGON,
-              WebkitClipPath: TITLE_POLYGON,
-              backgroundColor: "#211915",
-              backgroundImage:
-                "linear-gradient(180deg, #2C221C 0%, #1F1713 50%, #150F0D 100%), radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04) 0 1px, transparent 1px)",
-              backgroundSize: "100% 100%, 8px 8px",
               filter:
-                "drop-shadow(0 4px 10px rgba(33, 25, 21, 0.28)) drop-shadow(0 1px 3px rgba(33, 25, 21, 0.18))",
+                "drop-shadow(0 4px 12px rgba(22, 16, 13, 0.32)) drop-shadow(0 1px 3px rgba(22, 16, 13, 0.2))",
               WebkitFilter:
-                "drop-shadow(0 4px 10px rgba(33, 25, 21, 0.28)) drop-shadow(0 1px 3px rgba(33, 25, 21, 0.18))",
+                "drop-shadow(0 4px 12px rgba(22, 16, 13, 0.32)) drop-shadow(0 1px 3px rgba(22, 16, 13, 0.2))",
             }}
           >
-            <Crown
-              className="h-4 w-4 sm:h-5 sm:w-5 text-[#FAF6F0] shrink-0"
-              strokeWidth={1.75}
+            {/* Dark Brush Stroke SVG Background */}
+            <svg
+              viewBox="0 0 360 64"
+              fill="none"
+              preserveAspectRatio="none"
+              className="absolute inset-0 w-full h-full pointer-events-none -z-0"
               aria-hidden="true"
-            />
-            <h2 className="text-[15px] sm:text-[17px] md:text-lg font-extrabold text-[#FAF6F0] tracking-wide leading-none pt-0.5">
-              أحدث المنتجات
-            </h2>
+            >
+              <defs>
+                <filter id="brushInkTexture" x="-10%" y="-20%" width="120%" height="140%">
+                  <feTurbulence
+                    type="fractalNoise"
+                    baseFrequency="0.045 0.08"
+                    numOctaves="3"
+                    result="noise"
+                  />
+                  <feDisplacementMap
+                    in="SourceGraphic"
+                    in2="noise"
+                    scale="3"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                  />
+                </filter>
+                <linearGradient id="brushGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#140F0C" stopOpacity="0.88" />
+                  <stop offset="8%" stopColor="#1C1512" />
+                  <stop offset="20%" stopColor="#110C0A" />
+                  <stop offset="50%" stopColor="#18120F" />
+                  <stop offset="80%" stopColor="#110C0A" />
+                  <stop offset="92%" stopColor="#1C1512" />
+                  <stop offset="100%" stopColor="#140F0C" stopOpacity="0.88" />
+                </linearGradient>
+              </defs>
+
+              <g filter="url(#brushInkTexture)">
+                {/* Outer rough bleed boundary */}
+                <path
+                  d="M 22,26 C 16,18 28,14 48,11 C 72,8 102,10 138,8 C 176,6 216,8 254,7 C 286,6 314,9 332,15 C 342,18 350,23 354,28 C 352,32 346,34 340,33 C 348,37 350,42 344,45 C 334,50 316,52 294,54 C 260,56 220,53 178,55 C 136,56 94,53 58,52 C 34,51 18,47 10,42 C 6,38 8,34 12,31 C 8,30 10,27 16,28 C 12,27 16,25 22,26 Z"
+                  fill="#231B17"
+                  opacity="0.75"
+                />
+
+                {/* Main thick core brush stroke body */}
+                <path
+                  d="M 26,29 C 22,21 34,16 54,13 C 78,10 108,12 144,9 C 182,7 222,9 260,8 C 290,7 316,11 334,16 C 344,19 350,24 348,30 C 346,34 338,36 332,35 C 340,39 342,43 336,46 C 326,50 310,52 288,54 C 254,56 216,53 174,55 C 134,56 94,53 60,52 C 38,51 22,48 16,43 C 12,39 14,35 18,33 C 14,32 16,29 22,30 C 18,29 20,28 26,29 Z"
+                  fill="url(#brushGrad)"
+                />
+
+                {/* Heavy core black ink pigment deposit */}
+                <path
+                  d="M 38,28 C 36,22 48,18 68,16 C 94,14 124,15 158,13 C 196,12 234,13 268,13 C 294,13 316,16 328,21 C 334,24 336,28 332,32 C 328,34 322,35 316,35 C 322,38 322,42 318,44 C 310,47 296,49 276,50 C 246,52 210,50 172,51 C 136,52 100,50 72,49 C 52,48 40,45 34,41 C 30,37 32,34 36,32 C 32,31 34,29 38,28 Z"
+                  fill="#100B09"
+                />
+
+                {/* Left dry-brush bristles */}
+                <path d="M 4,33 C 12,31 22,32 32,34 C 20,35 10,35 4,33 Z" fill="#1A1310" />
+                <path d="M 8,26 C 16,24 28,25 38,27 C 26,28 14,28 8,26 Z" fill="#191310" />
+                <path d="M 10,40 C 18,39 30,40 42,42 C 28,43 16,43 10,40 Z" fill="#1C1512" />
+                <path
+                  d="M 16,19 C 26,17 40,18 52,20 C 38,21 24,21 16,19 Z"
+                  fill="#201713"
+                  opacity="0.85"
+                />
+                <path
+                  d="M 14,46 C 26,46 42,47 56,48 C 42,49 26,49 14,46 Z"
+                  fill="#1F1713"
+                  opacity="0.85"
+                />
+                <path d="M 2,36 C 8,36 16,36 24,37 C 16,38 8,38 2,36 Z" fill="#140F0C" />
+
+                {/* Right dry-brush bristles */}
+                <path d="M 326,20 C 336,22 346,25 356,28 C 346,27 336,24 326,20 Z" fill="#1A1310" />
+                <path d="M 330,30 C 340,31 348,33 358,36 C 348,35 338,33 330,30 Z" fill="#191310" />
+                <path d="M 324,40 C 334,42 344,45 352,48 C 342,46 332,43 324,40 Z" fill="#1C1512" />
+                <path
+                  d="M 312,14 C 324,16 336,19 346,23 C 334,20 322,17 312,14 Z"
+                  fill="#201713"
+                  opacity="0.85"
+                />
+                <path
+                  d="M 316,50 C 328,51 338,52 346,53 C 336,53 326,52 316,50 Z"
+                  fill="#1F1713"
+                  opacity="0.85"
+                />
+                <path d="M 334,34 C 342,35 350,36 358,37 C 350,37 342,36 334,34 Z" fill="#140F0C" />
+
+                {/* Dry brush voids / paper grain hints */}
+                <path
+                  d="M 65,22 C 110,20 170,21 230,20 C 270,19 295,21 310,23 C 295,22 270,21 230,22 C 170,22 110,22 65,22 Z"
+                  fill="#2E241F"
+                  opacity="0.35"
+                />
+                <path
+                  d="M 50,43 C 95,44 155,43 215,44 C 260,44 290,43 305,42 C 290,42 260,43 215,42 C 155,42 95,42 50,43 Z"
+                  fill="#2E241F"
+                  opacity="0.35"
+                />
+
+                {/* Ink splatter droplets */}
+                <circle cx="8" cy="21" r="1.2" fill="#1A1310" />
+                <circle cx="12" cy="49" r="1.4" fill="#17110E" />
+                <circle cx="352" cy="18" r="1.2" fill="#1A1310" />
+                <circle cx="354" cy="46" r="1.3" fill="#17110E" />
+                <circle cx="357" cy="32" r="0.9" fill="#150F0D" />
+                <circle cx="3" cy="31" r="0.8" fill="#150F0D" />
+              </g>
+            </svg>
+
+            {/* Content: Small White Crown on the Right (RTL start), Pure White Title Text */}
+            <div className="relative z-10 flex items-center gap-2 sm:gap-2.5">
+              <Crown
+                className="h-4 w-4 sm:h-[18px] sm:w-[18px] text-white shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
+                strokeWidth={2}
+                aria-hidden="true"
+              />
+              <h2 className="text-[15px] sm:text-[17px] md:text-lg font-extrabold text-white tracking-wide leading-none pt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">
+                أحدث المنتجات
+              </h2>
+            </div>
           </div>
         </div>
       </div>
