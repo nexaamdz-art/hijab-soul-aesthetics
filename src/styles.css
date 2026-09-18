@@ -74,23 +74,179 @@
   background-image:
     radial-gradient(circle at 18% 22%, oklch(1 0 0 / 3.5%) 0 1px, transparent 1px),
     radial-gradient(circle at 72% 68%, oklch(1 0 0 / 2.5%) 0 1px, transparent 1px);
-  background-size: 7px 7px, 11px 11px;
+  background-size:
+    7px 7px,
+    11px 11px;
 }
 
+/*
+ * paper-cream: Warm tactile parchment texture with micro-fibers and soft depth
+ */
 @utility paper-cream {
-  background-color: var(--paper);
+  background-color: #F6F0EA;
   background-image:
-    radial-gradient(circle at 25% 30%, oklch(0.55 0.03 70 / 5%) 0 1px, transparent 1px),
-    radial-gradient(circle at 70% 65%, oklch(0.55 0.03 70 / 4%) 0 1px, transparent 1px);
-  background-size: 6px 6px, 9px 9px;
+    linear-gradient(180deg, #FAF7F2 0%, #EFE5D8 100%),
+    radial-gradient(circle at 25% 32%, rgba(70, 50, 35, 0.04) 0 1px, transparent 1px),
+    radial-gradient(circle at 75% 68%, rgba(70, 50, 35, 0.035) 0 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    7px 7px,
+    11px 11px;
 }
 
+.paper-cream {
+  background-color: #F6F0EA;
+  background-image:
+    linear-gradient(180deg, #FAF7F2 0%, #EFE5D8 100%),
+    radial-gradient(circle at 25% 32%, rgba(70, 50, 35, 0.04) 0 1px, transparent 1px),
+    radial-gradient(circle at 75% 68%, rgba(70, 50, 35, 0.035) 0 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    7px 7px,
+    11px 11px;
+}
+
+/*
+ * Base torn-paper utility
+ */
 @utility torn-paper {
-  clip-path: polygon(
-    0% 12%, 2% 4%, 6% 10%, 12% 3%, 20% 9%, 30% 2%, 42% 8%, 55% 2%, 68% 9%,
-    80% 3%, 90% 9%, 96% 3%, 100% 11%, 99% 88%, 95% 96%, 88% 90%, 78% 97%,
-    66% 91%, 54% 98%, 42% 91%, 30% 97%, 20% 90%, 10% 97%, 4% 90%, 0% 89%
+  -webkit-clip-path: polygon(
+    0% 2.0%, 9.0% 0.7%, 19.0% 1.2%, 29.0% 0.9%, 39.0% 1.9%, 50.0% 2.4%, 61.0% 1.3%, 72.0% 1.2%, 82.0% 1.8%, 91.0% 1.5%, 100.0% 2.7%,
+    99.4% 10.0%, 97.6% 20.0%, 97.6% 31.0%, 97.6% 42.0%, 97.6% 53.0%, 98.8% 64.0%, 98.4% 74.0%, 99.0% 84.0%, 99.5% 93.0%, 97.9% 100.0%,
+    91.0% 98.2%, 81.0% 97.9%, 71.0% 98.5%, 60.0% 98.5%, 49.0% 98.6%, 38.0% 98.7%, 27.0% 98.8%, 18.0% 99.0%, 9.0% 97.3%, 0.0% 97.5%,
+    0.6% 90.0%, 2.1% 80.0%, 1.2% 69.0%, 1.1% 58.0%, 1.5% 47.0%, 1.5% 36.0%, 0.6% 26.0%, 2.4% 16.0%, 0.8% 7.0%, 1.6% 0.0%
   );
+  clip-path: polygon(
+    0% 2.0%, 9.0% 0.7%, 19.0% 1.2%, 29.0% 0.9%, 39.0% 1.9%, 50.0% 2.4%, 61.0% 1.3%, 72.0% 1.2%, 82.0% 1.8%, 91.0% 1.5%, 100.0% 2.7%,
+    99.4% 10.0%, 97.6% 20.0%, 97.6% 31.0%, 97.6% 42.0%, 97.6% 53.0%, 98.8% 64.0%, 98.4% 74.0%, 99.0% 84.0%, 99.5% 93.0%, 97.9% 100.0%,
+    91.0% 98.2%, 81.0% 97.9%, 71.0% 98.5%, 60.0% 98.5%, 49.0% 98.6%, 38.0% 98.7%, 27.0% 98.8%, 18.0% 99.0%, 9.0% 97.3%, 0.0% 97.5%,
+    0.6% 90.0%, 2.1% 80.0%, 1.2% 69.0%, 1.1% 58.0%, 1.5% 47.0%, 1.5% 36.0%, 0.6% 26.0%, 2.4% 16.0%, 0.8% 7.0%, 1.6% 0.0%
+  );
+}
+
+/*
+ * 6 randomized torn-paper deckled edge variations for cards
+ */
+
+/*
+ * Categories Section CSS Variables for rapid global tuning
+ * Controls card width, gap, image aspect ratio, strip height, and font size.
+ * Exposes category name label variables (--label-h, --label-inset, --label-font, --label-bg).
+ * All card dimensions reduced by ~12% across phone, tablet, and desktop breakpoints.
+ */
+#store-categories-section {
+  --card-w: clamp(106px, 32vw, 140px);
+  --gap: 11px;
+  --img-ratio: 4 / 5;
+  --strip-h: 32px;
+  --strip-font-size: 12px;
+
+  /* Category Name Paper Label Variables (scaled by ~12%) */
+  --label-h: 35px;
+  --label-inset: 11%;
+  --label-bottom: 7%;
+  --label-font: 15.5px;
+  --label-bg: #E2D0AC;
+  --label-color: #3B2A1A;
+}
+
+@media (min-width: 640px) {
+  #store-categories-section {
+    --card-w: clamp(132px, 19.5vw, 158px);
+    --gap: 12px;
+    --strip-h: 33px;
+    --strip-font-size: 12.5px;
+    --label-h: 35px;
+    --label-inset: 11%;
+    --label-font: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #store-categories-section {
+    --card-w: 1fr;
+    --gap: 12px;
+    --strip-h: 33px;
+    --strip-font-size: 12.5px;
+    --label-h: 35px;
+    --label-inset: 11%;
+    --label-font: 16px;
+  }
+}
+
+/*
+ * Latest Products Section CSS Variables
+ * Responsive card width and gap
+ */
+#latest-products-section {
+  --product-card-w: clamp(150px, 46vw, 190px);
+  --product-gap: 14px;
+}
+
+@media (min-width: 640px) {
+  #latest-products-section {
+    --product-card-w: 200px;
+    --product-gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  #latest-products-section {
+    --product-card-w: 1fr;
+    --product-gap: 18px;
+  }
+}
+
+/*
+ * Scrollbar suppression for smooth horizontal swipeable strips
+ */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Snappy, touch-smooth carousel utilities with zero viewport overflow
+ */
+@utility snap-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
+.snap-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
+@utility snap-item {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.snap-item {
+  flex: none;
+  scroll-snap-align: start;
 }
 
 :root {

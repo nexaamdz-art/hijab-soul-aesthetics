@@ -8,7 +8,10 @@ export const Route = createFileRoute("/isdalat")({
       { title: "اسدالات | حجاب سول" },
       { name: "description", content: "اسدالات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
       { property: "og:title", content: "اسدالات | حجاب سول" },
-      { property: "og:description", content: "اسدالات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
+      {
+        property: "og:description",
+        content: "اسدالات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

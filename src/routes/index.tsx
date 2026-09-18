@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { HeroArtwork } from "@/components/HeroArtwork";
+import { CategoriesSection } from "@/components/CategoriesSection";
+import { LatestProductsSection } from "@/components/LatestProductsSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -8,8 +10,7 @@ export const Route = createFileRoute("/")({
       { title: "حجاب سول | أزياء محتشمة أنيقة" },
       {
         name: "description",
-        content:
-          "حجاب سول: فساتين، إسدالات، خمار، عبايات وإكسسوارات محتشمة بلمسة أنيقة وراقية.",
+        content: "حجاب سول: فساتين، إسدالات، خمار، عبايات وإكسسوارات محتشمة بلمسة أنيقة وراقية.",
       },
       { property: "og:title", content: "حجاب سول | أزياء محتشمة أنيقة" },
       {
@@ -27,6 +28,8 @@ function Index() {
   return (
     <SiteLayout>
       <HeroArtwork />
+      <CategoriesSection />
+      <LatestProductsSection />
     </SiteLayout>
   );
 }

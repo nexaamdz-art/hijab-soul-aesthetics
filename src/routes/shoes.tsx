@@ -8,7 +8,10 @@ export const Route = createFileRoute("/shoes")({
       { title: "أحذية شرعية | حجاب سول" },
       { name: "description", content: "أحذية شرعية من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
       { property: "og:title", content: "أحذية شرعية | حجاب سول" },
-      { property: "og:description", content: "أحذية شرعية من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
+      {
+        property: "og:description",
+        content: "أحذية شرعية من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

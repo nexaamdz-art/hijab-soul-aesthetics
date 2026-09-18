@@ -1,0 +1,6 @@
+{
+  "name": "حجاب سول",
+  "description": "أكثر من مجرد ملابس .. إنه أسلوب حياة - متجر أزياء محتشمة أنيقة",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

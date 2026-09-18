@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import heroArtwork from "@/assets/hijab-soul-hero.png.asset.json";
+import heroArtwork from "@/assets/hijab-soul-hero.png";
 
 export function HeroArtwork() {
   return (
     <section aria-label="أناقة الحجاب بأسلوبك الخاص" className="w-full">
       <div className="relative aspect-[1034/485] w-full overflow-hidden">
         <img
-          src={heroArtwork.url}
+          src={heroArtwork}
           alt="أناقة الحجاب بأسلوبك الخاص"
           className="block h-full w-full object-contain"
           fetchPriority="high"

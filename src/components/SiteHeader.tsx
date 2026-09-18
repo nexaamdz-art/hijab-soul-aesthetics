@@ -32,7 +32,10 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
           <button aria-label="المفضلة" className="transition-opacity hover:opacity-70">
             <Heart className="h-5 w-5" strokeWidth={1.25} />
           </button>
-          <button aria-label="حسابي" className="hidden transition-opacity hover:opacity-70 sm:block">
+          <button
+            aria-label="حسابي"
+            className="hidden transition-opacity hover:opacity-70 sm:block"
+          >
             <User className="h-5 w-5" strokeWidth={1.25} />
           </button>
           <button aria-label="سلة التسوق" className="relative transition-opacity hover:opacity-70">
@@ -83,11 +86,7 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
               إنه أسلوب حياة <span className="text-burgundy">♡</span>
             </span>
           </span>
-          <img
-            src={logoMark}
-            alt="حجاب سول"
-            className="h-14 w-auto shrink-0 select-none sm:h-16"
-          />
+          <img src={logoMark} alt="حجاب سول" className="h-14 w-auto shrink-0 select-none sm:h-16" />
         </Link>
       </div>
 
@@ -105,7 +104,10 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
             aria-label="ابحث"
             className="w-full bg-transparent pl-8 text-sm text-ink placeholder:text-ink/50 focus:outline-none"
           />
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/70" strokeWidth={1.5} />
+          <Search
+            className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/70"
+            strokeWidth={1.5}
+          />
         </div>
       </form>
 

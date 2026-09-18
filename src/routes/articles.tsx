@@ -6,9 +6,15 @@ export const Route = createFileRoute("/articles")({
   head: () => ({
     meta: [
       { title: "مقالات و نصائح | حجاب سول" },
-      { name: "description", content: "مقالات و نصائح من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
+      {
+        name: "description",
+        content: "مقالات و نصائح من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+      },
       { property: "og:title", content: "مقالات و نصائح | حجاب سول" },
-      { property: "og:description", content: "مقالات و نصائح من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
+      {
+        property: "og:description",
+        content: "مقالات و نصائح من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

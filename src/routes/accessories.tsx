@@ -8,7 +8,10 @@ export const Route = createFileRoute("/accessories")({
       { title: "إكسسوارات | حجاب سول" },
       { name: "description", content: "إكسسوارات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
       { property: "og:title", content: "إكسسوارات | حجاب سول" },
-      { property: "og:description", content: "إكسسوارات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية." },
+      {
+        property: "og:description",
+        content: "إكسسوارات من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

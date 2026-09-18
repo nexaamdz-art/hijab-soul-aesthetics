@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 520" width="1500" height="1040">
+  <defs>
+    <filter id="brushFilter" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04 0.08" numOctaves="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="subtleWash" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#subtleWash)" fill="#231F20">
+    <!-- FAR LEFT FLORAL BRANCH -->
+    <path d="M 285 410 Q 255 330 250 250 Q 245 190 260 160" fill="none" stroke="#231F20" stroke-width="4.5" stroke-linecap="round"/>
+    
+    <!-- Leaves -->
+    <path d="M 265 370 Q 240 365 242 350 Q 255 352 268 365 Z" fill="#231F20"/>
+    <path d="M 275 340 Q 295 330 292 318 Q 280 322 272 335 Z" fill="#231F20"/>
+    <path d="M 258 310 Q 235 300 236 288 Q 250 290 260 305 Z" fill="#231F20"/>
+    <path d="M 262 275 Q 280 260 278 248 Q 266 254 260 270 Z" fill="#231F20"/>
+    <path d="M 252 240 Q 232 230 235 218 Q 248 222 254 236 Z" fill="#231F20"/>
+
+    <!-- Blossoms -->
+    <circle cx="238" cy="278" r="9" />
+    <circle cx="234" cy="270" r="7" />
+    <circle cx="244" cy="272" r="7" />
+
+    <circle cx="236" cy="208" r="11" />
+    <circle cx="242" cy="198" r="9" />
+    <circle cx="228" cy="200" r="9" />
+    <circle cx="227" cy="214" r="8" />
+
+    <circle cx="240" cy="155" r="12" />
+    <circle cx="248" cy="144" r="9.5" />
+    <circle cx="230" cy="146" r="9" />
+    <circle cx="232" cy="162" r="8" />
+
+    <circle cx="272" cy="152" r="11.5" />
+    <circle cx="282" cy="142" r="9" />
+    <circle cx="265" cy="140" r="8.5" />
+    <circle cx="284" cy="158" r="8.5" />
+
+    <circle cx="282" cy="205" r="11" />
+    <circle cx="292" cy="198" r="8.5" />
+    <circle cx="275" cy="196" r="8" />
+
+    <!-- MOSQUE BASE STRUCTURES -->
+    <path d="M 275 420 L 275 350 L 370 350 L 370 420 Z" />
+    <path d="M 370 420 L 370 330 L 490 330 L 490 420 Z" />
+
+    <!-- Left Minaret / Turret -->
+    <rect x="290" y="325" width="60" height="70" rx="3" />
+    <path d="M 312 375 A 8 8 0 0 1 328 375 L 328 395 L 312 395 Z" fill="#E3D5C9" opacity="0.9"/>
+    <path d="M 290 325 Q 320 280 350 325 Z" />
+    <path d="M 317 285 L 323 285 L 321 190 L 319 190 Z" />
+    <path d="M 320 188 A 6 6 0 1 1 324 176 A 5 5 0 0 0 320 188 Z" />
+    <path d="M 321 245 Q 345 200 375 205 Q 380 230 365 240 Q 355 220 340 235 Z" />
+
+    <!-- CENTER MAIN DOME -->
+    <path d="M 365 340 C 365 240 495 240 495 340 Z" />
+    <path d="M 427 245 L 433 245 L 431 195 L 429 195 Z" />
+    <circle cx="430" cy="225" r="4.5" />
+    <path d="M 430 193 A 7 7 0 1 1 435 178 A 6 6 0 0 0 430 193 Z" />
+
+    <!-- RIGHT TALL MINARET -->
+    <path d="M 495 430 L 495 245 L 545 245 L 545 430 Z" />
+    <rect x="490" y="240" width="60" height="12" rx="2" />
+    <line x1="492" y1="240" x2="548" y2="240" stroke="#E3D5C9" stroke-width="2" />
+    
+    <path d="M 498 240 L 498 155 L 542 155 L 542 240 Z" />
+    <rect x="517" y="175" width="5" height="18" rx="2.5" fill="#E3D5C9" opacity="0.9" />
+    <rect x="517" y="205" width="5" height="18" rx="2.5" fill="#E3D5C9" opacity="0.9" />
+
+    <rect x="493" y="145" width="54" height="10" rx="2" />
+    <line x1="495" y1="145" x2="545" y2="145" stroke="#E3D5C9" stroke-width="1.5" />
+    <rect x="491" y="133" width="58" height="12" fill="none" stroke="#231F20" stroke-width="3" />
+    <line x1="500" y1="133" x2="500" y2="145" stroke="#231F20" stroke-width="2" />
+    <line x1="510" y1="133" x2="510" y2="145" stroke="#231F20" stroke-width="2" />
+    <line x1="520" y1="133" x2="520" y2="145" stroke="#231F20" stroke-width="2" />
+    <line x1="530" y1="133" x2="530" y2="145" stroke="#231F20" stroke-width="2" />
+    <line x1="540" y1="133" x2="540" y2="145" stroke="#231F20" stroke-width="2" />
+
+    <path d="M 502 133 L 502 85 L 538 85 L 538 133 Z" />
+    <rect x="516" y="95" width="8" height="24" rx="4" fill="#E3D5C9" opacity="0.9" />
+
+    <path d="M 500 85 Q 520 40 540 85 Z" />
+    <path d="M 518 50 L 522 50 L 521 15 L 519 15 Z" />
+    <circle cx="520" cy="30" r="3.5" />
+    <path d="M 520 14 A 7 7 0 1 1 525 0 A 6 6 0 0 0 520 14 Z" />
+  </g>
+
+  <!-- FOREGROUND TEXTURED BRUSH STROKE -->
+  <g transform="rotate(-10, 425, 420)">
+    <path filter="url(#brushFilter)" d="
+      M 195 400
+      C 205 365, 255 342, 320 338
+      C 385 334, 490 336, 565 348
+      C 625 358, 660 382, 655 422
+      C 650 462, 605 490, 525 498
+      C 440 506, 320 502, 255 486
+      C 205 470, 180 438, 195 400 Z
+    " fill="#1C1816" />
+
+    <path filter="url(#brushFilter)" d="
+      M 185 415 Q 198 385 240 372 L 635 366 Q 670 395 660 425 L 640 460 Q 585 502 500 504 L 245 490 Q 175 455 185 415 Z
+    " fill="#24201E" opacity="0.9" />
+
+    <!-- Crisp Arabic typography in Aref Ruqaa Bold -->
+    <g fill="#FFFFFF" text-anchor="middle" font-family="'Aref Ruqaa', 'Amiri', serif" font-weight="700">
+      <text x="425" y="386" font-size="30" letter-spacing="0.5">كل ما تحتاجينه</text>
+      <text x="425" y="425" font-size="30" letter-spacing="0.5">من ملابس المحجبات</text>
+      <text x="425" y="462" font-size="28" letter-spacing="0.5">في مكان واحد ..</text>
+
+      <path d="M 425 496 C 425 496, 411 486, 411 477 C 411 471, 416 467, 421 467 C 423.5 467, 424.5 469, 425 471 C 425.5 469, 426.5 467, 429 467 C 434 467, 439 471, 439 477 C 439 486, 425 496, 425 496 Z" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </g>
+</svg>
