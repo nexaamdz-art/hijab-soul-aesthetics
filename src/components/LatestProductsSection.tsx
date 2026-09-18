@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Crown, Heart } from "lucide-react";
+import { useStoreData } from "@/lib/store-data";
 
 /**
  * Single source of truth for Latest Products data.
@@ -177,8 +178,12 @@ const BTN_SEEDS = [11443, 12557, 13669, 14783, 15897, 17011, 18123, 19237];
 const BTN_POLYGONS = BTN_SEEDS.map((s) => generateSmoothTornPolygon(s, 100, 0.65, 9));
 
 export function LatestProductsSection() {
+  const { products: storeProducts } = useStoreData();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
+
+  const displayProducts =
+    storeProducts && storeProducts.length > 0 ? storeProducts : LATEST_PRODUCTS_DATA;
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -385,7 +390,7 @@ export function LatestProductsSection() {
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {LATEST_PRODUCTS_DATA.map((product, index) => {
+          {displayProducts.map((product, index) => {
             const cardPolygon = CARD_POLYGONS[index % CARD_POLYGONS.length];
             const btnPolygon = BTN_POLYGONS[index % BTN_POLYGONS.length];
             const isFavorite = favorites.has(product.id);
