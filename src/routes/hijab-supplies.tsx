@@ -5,15 +5,17 @@ import { CategoryPage } from "@/components/CategoryPage";
 export const Route = createFileRoute("/hijab-supplies")({
   head: () => ({
     meta: [
-      { title: "مستلزمات الحجاب | حجاب سول" },
+      { title: "حجابات | حجاب سول" },
       {
         name: "description",
-        content: "مستلزمات الحجاب من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+        content:
+          "حجابات وشالات فاخرة من حجاب سول — أقمشة شيفون جورجيت وكريب تركي ناعم وشالات سهرة.",
       },
-      { property: "og:title", content: "مستلزمات الحجاب | حجاب سول" },
+      { property: "og:title", content: "حجابات | حجاب سول" },
       {
         property: "og:description",
-        content: "مستلزمات الحجاب من حجاب سول — أزياء محتشمة أنيقة بلمسة راقية.",
+        content:
+          "حجابات وشالات فاخرة من حجاب سول — أقمشة شيفون جورجيت وكريب تركي ناعم وشالات سهرة.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -21,7 +23,10 @@ export const Route = createFileRoute("/hijab-supplies")({
   }),
   component: () => (
     <SiteLayout>
-      <CategoryPage title="مستلزمات الحجاب" />
+      <CategoryPage
+        title="حجابات"
+        subtitle="تشكيلة أرقى الحجابات والشالات التركية، شيفون جورجيت، كريب ناعم، شالات سهرة مرصعة، وأوشحة مريحة"
+      />
     </SiteLayout>
   ),
 });

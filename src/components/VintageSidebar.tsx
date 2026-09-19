@@ -6,7 +6,7 @@ export const sidebarCategories = [
   { label: "اسدالات", to: "/isdalat" },
   { label: "خمار", to: "/khimar" },
   { label: "عبايات", to: "/abayas" },
-  { label: "مستلزمات الحجاب", to: "/hijab-supplies" },
+  { label: "حجابات", to: "/hijab-supplies" },
   { label: "إكسسوارات", to: "/accessories" },
   { label: "أحذية شرعية", to: "/shoes" },
   { label: "مقالات و نصائح", to: "/articles" },

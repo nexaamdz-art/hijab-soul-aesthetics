@@ -21,7 +21,7 @@ const navItems = [
   { label: "الخمار", to: "/khimar" },
   { label: "العبايات", to: "/abayas" },
   { label: "الإكسسوارات", to: "/accessories" },
-  { label: "مستلزمات الحجاب", to: "/hijab-supplies" },
+  { label: "حجابات", to: "/hijab-supplies" },
   { label: "تخفيضات", to: "/sales" },
 ] as const;
 
