@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import sidebarArt from "@/assets/vintage-sidebar-art.png";
 
-export const sidebarCategories = [
+const sidebarCategories = [
   { label: "فساتين", to: "/dresses" },
   { label: "اسدالات", to: "/isdalat" },
   { label: "خمار", to: "/khimar" },

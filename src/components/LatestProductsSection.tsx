@@ -15,7 +15,7 @@ export interface ProductItem {
   href: string;
 }
 
-export const LATEST_PRODUCTS_DATA: ProductItem[] = [
+const LATEST_PRODUCTS_DATA: ProductItem[] = [
   {
     id: "product-1",
     name: "عباءة سوداء مطرزة",
