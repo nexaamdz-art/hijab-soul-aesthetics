@@ -6,14 +6,18 @@ import {
   MessageSquare,
   AlertCircle,
   ArrowUpRight,
+  Layers,
 } from "lucide-react";
-import { AdminProduct, CustomerOrder, CustomerConversation } from "@/lib/store-data";
+import { AdminProduct, CustomerOrder, CustomerConversation, StoreCategory } from "@/lib/store-data";
 
 interface AdminOverviewProps {
   products: AdminProduct[];
   orders: CustomerOrder[];
   conversations: CustomerConversation[];
-  onTabChange: (tab: "products" | "orders" | "chat" | "settings") => void;
+  categories?: StoreCategory[];
+  onTabChange: (
+    tab: "overview" | "products" | "categories" | "orders" | "chat" | "settings",
+  ) => void;
   onSelectOrder: (order: CustomerOrder) => void;
 }
 
@@ -295,6 +299,16 @@ export function AdminOverview({
           <div className="rounded-2xl bg-[#EDE0CD] p-5 border border-[#D5C2AA]">
             <h4 className="font-bold text-sm text-[#2B2119] mb-2">إجراءات سريعة للمدير</h4>
             <div className="space-y-2 text-xs font-semibold">
+              <button
+                onClick={() => onTabChange("categories")}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/90 hover:bg-white text-[#2B2119] transition-all border border-[#D5C2AA] font-bold"
+              >
+                <span className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-[#8C2A3E]" />
+                  <span>تغيير صور وبنرات أقسام المتجر</span>
+                </span>
+                <span>←</span>
+              </button>
               <button
                 onClick={() => onTabChange("products")}
                 className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/80 hover:bg-white text-[#2B2119] transition-all"

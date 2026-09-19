@@ -1,16 +1,10 @@
 import { Link } from "@tanstack/react-router";
+import { useStoreData } from "@/lib/store-data";
 
 // Constants for smooth flowing hand-torn paper deckled edges
 const TEAR_AMPLITUDE = 0.7; // Amplitude about 0.4% - 1.0% of the size
 const TEAR_POINTS = 280; // 250+ polygon points along perimeter
 const TEAR_WAVELENGTH = 11; // Wavelength about 8% - 15% of edge length
-
-interface CategoryItem {
-  name: string;
-  href: string;
-  image: string;
-  alt: string;
-}
 
 /**
  * Seeded pseudo-random number generator (mulberry32).
@@ -104,63 +98,17 @@ function generateSmoothTornPolygon(
   return `polygon(${pts.join(", ")})`;
 }
 
-/**
- * Single source of truth for categories.
- * Ordered strictly from Right-to-Left (RTL):
- * 1. فساتين (/dresses)
- * 2. اسدالات (/isdalat)
- * 3. حجابات (/hijab-supplies)
- * 4. عبايات (/abayas)
- * 5. اكسسوارات (/accessories)
- * 6. تخفيضات (/sales)
- */
-const CATEGORIES_DATA: CategoryItem[] = [
-  {
-    name: "فساتين",
-    href: "/dresses",
-    image: "/images/categories/dresses.jpg",
-    alt: "فساتين محتشمة وأنيقة - حجاب سول",
-  },
-  {
-    name: "اسدالات",
-    href: "/isdalat",
-    image: "/images/categories/isdalat.jpg",
-    alt: "إسدالات صلاة وخروج راقية - حجاب سول",
-  },
-  {
-    name: "حجابات",
-    href: "/hijab-supplies",
-    image: "/images/categories/hijabs.jpg",
-    alt: "حجابات وخمارات بأقمشة ناعمة فاخرة - حجاب سول",
-  },
-  {
-    name: "عبايات",
-    href: "/abayas",
-    image: "/images/categories/abayas.jpg",
-    alt: "عبايات عصرية بتطريز راقٍ - حجاب سول",
-  },
-  {
-    name: "اكسسوارات",
-    href: "/accessories",
-    image: "/images/categories/accessories.jpg",
-    alt: "إكسسوارات وبروشات الحجاب الأنيقة - حجاب سول",
-  },
-  {
-    name: "تخفيضات",
-    href: "/sales",
-    image: "/images/categories/sale.jpg",
-    alt: "عروض وتخفيضات حصرية على الأزياء المحتشمة - حجاب سول",
-  },
-];
-
 // Seeded fixed numbers per card and label for unique, reproducible smooth torn edges
-const CARD_SEEDS = [1021, 2039, 3067, 4111, 5171, 6217];
-const LABEL_SEEDS = [7243, 8317, 9391, 10459, 11549, 12641];
+const CARD_SEEDS = [1021, 2039, 3067, 4111, 5171, 6217, 7253, 8311];
+const LABEL_SEEDS = [7243, 8317, 9391, 10459, 11549, 12641, 13723, 14819];
 
 const CARD_POLYGONS = CARD_SEEDS.map((seed) => generateSmoothTornPolygon(seed));
 const LABEL_POLYGONS = LABEL_SEEDS.map((seed) => generateSmoothTornPolygon(seed));
 
 export function CategoriesSection() {
+  const { categories } = useStoreData();
+  const activeCategories = categories.filter((c) => c.isActive);
+
   return (
     <section
       id="store-categories-section"
@@ -178,29 +126,25 @@ export function CategoriesSection() {
       }
     >
       <nav aria-label="تصفح أقسام المتجر" className="w-full">
-        {/*
-          Responsive Container:
-          - Mobile (< 640px): Card width ~30-34vw (min 106px, max 140px) via var(--card-w).
-            About 2.5 cards visible with next one cut off. Gap 11px via var(--gap).
-          - Tablet (640-1024px): Card width 132-158px via var(--card-w).
-          - Desktop (1024px+): 6 cards in one row, max-width 968px centered, total card height <= ~228px.
-          - Tuning sizes: Tunable via CSS variables (--card-w, --gap, --img-ratio, --strip-h, --label-h, --label-font).
-        */}
         <div
           dir="rtl"
-          className="no-scrollbar snap-carousel flex w-full items-stretch overflow-x-auto scroll-smooth snap-x snap-mandatory overscroll-x-contain touch-pan-x px-4 sm:px-6 md:px-8 lg:grid lg:grid-cols-6 lg:overflow-visible lg:snap-none lg:max-w-[968px] lg:mx-auto lg:px-4"
+          className={`no-scrollbar snap-carousel flex w-full items-stretch overflow-x-auto scroll-smooth snap-x snap-mandatory overscroll-x-contain touch-pan-x px-4 sm:px-6 md:px-8 ${
+            activeCategories.length <= 6
+              ? "lg:grid lg:grid-cols-6 lg:overflow-visible lg:snap-none lg:max-w-[968px] lg:mx-auto lg:px-4"
+              : "lg:grid lg:grid-cols-8 lg:overflow-visible lg:snap-none lg:max-w-[1180px] lg:mx-auto lg:px-4"
+          }`}
           style={{
             gap: "var(--gap)",
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {CATEGORIES_DATA.map((category, index) => {
+          {activeCategories.map((category, index) => {
             const cardPoly = CARD_POLYGONS[index % CARD_POLYGONS.length];
             const labelPoly = LABEL_POLYGONS[index % LABEL_POLYGONS.length];
 
             return (
               <Link
-                key={category.name}
+                key={category.id || category.name}
                 to={category.href}
                 aria-label={`تصفح قسم ${category.name}`}
                 className="group snap-item relative block flex-none snap-start lg:w-full lg:max-w-none lg:min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8C6D58] focus-visible:ring-offset-4 focus-visible:ring-offset-paper transition-transform duration-300 motion-reduce:transition-none"
@@ -208,12 +152,6 @@ export function CategoriesSection() {
                   width: "var(--card-w)",
                 }}
               >
-                {/*
-                  Unclipped Wrapper:
-                  Holds drop-shadow for the outer torn paper card.
-                  The photo fills the whole card (object-fit: cover), so total width and height stay proportional.
-                  Aspect ratio is set to 4/5 via var(--img-ratio), capped at ~228px total.
-                */}
                 <div
                   className="relative w-full transition-[transform,filter] duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none"
                   style={{
@@ -225,10 +163,7 @@ export function CategoriesSection() {
                       "drop-shadow(0 8px 16px rgba(44, 34, 30, 0.14)) drop-shadow(0 2px 4px rgba(44, 34, 30, 0.08))",
                   }}
                 >
-                  {/*
-                    Layer 1: Outer Card Container (Clipped with smooth hand-torn polygon).
-                    The photo fills the entire card with object-cover.
-                  */}
+                  {/* Layer 1: Outer Card Container (Clipped with smooth hand-torn polygon) */}
                   <div
                     className="relative w-full h-full overflow-hidden bg-[#ECE4DB]"
                     style={{
@@ -241,10 +176,13 @@ export function CategoriesSection() {
                   >
                     <img
                       src={category.image}
-                      alt={category.alt}
+                      alt={category.alt || category.name}
                       loading="lazy"
                       decoding="async"
                       className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transform-none"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/images/categories/dresses.jpg";
+                      }}
                     />
 
                     {/* Subtle warm paper depth gradient under the bottom part where the label sits */}
@@ -254,14 +192,7 @@ export function CategoriesSection() {
                     />
                   </div>
 
-                  {/*
-                    Layer 2: Bottom Sandy Paper Label (Inside the photo at its bottom part).
-                    - Size: Height 35px (scaled ~12% from 40px via var(--label-h)), side insets 11%,
-                      bottom margin 7% (via var(--label-bottom)).
-                    - Non-plain box: keeps smooth flowing hand-torn edges (labelPoly) and slightly rounded corners.
-                    - Color: Sandy background #E2D0AC with subtle paper gradient to #D9C39A.
-                    - Floats above the photo with soft paper drop shadow.
-                  */}
+                  {/* Layer 2: Bottom Sandy Paper Label */}
                   <div
                     className="absolute z-10 pointer-events-none transition-transform duration-300 group-hover:translate-y-[-1px] motion-reduce:transform-none rounded-[6px]"
                     style={{

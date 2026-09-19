@@ -8,11 +8,13 @@ import {
   Settings,
   ArrowRight,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import logoMark from "@/assets/hijab-soul-mark.png";
 import { useStoreData, CustomerOrder } from "@/lib/store-data";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AdminProducts } from "@/components/admin/AdminProducts";
+import { AdminCategories } from "@/components/admin/AdminCategories";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminChat } from "@/components/admin/AdminChat";
 import { AdminSettings } from "@/components/admin/AdminSettings";
@@ -35,7 +37,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<
-    "overview" | "products" | "orders" | "chat" | "settings"
+    "overview" | "products" | "categories" | "orders" | "chat" | "settings"
   >("overview");
   const [selectedOrderForDetails, setSelectedOrderForDetails] = useState<CustomerOrder | null>(
     null,
@@ -46,12 +48,19 @@ function AdminDashboardPage() {
     products,
     orders,
     conversations,
+    categories,
+    heroBanner,
     updateProduct,
     addProduct,
     deleteProduct,
     updateOrderStatus,
     sendMessage,
     markConversationAsRead,
+    updateCategory,
+    addCategory,
+    deleteCategory,
+    resetCategoriesToDefault,
+    updateHeroBanner,
   } = useStoreData();
 
   const unreadMessagesTotal = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
@@ -125,6 +134,18 @@ function AdminDashboardPage() {
             </button>
 
             <button
+              onClick={() => setActiveTab("categories")}
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+                activeTab === "categories"
+                  ? "bg-[#E5D2B8] text-[#2B2119] shadow-sm"
+                  : "text-[#D5C2AA] hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Layers className="h-4 w-4" />
+              <span>الأقسام والصور ({categories.length})</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab("products")}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === "products"
@@ -192,11 +213,24 @@ function AdminDashboardPage() {
             products={products}
             orders={orders}
             conversations={conversations}
+            categories={categories}
             onTabChange={setActiveTab}
             onSelectOrder={(ord) => {
               setSelectedOrderForDetails(ord);
               setActiveTab("orders");
             }}
+          />
+        )}
+
+        {activeTab === "categories" && (
+          <AdminCategories
+            categories={categories}
+            heroBanner={heroBanner}
+            onUpdateCategory={updateCategory}
+            onAddCategory={addCategory}
+            onDeleteCategory={deleteCategory}
+            onResetCategories={resetCategoriesToDefault}
+            onUpdateHeroBanner={updateHeroBanner}
           />
         )}
 
