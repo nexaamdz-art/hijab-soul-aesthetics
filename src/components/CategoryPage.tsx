@@ -8,7 +8,6 @@ import {
   Sparkles,
   Search,
   ArrowRight,
-  ShieldCheck,
   X,
   Plus,
   Minus,
@@ -111,242 +110,11 @@ function resolveCategory(title: string, categoryKey?: string): string | null {
   return null;
 }
 
-// Subcategory filters specifically for Accessories
-const ACCESSORY_TABS = [
-  { id: "all", label: "الكل" },
-  { id: "bags", label: "حقائب فاخرة" },
-  { id: "hair", label: "أطواق ومشابك" },
-  { id: "jewelry", label: "أساور ومجوهرات" },
-  { id: "sleeves", label: "أكمام ومعاصم" },
-];
-
-function matchesAccessoryTab(product: AdminProduct, tabId: string): boolean {
-  if (tabId === "all") return true;
-  const name = product.name.toLowerCase();
-  const desc = (product.description || "").toLowerCase();
-  const combined = `${name} ${desc}`;
-
-  if (tabId === "bags") {
-    return combined.includes("حقيبة") || combined.includes("شنطة");
-  }
-  if (tabId === "hair") {
-    return (
-      combined.includes("طوق") ||
-      combined.includes("مشبك") ||
-      combined.includes("شعر") ||
-      combined.includes("كليب")
-    );
-  }
-  if (tabId === "jewelry") {
-    return (
-      combined.includes("سوار") ||
-      combined.includes("قلادة") ||
-      combined.includes("خواتم") ||
-      combined.includes("عقد") ||
-      combined.includes("أساور") ||
-      combined.includes("مجوهرات")
-    );
-  }
-  if (tabId === "sleeves") {
-    return combined.includes("معصم") || combined.includes("أكمام") || combined.includes("معاصم");
-  }
-  return true;
-}
-
-// Subcategory filters specifically for Abayas
-const ABAYA_TABS = [
-  { id: "all", label: "الكل" },
-  { id: "black", label: "سوداء فاخرة" },
-  { id: "evening", label: "سهرة ومناسبات" },
-  { id: "colored", label: "عبايات ملونة" },
-  { id: "open", label: "مفتوحة وكاب" },
-];
-
-function matchesAbayaTab(product: AdminProduct, tabId: string): boolean {
-  if (tabId === "all") return true;
-  const combined = `${product.name} ${product.description || ""}`.toLowerCase();
-  if (tabId === "black") {
-    return combined.includes("سوداء") || combined.includes("أسود") || combined.includes("سواد");
-  }
-  if (tabId === "evening") {
-    return (
-      combined.includes("سهرة") ||
-      combined.includes("مخمل") ||
-      combined.includes("كريستال") ||
-      combined.includes("دانتيل") ||
-      combined.includes("بروش") ||
-      combined.includes("مناسبات")
-    );
-  }
-  if (tabId === "colored") {
-    return (
-      combined.includes("عنابي") ||
-      combined.includes("بوردو") ||
-      combined.includes("أخضر") ||
-      combined.includes("عاجي") ||
-      combined.includes("بني") ||
-      combined.includes("شوكولاتة") ||
-      combined.includes("زيتي")
-    );
-  }
-  if (tabId === "open") {
-    return (
-      combined.includes("مفتوحة") ||
-      combined.includes("كيمونو") ||
-      combined.includes("كاب") ||
-      combined.includes("انسيابي")
-    );
-  }
-  return true;
-}
-
-// Subcategory filters specifically for Hijabs
-const HIJAB_TABS = [
-  { id: "all", label: "الكل" },
-  { id: "chiffon", label: "شيفون وشالات" },
-  { id: "instant", label: "حجاب جاهز وسريع" },
-  { id: "evening", label: "سهرة ومناسبات" },
-  { id: "palettes", label: "مجموعات وألوان" },
-];
-
-function matchesHijabTab(product: AdminProduct, tabId: string): boolean {
-  if (tabId === "all") return true;
-  const combined = `${product.name} ${product.description || ""}`.toLowerCase();
-  if (tabId === "chiffon") {
-    return (
-      combined.includes("شيفون") ||
-      combined.includes("شال") ||
-      combined.includes("أوشحة") ||
-      combined.includes("خمار")
-    );
-  }
-  if (tabId === "instant") {
-    return (
-      combined.includes("جاهز") ||
-      combined.includes("جيرسي") ||
-      combined.includes("بندانة") ||
-      combined.includes("سريع") ||
-      combined.includes("مطاط")
-    );
-  }
-  if (tabId === "evening") {
-    return (
-      combined.includes("سهرة") ||
-      combined.includes("لؤلؤ") ||
-      combined.includes("ميتاليك") ||
-      combined.includes("ذهبي") ||
-      combined.includes("فضية") ||
-      combined.includes("فضي") ||
-      combined.includes("مناسبات")
-    );
-  }
-  if (tabId === "palettes") {
-    return (
-      combined.includes("باليت") ||
-      combined.includes("ألوان") ||
-      combined.includes("مجموعة") ||
-      combined.includes("تشكيلة")
-    );
-  }
-  return true;
-}
-
-// Subcategory filters specifically for Isdalat
-const ISDAL_TABS = [
-  { id: "all", label: "الكل" },
-  { id: "layered", label: "إسدالات طبقات" },
-  { id: "twotone", label: "طقم ثنائي اللون" },
-  { id: "prayer", label: "صلاة وخروج" },
-];
-
-function matchesIsdalTab(product: AdminProduct, tabId: string): boolean {
-  if (tabId === "all") return true;
-  const combined = `${product.name} ${product.description || ""}`.toLowerCase();
-  if (tabId === "layered") {
-    return (
-      combined.includes("طبقات") ||
-      combined.includes("متدرج") ||
-      combined.includes("ثلاثي") ||
-      combined.includes("كشكش")
-    );
-  }
-  if (tabId === "twotone") {
-    return (
-      combined.includes("سماوي") ||
-      combined.includes("أبيض") ||
-      combined.includes("رمادي") ||
-      combined.includes("شوكولاتة") ||
-      combined.includes("طقم") ||
-      combined.includes("أزرق")
-    );
-  }
-  if (tabId === "prayer") {
-    return (
-      combined.includes("صلاة") ||
-      combined.includes("يومي") ||
-      combined.includes("خروج") ||
-      combined.includes("عملي")
-    );
-  }
-  return true;
-}
-
-// Subcategory filters specifically for Dresses
-const DRESS_TABS = [
-  { id: "all", label: "الكل" },
-  { id: "casual", label: "يومي وكاجوال" },
-  { id: "evening", label: "سهرة ومناسبات" },
-  { id: "vintage", label: "فينتج وكلاسيك" },
-];
-
-function matchesDressTab(product: AdminProduct, tabId: string): boolean {
-  if (tabId === "all") return true;
-  const combined = `${product.name} ${product.description || ""}`.toLowerCase();
-  if (tabId === "casual") {
-    return (
-      combined.includes("كتان") ||
-      combined.includes("كريب") ||
-      combined.includes("صيفي") ||
-      combined.includes("يومي") ||
-      combined.includes("كاجوال") ||
-      combined.includes("عملي") ||
-      combined.includes("مريح") ||
-      combined.includes("سادة") ||
-      combined.includes("ماكسي") ||
-      combined.includes("بوهيمي")
-    );
-  }
-  if (tabId === "evening") {
-    return (
-      combined.includes("سهرة") ||
-      combined.includes("كاب") ||
-      combined.includes("كوتور") ||
-      combined.includes("عرائس") ||
-      combined.includes("مطرز") ||
-      combined.includes("طقم") ||
-      combined.includes("مناسبات")
-    );
-  }
-  if (tabId === "vintage") {
-    return (
-      combined.includes("فينتج") ||
-      combined.includes("كلاسيك") ||
-      combined.includes("دانتيل") ||
-      combined.includes("كورسيه") ||
-      combined.includes("كسرات") ||
-      combined.includes("درامي") ||
-      combined.includes("فيونكة")
-    );
-  }
-  return true;
-}
-
 export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps) {
   const { products: storeProducts, addOrder } = useStoreData();
   const resolvedCat = resolveCategory(title, categoryKey);
 
   // States
-  const [activeTab, setActiveTab] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc">("featured");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -380,34 +148,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
     return storeProducts.filter((p) => p.category === resolvedCat);
   }, [storeProducts, resolvedCat]);
 
-  // Apply tab filter (for accessories, abayas, hijabs), search, and sort
+  // Apply search and sort
   const displayProducts = useMemo(() => {
     let list = [...categoryProducts];
-
-    // Accessories subcategory filter
-    if (resolvedCat === "accessories" && activeTab !== "all") {
-      list = list.filter((p) => matchesAccessoryTab(p, activeTab));
-    }
-
-    // Abayas subcategory filter
-    if (resolvedCat === "abayas" && activeTab !== "all") {
-      list = list.filter((p) => matchesAbayaTab(p, activeTab));
-    }
-
-    // Hijabs subcategory filter
-    if ((resolvedCat === "hijab-supplies" || resolvedCat === "khimar") && activeTab !== "all") {
-      list = list.filter((p) => matchesHijabTab(p, activeTab));
-    }
-
-    // Isdalat subcategory filter
-    if (resolvedCat === "isdalat" && activeTab !== "all") {
-      list = list.filter((p) => matchesIsdalTab(p, activeTab));
-    }
-
-    // Dresses subcategory filter
-    if (resolvedCat === "dresses" && activeTab !== "all") {
-      list = list.filter((p) => matchesDressTab(p, activeTab));
-    }
 
     // Search query filter
     if (searchQuery.trim()) {
@@ -427,7 +170,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
     }
 
     return list;
-  }, [categoryProducts, resolvedCat, activeTab, searchQuery, sortBy]);
+  }, [categoryProducts, searchQuery, sortBy]);
 
   // Favorite toggle
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
@@ -565,129 +308,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                 ? "تشكيلة مختارة بعناية من أرقى الإكسسوارات، الحقائب الفاخرة، المجوهرات الذهبية، وأطواق الشعر التي تكتمل بها إطلالتك المحتشمة."
                 : `استكشفي أحدث وأرقى تشكيلات ${title} المصممة لتجمع بين الأصالة والحشمة والأناقة.`)}
           </p>
-
-          {/* Guarantee Badges */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-[#5A412F]">
-            <div className="flex items-center gap-1.5 bg-[#EDE0CD]/70 px-3 py-1.5 rounded-full border border-[#D5C2AA]/60">
-              <Truck className="h-3.5 w-3.5 text-[#8C2A3E]" />
-              <span>توصيل سريع لـ 58 ولاية</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-[#EDE0CD]/70 px-3 py-1.5 rounded-full border border-[#D5C2AA]/60">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-              <span>الدفع عند الاستلام والمعاينة</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-[#EDE0CD]/70 px-3 py-1.5 rounded-full border border-[#D5C2AA]/60">
-              <Sparkles className="h-3.5 w-3.5 text-amber-700" />
-              <span>جودة خامات عالية وممتازة</span>
-            </div>
-          </div>
         </div>
-
-        {/* Subcategory Filter Tabs (for accessories and abayas) */}
-        {resolvedCat === "accessories" && (
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {ACCESSORY_TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none shadow-xs ${
-                    isActive
-                      ? "bg-[#2B2119] text-[#FAF6F0] shadow-md scale-105"
-                      : "bg-[#EDE0CD] text-[#423124] hover:bg-[#E3D4C0] border border-[#D5C2AA]/70"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {resolvedCat === "abayas" && (
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {ABAYA_TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none shadow-xs ${
-                    isActive
-                      ? "bg-[#2B2119] text-[#FAF6F0] shadow-md scale-105"
-                      : "bg-[#EDE0CD] text-[#423124] hover:bg-[#E3D4C0] border border-[#D5C2AA]/70"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {(resolvedCat === "hijab-supplies" || resolvedCat === "khimar") && (
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {HIJAB_TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none shadow-xs ${
-                    isActive
-                      ? "bg-[#2B2119] text-[#FAF6F0] shadow-md scale-105"
-                      : "bg-[#EDE0CD] text-[#423124] hover:bg-[#E3D4C0] border border-[#D5C2AA]/70"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {resolvedCat === "isdalat" && (
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {ISDAL_TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none shadow-xs ${
-                    isActive
-                      ? "bg-[#2B2119] text-[#FAF6F0] shadow-md scale-105"
-                      : "bg-[#EDE0CD] text-[#423124] hover:bg-[#E3D4C0] border border-[#D5C2AA]/70"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {resolvedCat === "dresses" && (
-          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            {DRESS_TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none shadow-xs ${
-                    isActive
-                      ? "bg-[#2B2119] text-[#FAF6F0] shadow-md scale-105"
-                      : "bg-[#EDE0CD] text-[#423124] hover:bg-[#E3D4C0] border border-[#D5C2AA]/70"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        )}
 
         {/* Search & Sort Bar */}
         <div className="mb-8 flex flex-col sm:flex-row items-center justify-between gap-3.5 bg-[#EDE0CD]/40 p-3 sm:p-4 rounded-2xl border border-[#E3D4C0]">

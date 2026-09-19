@@ -402,15 +402,9 @@ DARK TEXTURED HEADER + PAPER SEARCH BAR + HIJAB SOUL BRANDING + ARABIC NAVIGATIO
 
 Do not add anything below the header unless explicitly requested later.
 
-This project was built with [Lovable](https://lovable.dev).
+## Overview
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/09c5d434-b109-4dae-8ea8-3f199bec2195).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Hijab Soul (روح الحجاب) - Algerian Modest Fashion Boutique, featuring elegant abayas, isdalat, hijabs, accessories, and dresses with local delivery across all 58 Algerian wilayas.
 
 ## Development
 
