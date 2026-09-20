@@ -2,8 +2,8 @@ import { r as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react_tanstack__react-query.mjs";
 import { r as useAuth, t as ADMIN_EMAILS } from "./auth-context-B0JRZaal.mjs";
 import { a as useStoreData, i as hijab_soul_mark_default, n as compressImageFile, r as getProductFallbackImage, t as CURATED_IMAGE_PRESETS } from "./store-data-Bmptt2jx.mjs";
-import { h as Link } from "../_libs/@tanstack/react-router_chunks.mjs";
-import { B as Crown, C as Package, E as MessageCircle, F as LayoutDashboard, G as CircleAlert, H as CircleX, I as Layers, J as CheckCheck, K as ChevronDown, L as Image, N as Link$1, O as MapPin, P as LayoutGrid, S as Pen, T as MessageSquare, U as CircleCheck, V as Clock, X as ArrowRight, Y as ArrowUpRight, _ as RotateCcw, a as Upload, b as Plus, c as TrendingUp, d as Sparkles, f as ShoppingBag, g as Search, h as Send, i as UserCheck, j as Lock, k as Mail, l as Trash2, m as Settings, n as X, o as Truck, p as ShieldCheck, q as Check, r as User, s as TriangleAlert, t as Zap, u as Store, x as Phone, y as Printer, z as FileText } from "../_libs/lucide-react.mjs";
+import { g as Link } from "../_libs/@tanstack/react-router_chunks.mjs";
+import { $ as ArrowRight, A as Mail, C as Pen, D as MessageCircle, E as MessageSquare, F as LayoutGrid, G as CircleX, H as FileText, I as LayoutDashboard, J as CircleAlert, K as CircleCheck, L as Layers, M as Lock, P as Link$1, Q as ArrowUpRight, R as Image, S as Phone, U as Crown, W as Clock, X as Check, Y as ChevronDown, Z as CheckCheck, _ as Search, a as Upload, b as Printer, c as TrendingUp, d as Store, f as Sparkles, g as Send, h as Settings, i as UserCheck, k as MapPin, l as Trash2, m as ShieldCheck, n as X, o as Truck, p as ShoppingBag, r as User, s as TriangleAlert, t as Zap, v as RotateCcw, w as Package, x as Plus } from "../_libs/lucide-react.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/admin-DGuOFq_G.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();

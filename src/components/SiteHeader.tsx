@@ -66,17 +66,20 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
     <header className="paper-dark w-full bg-header text-header-foreground">
       <div className="mx-auto flex w-full max-w-[1400px] items-center gap-4 px-4 pt-2 sm:px-6 lg:gap-8">
         {/* Actions (right in RTL) */}
-        <div className="flex shrink-0 items-center gap-3.5 sm:gap-5">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <button
             aria-label="القائمة"
             onClick={onMenuClick}
-            className="transition-opacity hover:opacity-70 lg:hidden"
+            className="p-2 rounded-full transition-colors hover:bg-white/10 active:scale-95 lg:hidden text-header-foreground"
           >
-            <Menu className="h-5 w-5" strokeWidth={1.25} />
+            <Menu className="h-5 w-5" strokeWidth={1.5} />
           </button>
 
-          <button aria-label="المفضلة" className="transition-opacity hover:opacity-70">
-            <Heart className="h-5 w-5" strokeWidth={1.25} />
+          <button
+            aria-label="المفضلة"
+            className="p-2 rounded-full transition-colors hover:bg-white/10 active:scale-95 text-header-foreground"
+          >
+            <Heart className="h-5 w-5" strokeWidth={1.5} />
           </button>
 
           {/* User Account / Auth Trigger */}
@@ -85,7 +88,7 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
               aria-label={user ? `حساب ${profile?.fullName || "المستخدم"}` : "تسجيل الدخول / حسابي"}
               aria-expanded={userDropdownOpen}
               onClick={handleAccountClick}
-              className="flex items-center gap-1.5 py-1 px-1.5 rounded-lg transition-colors hover:bg-white/5 active:scale-95 text-header-foreground"
+              className="flex items-center gap-1.5 p-1.5 rounded-full sm:rounded-lg transition-colors hover:bg-white/10 active:scale-95 text-header-foreground"
             >
               {user && profile?.avatarUrl ? (
                 <img
@@ -94,7 +97,7 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
                   className="h-6 w-6 rounded-full object-cover border border-accent/40"
                 />
               ) : (
-                <User className="h-5 w-5" strokeWidth={1.25} />
+                <User className="h-5 w-5" strokeWidth={1.5} />
               )}
 
               {user ? (
@@ -108,6 +111,7 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
                 </span>
               )}
             </button>
+
 
             {/* Authenticated User Dropdown Menu */}
             {user && userDropdownOpen && (

@@ -308,9 +308,54 @@ var FileText = createLucideIcon("file-text", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Grid3x3 = createLucideIcon("grid-3x3", [
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "3",
+		rx: "2",
+		key: "afitv7"
+	}],
+	["path", {
+		d: "M3 9h18",
+		key: "1pudct"
+	}],
+	["path", {
+		d: "M3 15h18",
+		key: "5xshup"
+	}],
+	["path", {
+		d: "M9 3v18",
+		key: "fh3hqa"
+	}],
+	["path", {
+		d: "M15 3v18",
+		key: "14nvp0"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Heart = createLucideIcon("heart", [["path", {
 	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
 	key: "mvr1a0"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var House = createLucideIcon("house", [["path", {
+	d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
+	key: "5wwlr5"
+}], ["path", {
+	d: "M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+	key: "r6nss1"
 }]]);
 /**
 * @license lucide-react v0.575.0 - ISC
@@ -828,6 +873,22 @@ var Store = createLucideIcon("store", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Tag = createLucideIcon("tag", [["path", {
+	d: "M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",
+	key: "vktsd0"
+}], ["circle", {
+	cx: "7.5",
+	cy: "7.5",
+	r: ".5",
+	fill: "currentColor",
+	key: "kqv944"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Trash2 = createLucideIcon("trash-2", [
 	["path", {
 		d: "M10 11v6",
@@ -996,4 +1057,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { LogOut as A, Crown as B, Package as C, Menu as D, MessageCircle as E, LayoutDashboard as F, CircleAlert as G, CircleX as H, Layers as I, CheckCheck as J, ChevronDown as K, Image as L, LoaderCircle as M, Link as N, MapPin as O, LayoutGrid as P, Heart as R, Pen as S, MessageSquare as T, CircleCheck as U, Clock as V, CircleCheckBig as W, ArrowRight as X, ArrowUpRight as Y, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, ShoppingBag as f, Search as g, Send as h, UserCheck as i, Lock as j, Mail as k, Trash2 as l, Settings as m, X as n, Truck as o, ShieldCheck as p, Check as q, User as r, TriangleAlert as s, Zap as t, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, FileText as z };
+export { ArrowRight as $, Mail as A, Heart as B, Pen as C, MessageCircle as D, MessageSquare as E, LayoutGrid as F, CircleX as G, FileText as H, LayoutDashboard as I, CircleAlert as J, CircleCheck as K, Layers as L, Lock as M, LoaderCircle as N, Menu as O, Link as P, ArrowUpRight as Q, Image as R, Phone as S, Minus as T, Crown as U, Grid3x3 as V, Clock as W, Check as X, ChevronDown as Y, CheckCheck as Z, Search as _, Upload as a, Printer as b, TrendingUp as c, Store as d, Sparkles as f, Send as g, Settings as h, UserCheck as i, LogOut as j, MapPin as k, Trash2 as l, ShieldCheck as m, X as n, Truck as o, ShoppingBag as p, CircleCheckBig as q, User as r, TriangleAlert as s, Zap as t, Tag as u, RotateCcw as v, Package as w, Plus as x, RefreshCw as y, House as z };

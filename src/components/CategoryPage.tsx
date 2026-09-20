@@ -869,7 +869,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                         className="w-full flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-[#2B2119] hover:bg-[#3D2E24] text-white text-xs font-bold transition-all duration-150 active:scale-98 shadow-xs"
                       >
                         <Truck className="h-3.5 w-3.5 text-[#E2D0AC]" />
-                        <span>طلب سريع (الدفع عند الاستلام)</span>
+                        <span>طلب سريع</span>
                       </button>
 
                       {/* Add to Cart Button */}
