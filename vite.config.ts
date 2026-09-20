@@ -9,7 +9,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, mode }) => ({
+  mode: process.env.NODE_ENV === "production" || command === "build" ? "production" : mode,
   server: {
     host: "0.0.0.0",
     port: 3000,
@@ -35,11 +36,11 @@ export default defineConfig(({ command }) => ({
     }),
     command === "build"
       ? nitro({
-          ...(process.env["VERCEL"] || process.env["NITRO_PRESET"] === "vercel"
-            ? { preset: "vercel" }
-            : process.env["NITRO_PRESET"]
-              ? { preset: process.env["NITRO_PRESET"] }
-              : { preset: "cloudflare-module" }),
+          preset:
+            process.env["NITRO_PRESET"] ||
+            (process.env["VERCEL"] || process.env["VERCEL_ENV"] || !process.env["CF_PAGES"]
+              ? "vercel"
+              : "cloudflare-module"),
         })
       : null,
     viteReact(),

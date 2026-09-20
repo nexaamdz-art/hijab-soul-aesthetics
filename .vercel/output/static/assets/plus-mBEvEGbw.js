@@ -1,1 +1,0 @@
-import{o as e}from"./index-CxV5lelE.js";var t=e(`check`,[[`path`,{d:`M20 6 9 17l-5-5`,key:`1gmf2c`}]]),n=e(`plus`,[[`path`,{d:`M5 12h14`,key:`1ays0h`}],[`path`,{d:`M12 5v14`,key:`s699le`}]]);export{t as n,n as t};

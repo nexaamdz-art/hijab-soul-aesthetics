@@ -94,3 +94,40 @@ function sanitizeFolder(baseDir) {
 
 sanitizeFolder(path.join(root, ".vercel", "output", "functions"));
 sanitizeFolder(path.join(root, ".output", "server"));
+
+// 3. Pre-render initial HTML so static fallbacks or CDNs immediately have index.html
+async function prerenderInitialHtml() {
+  const funcEntry = path.join(root, ".vercel", "output", "functions", "__server.func", "index.mjs");
+  const serverEntry = path.join(root, ".output", "server", "index.mjs");
+  const targetEntry = fs.existsSync(funcEntry) ? funcEntry : fs.existsSync(serverEntry) ? serverEntry : null;
+
+  if (!targetEntry) return;
+
+  try {
+    const { default: handler } = await import(`file://${targetEntry}`);
+    if (handler && typeof handler.fetch === "function") {
+      const response = await handler.fetch(new Request("http://localhost/"), {}, {});
+      if (response && response.status === 200) {
+        const html = await response.text();
+        if (html && html.includes("<html")) {
+          const destinations = [
+            path.join(root, ".vercel", "output", "static", "index.html"),
+            path.join(root, "dist", "index.html"),
+            path.join(root, ".output", "public", "index.html"),
+          ];
+          for (const dest of destinations) {
+            const dir = path.dirname(dest);
+            if (fs.existsSync(dir)) {
+              fs.writeFileSync(dest, html, "utf-8");
+              console.log(`[postbuild] Generated pre-rendered HTML at ${path.relative(root, dest)}`);
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(`[postbuild] Note: prerender skipped (${err.message || err})`);
+  }
+}
+
+await prerenderInitialHtml();

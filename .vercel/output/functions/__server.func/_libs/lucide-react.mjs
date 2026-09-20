@@ -941,6 +941,28 @@ var Upload = createLucideIcon("upload", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var UserCheck = createLucideIcon("user-check", [
+	["path", {
+		d: "m16 11 2 2 4-4",
+		key: "9rsbq5"
+	}],
+	["path", {
+		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
+		key: "1yyitq"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "7",
+		r: "4",
+		key: "nufk8"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var User = createLucideIcon("user", [["path", {
 	d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2",
 	key: "975kel"
@@ -974,4 +996,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { Lock as A, Clock as B, Minus as C, MapPin as D, Menu as E, Layers as F, ChevronDown as G, CircleCheck as H, Image as I, ArrowUpRight as J, Check as K, Heart as L, Link as M, LayoutGrid as N, Mail as O, LayoutDashboard as P, FileText as R, Package as S, MessageCircle as T, CircleCheckBig as U, CircleX as V, CircleAlert as W, ArrowRight as Y, RefreshCw as _, Truck as a, Phone as b, Trash2 as c, ShoppingBag as d, ShieldCheck as f, RotateCcw as g, Search as h, Upload as i, LoaderCircle as j, LogOut as k, Store as l, Send as m, X as n, TriangleAlert as o, Settings as p, CheckCheck as q, User as r, TrendingUp as s, Zap as t, Sparkles as u, Printer as v, MessageSquare as w, Pen as x, Plus as y, Crown as z };
+export { LogOut as A, Crown as B, Package as C, Menu as D, MessageCircle as E, LayoutDashboard as F, CircleAlert as G, CircleX as H, Layers as I, CheckCheck as J, ChevronDown as K, Image as L, LoaderCircle as M, Link as N, MapPin as O, LayoutGrid as P, Heart as R, Pen as S, MessageSquare as T, CircleCheck as U, Clock as V, CircleCheckBig as W, ArrowRight as X, ArrowUpRight as Y, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, ShoppingBag as f, Search as g, Send as h, UserCheck as i, Lock as j, Mail as k, Trash2 as l, Settings as m, X as n, Truck as o, ShieldCheck as p, Check as q, User as r, TriangleAlert as s, Zap as t, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, FileText as z };
