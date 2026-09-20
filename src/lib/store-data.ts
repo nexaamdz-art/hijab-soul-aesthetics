@@ -352,6 +352,66 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     createdAt: "2026-09-19",
   },
   {
+    id: "robe-1",
+    name: "روب حجاب ملكي بتطريز زهور عاجية فاخرة",
+    price: 7500,
+    originalPrice: 8600,
+    image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
+    category: "hijab-robe",
+    stock: 10,
+    href: "/hijab-robe",
+    description: "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
+    createdAt: "2026-09-19",
+  },
+  {
+    id: "robe-2",
+    name: "روب حجاب سهرة مخملي عنابي بتطريز فضي ملكي",
+    price: 9800,
+    originalPrice: 11500,
+    image: "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg",
+    category: "hijab-robe",
+    stock: 6,
+    href: "/hijab-robe",
+    description: "روب حجاب مخملي فاخر بلون عنابي دافئ مزين بتطريز خيوط فضية على الحواف والأكمام.",
+    createdAt: "2026-09-19",
+  },
+  {
+    id: "robe-3",
+    name: "روب حجاب أسود مرصع بخطوط كريستالية متألقة",
+    price: 9200,
+    originalPrice: 10500,
+    image: "/images/uploads/crystal_sparkle_black_abaya_1789830134113.jpg",
+    category: "hijab-robe",
+    stock: 8,
+    href: "/hijab-robe",
+    description: "روب حجاب أسود انسيابي فخم مرصع بالكامل بأحجار كريستالية متدلية تعزز أناقتك الملكية.",
+    createdAt: "2026-09-19",
+  },
+  {
+    id: "robe-4",
+    name: "روب حجاب شتوي كاب شوكولاتة مع بروش ذهبي",
+    price: 8900,
+    originalPrice: 9900,
+    image: "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
+    category: "hijab-robe",
+    stock: 7,
+    href: "/hijab-robe",
+    description: "روب حجاب بتصميم كاب واسع ومريح بلون الشوكولاتة الداكنة مع بروش ذهبي فاخر.",
+    createdAt: "2026-09-19",
+  },
+  {
+    id: "robe-5",
+    name: "روب حجاب صيفي من الكتان الأخضر الهادئ",
+    price: 7100,
+    originalPrice: 8200,
+    image: "/images/uploads/sage_green_crystal_abaya_1789830162620.jpg",
+    category: "hijab-robe",
+    stock: 12,
+    href: "/hijab-robe",
+    description: "روب حجاب بتصميم عصري مريح بلون أخضر مريمي مع تفاصيل كريستالية على المعصمين.",
+    createdAt: "2026-09-19",
+  },
+  {
     id: "abaya-1",
     name: "عباءة سوداء بتطريز أزهار ربيعية وقياطين زيتية",
     price: 6800,
@@ -1001,6 +1061,17 @@ const HERO_BANNER_KEY = "hijab_soul_hero_banner_v1";
 
 export const INITIAL_CATEGORIES: StoreCategory[] = [
   {
+    id: "hijab-robe",
+    name: "روب حجاب",
+    href: "/hijab-robe",
+    image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
+    bannerImage: "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg",
+    alt: "روب حجاب فاخر وأنيق - حجاب سول",
+    description: "تشكيلة روب حجاب الملكية الفاخرة بتصاميم راقية وأقمشة مريحة ساترة",
+    order: 0,
+    isActive: true,
+  },
+  {
     id: "dresses",
     name: "فساتين",
     href: "/dresses",
@@ -1527,15 +1598,19 @@ export function saveStoredConversations(conversations: CustomerConversation[]) {
 }
 
 export function useStoreData() {
-  const [products, setProducts] = useState<AdminProduct[]>(() => getStoredProducts());
-  const [orders, setOrders] = useState<CustomerOrder[]>(() => getStoredOrders());
-  const [conversations, setConversations] = useState<CustomerConversation[]>(() =>
-    getStoredConversations(),
-  );
-  const [categories, setCategories] = useState<StoreCategory[]>(() => getStoredCategories());
-  const [heroBanner, setHeroBanner] = useState<string | null>(() => getStoredHeroBanner());
+  const [products, setProducts] = useState<AdminProduct[]>(INITIAL_PRODUCTS);
+  const [orders, setOrders] = useState<CustomerOrder[]>(INITIAL_ORDERS);
+  const [conversations, setConversations] = useState<CustomerConversation[]>(INITIAL_CONVERSATIONS);
+  const [categories, setCategories] = useState<StoreCategory[]>(INITIAL_CATEGORIES);
+  const [heroBanner, setHeroBanner] = useState<string | null>(null);
 
   useEffect(() => {
+    setProducts(getStoredProducts());
+    setOrders(getStoredOrders());
+    setConversations(getStoredConversations());
+    setCategories(getStoredCategories());
+    setHeroBanner(getStoredHeroBanner());
+
     const updateProducts = () => setProducts(getStoredProducts());
     const updateOrders = () => setOrders(getStoredOrders());
     const updateConvs = () => setConversations(getStoredConversations());

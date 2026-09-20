@@ -99,6 +99,7 @@ function formatDZD(amount: number): string {
 function resolveCategory(title: string, categoryKey?: string): string | null {
   if (categoryKey) return categoryKey;
   const t = title.trim();
+  if (t === "روب حجاب" || t === "روب الحجاب") return "hijab-robe";
   if (t === "إكسسوارات" || t === "اكسسوارات") return "accessories";
   if (t === "عبايات" || t === "عباءات") return "abayas";
   if (t === "فساتين") return "dresses";

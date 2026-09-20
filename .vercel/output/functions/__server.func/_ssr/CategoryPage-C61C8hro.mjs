@@ -1,8 +1,8 @@
 import { r as __toESM } from "../_runtime.mjs";
-import { r as require_react } from "../_libs/react+tanstack__react-query.mjs";
+import { r as require_react } from "../_libs/react_tanstack__react-query.mjs";
 import { t as require_jsx_dev_runtime } from "../_libs/react.mjs";
 import { i as useStoreData } from "./store-data-BX58v80_.mjs";
-import { h as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { h as Link } from "../_libs/@tanstack/react-router_chunks.mjs";
 import { C as Minus, K as Check, L as Heart, a as Truck, d as ShoppingBag, h as Search, n as X, u as Sparkles, y as Plus, z as Crown } from "../_libs/lucide-react.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/CategoryPage-C61C8hro.js
 var import_react = /* @__PURE__ */ __toESM(require_react());

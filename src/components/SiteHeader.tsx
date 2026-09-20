@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { label: "الرئيسيـة", to: "/" },
+  { label: "روب حجاب", to: "/hijab-robe" },
   { label: "الفساتين", to: "/dresses" },
   { label: "الإسدالات", to: "/isdalat" },
   { label: "الخمار", to: "/khimar" },

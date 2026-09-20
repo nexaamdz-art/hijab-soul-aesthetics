@@ -1,5 +1,5 @@
 import { r as __toESM } from "../_runtime.mjs";
-import { r as require_react } from "../_libs/react+tanstack__react-query.mjs";
+import { r as require_react } from "../_libs/react_tanstack__react-query.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/store-data-BX58v80_.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var hijab_soul_mark_default = "/assets/hijab-soul-mark-BfADWJpd.png";

@@ -1,8 +1,8 @@
 import { r as __toESM } from "../_runtime.mjs";
-import { r as require_react, t as QueryClientProvider } from "../_libs/react+tanstack__react-query.mjs";
+import { r as require_react, t as QueryClientProvider } from "../_libs/react_tanstack__react-query.mjs";
 import { t as require_jsx_dev_runtime } from "../_libs/react.mjs";
 import { n as useAuth, t as AuthProvider } from "./auth-context-prnidh_s.mjs";
-import { c as HeadContent, d as Outlet, f as lazyRouteComponent, g as useRouter, h as Link, m as createRootRouteWithContext, p as createFileRoute, s as Scripts, u as createRouter } from "../_libs/@tanstack/react-router+[...].mjs";
+import { c as HeadContent, d as Outlet, f as lazyRouteComponent, g as useRouter, h as Link, m as createRootRouteWithContext, p as createFileRoute, s as Scripts, u as createRouter } from "../_libs/@tanstack/react-router_chunks.mjs";
 import { A as Lock, H as CircleCheck, O as Mail, W as CircleAlert, j as LoaderCircle, n as X, r as User, u as Sparkles } from "../_libs/lucide-react.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/router-Bg7claC6.js

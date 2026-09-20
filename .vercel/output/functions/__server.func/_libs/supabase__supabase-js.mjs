@@ -1,7 +1,7 @@
 import { t as FunctionsClient } from "./supabase__functions-js.mjs";
 import { t as PostgrestClient } from "./supabase__postgrest-js.mjs";
 import { t as RealtimeClient } from "./supabase__realtime-js.mjs";
-import { t as StorageClient } from "./@supabase/storage-js+[...].mjs";
+import { t as StorageClient } from "./@supabase/storage-js_chunks.mjs";
 import { t as AuthClient } from "./supabase__auth-js.mjs";
 //#region node_modules/@supabase/supabase-js/dist/tracingRegistry.mjs
 var EXTRACTOR_KEY = Symbol.for("@supabase/supabase-js.traceContextExtractor");

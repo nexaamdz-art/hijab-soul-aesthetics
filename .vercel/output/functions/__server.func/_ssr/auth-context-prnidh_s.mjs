@@ -1,5 +1,5 @@
 import { r as __toESM } from "../_runtime.mjs";
-import { r as require_react } from "../_libs/react+tanstack__react-query.mjs";
+import { r as require_react } from "../_libs/react_tanstack__react-query.mjs";
 import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
 import { t as require_jsx_dev_runtime } from "../_libs/react.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/auth-context-prnidh_s.js
