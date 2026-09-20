@@ -17,7 +17,7 @@ export const Route = createFileRoute("/hijab-robe")({
   }),
   component: () => (
     <SiteLayout>
-      <CategoryPage title="روب حجاب" categoryKey="hijab-robe" />
+      <CategoryPage title="العبايات" categoryKey="abayas" />
     </SiteLayout>
   ),
 });

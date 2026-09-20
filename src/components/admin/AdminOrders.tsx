@@ -15,7 +15,7 @@ import {
   ShoppingBag,
   Check,
 } from "lucide-react";
-import { CustomerOrder, OrderStatus } from "@/lib/store-data";
+import { CustomerOrder, OrderStatus, getProductFallbackImage } from "@/lib/store-data";
 
 interface AdminOrdersProps {
   orders: CustomerOrder[];
@@ -74,7 +74,7 @@ export function AdminOrders({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeOrder, setActiveOrder] = useState<CustomerOrder | null>(
-    propSelectedOrder || (orders.length > 0 ? orders[0] : null),
+    propSelectedOrder ?? (orders[0] || null),
   );
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
   const [actionSuccessToast, setActionSuccessToast] = useState<string | null>(null);
@@ -398,6 +398,9 @@ export function AdminOrders({
                           src={item.image}
                           alt={item.name}
                           className="h-12 w-12 rounded-lg object-cover border border-[#D5C2AA]"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = getProductFallbackImage();
+                          }}
                         />
                         <div>
                           <p className="font-bold text-xs sm:text-sm text-[#2B2119]">{item.name}</p>

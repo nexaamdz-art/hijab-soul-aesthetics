@@ -5,9 +5,10 @@ export interface StoreCategory {
   name: string;
   href: string;
   image: string;
-  bannerImage?: string;
+  bannerImage?: string | undefined;
   alt: string;
-  description?: string;
+  description?: string | undefined;
+  tag?: string | undefined;
   order: number;
   isActive: boolean;
 }
@@ -16,7 +17,7 @@ export interface AdminProduct {
   id: string;
   name: string;
   price: number;
-  originalPrice?: number;
+  originalPrice?: number | undefined;
   image: string;
   category:
     | "abayas"
@@ -29,7 +30,7 @@ export interface AdminProduct {
     | (string & {});
   stock: number;
   href: string;
-  description?: string;
+  description?: string | undefined;
   createdAt: string;
 }
 
@@ -57,7 +58,7 @@ export interface CustomerOrder {
   grandTotal: number;
   status: OrderStatus;
   createdAt: string;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export interface ChatMessage {
@@ -102,14 +103,14 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
   },
   {
     id: "product-2",
-    name: "روب حجاب عاجي راقٍ",
+    name: "عباية استقبال عاجية راقية",
     price: 3800,
     originalPrice: 4200,
     image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 8,
-    href: "/hijab-robe",
-    description: "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال.",
+    href: "/abayas",
+    description: "عباءة استقبال راقية بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
     createdAt: "2026-09-12",
   },
   {
@@ -357,9 +358,9 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     price: 7500,
     originalPrice: 8600,
     image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 10,
-    href: "/hijab-robe",
+    href: "/abayas",
     description: "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
     createdAt: "2026-09-19",
   },
@@ -369,9 +370,9 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     price: 9800,
     originalPrice: 11500,
     image: "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 6,
-    href: "/hijab-robe",
+    href: "/abayas",
     description: "روب حجاب مخملي فاخر بلون عنابي دافئ مزين بتطريز خيوط فضية على الحواف والأكمام.",
     createdAt: "2026-09-19",
   },
@@ -381,9 +382,9 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     price: 9200,
     originalPrice: 10500,
     image: "/images/uploads/crystal_sparkle_black_abaya_1789830134113.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 8,
-    href: "/hijab-robe",
+    href: "/abayas",
     description: "روب حجاب أسود انسيابي فخم مرصع بالكامل بأحجار كريستالية متدلية تعزز أناقتك الملكية.",
     createdAt: "2026-09-19",
   },
@@ -393,9 +394,9 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     price: 8900,
     originalPrice: 9900,
     image: "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 7,
-    href: "/hijab-robe",
+    href: "/abayas",
     description: "روب حجاب بتصميم كاب واسع ومريح بلون الشوكولاتة الداكنة مع بروش ذهبي فاخر.",
     createdAt: "2026-09-19",
   },
@@ -405,9 +406,9 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     price: 7100,
     originalPrice: 8200,
     image: "/images/uploads/sage_green_crystal_abaya_1789830162620.jpg",
-    category: "hijab-robe",
+    category: "abayas",
     stock: 12,
-    href: "/hijab-robe",
+    href: "/abayas",
     description: "روب حجاب بتصميم عصري مريح بلون أخضر مريمي مع تفاصيل كريستالية على المعصمين.",
     createdAt: "2026-09-19",
   },
@@ -767,7 +768,7 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     name: "فستان كاب سهرة وعرائس ملكي أبيض ناصع",
     price: 7900,
     originalPrice: 9200,
-    image: "/images/uploads/lady_white_handbag_1789829346343.jpg",
+    image: "/images/uploads/black_embroidered_abaya_1789749117503.jpg",
     category: "dresses",
     stock: 7,
     href: "/dresses",
@@ -780,7 +781,7 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     name: "طقم فستان سهرة ليلكي ملكي مع شال وكلتش لؤلؤ",
     price: 6900,
     originalPrice: 7900,
-    image: "/images/uploads/embroidered_evening_bag_1789829357737.jpg",
+    image: "/images/uploads/mauve_hijab_model_1789749104873.jpg",
     category: "dresses",
     stock: 9,
     href: "/dresses",
@@ -793,7 +794,7 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     name: "فستان كريب شوكولاتة مينيمال بأكمام مروحية واسعة",
     price: 4800,
     originalPrice: 5500,
-    image: "/images/uploads/akiki_cream_handbag_1789829330238.jpg",
+    image: "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
     category: "dresses",
     stock: 17,
     href: "/dresses",
@@ -806,7 +807,7 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     name: "طقم فستان مريمي كاجوال بطبقات مع شال وحقيبة",
     price: 5300,
     originalPrice: 6100,
-    image: "/images/uploads/sage_green_crossbody_1789829366417.jpg",
+    image: "/images/uploads/sage_green_crystal_abaya_1789830162620.jpg",
     category: "dresses",
     stock: 13,
     href: "/dresses",
@@ -1053,24 +1054,50 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
   },
 ];
 
-const PRODUCTS_KEY = "hijab_soul_products_v6";
-const ORDERS_KEY = "hijab_soul_orders_v1";
-const CONVERSATIONS_KEY = "hijab_soul_conversations_v1";
-const CATEGORIES_KEY = "hijab_soul_categories_v3";
-const HERO_BANNER_KEY = "hijab_soul_hero_banner_v1";
+const CURRENT_DATA_VERSION = "v15";
+const PRODUCTS_KEY = `hijab_soul_products_${CURRENT_DATA_VERSION}`;
+const ORDERS_KEY = `hijab_soul_orders_${CURRENT_DATA_VERSION}`;
+const CONVERSATIONS_KEY = `hijab_soul_conversations_${CURRENT_DATA_VERSION}`;
+const CATEGORIES_KEY = `hijab_soul_categories_${CURRENT_DATA_VERSION}`;
+const HERO_BANNER_KEY = `hijab_soul_hero_banner_${CURRENT_DATA_VERSION}`;
+
+export const DEFAULT_CATEGORY_IMAGES: Record<string, string> = {
+  abayas: "/images/categories/abayas.jpg",
+  dresses: "/images/categories/dresses.jpg",
+  isdalat: "/images/categories/isdalat.jpg",
+  "hijab-supplies": "/images/categories/hijabs.jpg",
+  hijabs: "/images/categories/hijabs.jpg",
+  accessories: "/images/categories/accessories.jpg",
+  khimar: "/images/uploads/hijab_pearl_beaded_shawls_1789831343828.jpg",
+  sales: "/images/categories/sale.jpg",
+  shoes: "/images/uploads/akiki_cream_handbag_1789829330238.jpg",
+};
+
+export function getProductFallbackImage(category?: string): string {
+  if (!category) return "/images/categories/abayas.jpg";
+  const normalized = category === "hijab-robe" ? "abayas" : category;
+  return DEFAULT_CATEGORY_IMAGES[normalized] || "/images/categories/abayas.jpg";
+}
+
+function cleanupLegacyStorage() {
+  if (typeof window === "undefined") return;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (
+        key &&
+        key.startsWith("hijab_soul_") &&
+        !key.endsWith(`_${CURRENT_DATA_VERSION}`)
+      ) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch {
+    // Ignore storage errors in restricted iframe environments
+  }
+}
 
 export const INITIAL_CATEGORIES: StoreCategory[] = [
-  {
-    id: "hijab-robe",
-    name: "روب حجاب",
-    href: "/hijab-robe",
-    image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    bannerImage: "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg",
-    alt: "روب حجاب فاخر وأنيق - حجاب سول",
-    description: "تشكيلة روب حجاب الملكية الفاخرة بتصاميم راقية وأقمشة مريحة ساترة",
-    order: 0,
-    isActive: true,
-  },
   {
     id: "dresses",
     name: "فساتين",
@@ -1079,7 +1106,7 @@ export const INITIAL_CATEGORIES: StoreCategory[] = [
     bannerImage: "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
     alt: "فساتين محتشمة وأنيقة - حجاب سول",
     description: "فساتين محتشمة وأنيقة بقصات راقية وأقمشة فاخرة تناسب كل المناسبات",
-    order: 1,
+    order: 0,
     isActive: true,
   },
   {
@@ -1477,24 +1504,45 @@ export function compressImageFile(file: File, maxWidth = 1000, quality = 0.85): 
 export function getStoredCategories(): StoreCategory[] {
   if (typeof window === "undefined") return INITIAL_CATEGORIES;
   try {
+    cleanupLegacyStorage();
     const raw = localStorage.getItem(CATEGORIES_KEY);
     if (!raw) {
       localStorage.setItem(CATEGORIES_KEY, JSON.stringify(INITIAL_CATEGORIES));
       return INITIAL_CATEGORIES;
     }
     const parsed: StoreCategory[] = JSON.parse(raw);
-    const existingIds = new Set(parsed.map((c) => c.id));
-    let hasNew = false;
+    const initialMap = new Map(INITIAL_CATEGORIES.map((c) => [c.id, c]));
+    
+    // Filter out obsolete categories like "hijab-robe"
+    const validParsed = parsed.filter((c) => c.id !== "hijab-robe");
+
+    // Synchronize initial categories with verified assets
+    const synchronized: StoreCategory[] = validParsed.map((cat) => {
+      const initCat = initialMap.get(cat.id);
+      if (initCat) {
+        return {
+          ...cat,
+          name: initCat.name,
+          href: initCat.href,
+          image: initCat.image,
+          bannerImage: initCat.bannerImage || cat.bannerImage,
+          alt: initCat.alt,
+          description: initCat.description || cat.description,
+        };
+      }
+      return cat;
+    });
+
+    // Add any new initial categories not yet present
+    const existingIds = new Set(synchronized.map((c) => c.id));
     for (const initCat of INITIAL_CATEGORIES) {
       if (!existingIds.has(initCat.id)) {
-        parsed.push(initCat);
-        hasNew = true;
+        synchronized.push(initCat);
       }
     }
-    if (hasNew) {
-      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(parsed));
-    }
-    return parsed.sort((a, b) => a.order - b.order);
+
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(synchronized));
+    return synchronized.sort((a, b) => a.order - b.order);
   } catch {
     return INITIAL_CATEGORIES;
   }
@@ -1528,24 +1576,50 @@ export function saveStoredHeroBanner(url: string | null) {
 export function getStoredProducts(): AdminProduct[] {
   if (typeof window === "undefined") return INITIAL_PRODUCTS;
   try {
+    cleanupLegacyStorage();
     const raw = localStorage.getItem(PRODUCTS_KEY);
     if (!raw) {
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(INITIAL_PRODUCTS));
       return INITIAL_PRODUCTS;
     }
     const parsed: AdminProduct[] = JSON.parse(raw);
-    const existingIds = new Set(parsed.map((p) => p.id));
-    let hasNew = false;
+    const initialMap = new Map(INITIAL_PRODUCTS.map((p) => [p.id, p]));
+
+    // Synchronize and heal products
+    const synchronized: AdminProduct[] = parsed.map((prod) => {
+      const initProd = initialMap.get(prod.id);
+      if (initProd) {
+        // Built-in catalog item: guarantee latest verified image and category
+        return {
+          ...initProd,
+          stock: typeof prod.stock === "number" ? prod.stock : initProd.stock,
+          isFeatured: typeof prod.isFeatured === "boolean" ? prod.isFeatured : initProd.isFeatured,
+          price: typeof prod.price === "number" && prod.price > 0 ? prod.price : initProd.price,
+        };
+      }
+      // Custom user product: validate image and normalize category
+      const normalizedCat = prod.category === "hijab-robe" ? "abayas" : prod.category;
+      const validImage = prod.image && prod.image.trim() !== "" 
+        ? prod.image 
+        : getProductFallbackImage(normalizedCat);
+      return {
+        ...prod,
+        category: normalizedCat,
+        href: normalizedCat ? `/${normalizedCat}` : "/abayas",
+        image: validImage,
+      };
+    });
+
+    // Add any initial products that might be missing
+    const existingIds = new Set(synchronized.map((p) => p.id));
     for (const initProd of INITIAL_PRODUCTS) {
       if (!existingIds.has(initProd.id)) {
-        parsed.push(initProd);
-        hasNew = true;
+        synchronized.push(initProd);
       }
     }
-    if (hasNew) {
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(parsed));
-    }
-    return parsed;
+
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(synchronized));
+    return synchronized;
   } catch {
     return INITIAL_PRODUCTS;
   }
@@ -1689,7 +1763,7 @@ export function useStoreData() {
     const item: AdminProduct = {
       ...newProd,
       id: `product-${Date.now()}`,
-      createdAt: new Date().toISOString().split("T")[0],
+      createdAt: new Date().toISOString().split("T")[0]!,
     };
     setProducts((prev) => {
       const next = [item, ...prev];
@@ -1722,6 +1796,15 @@ export function useStoreData() {
       saveStoredOrders(next);
       return next;
     });
+  }, []);
+
+  const addOrder = useCallback((newOrder: CustomerOrder) => {
+    setOrders((prev) => {
+      const next = [newOrder, ...prev];
+      saveStoredOrders(next);
+      return next;
+    });
+    return newOrder;
   }, []);
 
   // Chat Actions
@@ -1786,6 +1869,7 @@ export function useStoreData() {
     deleteProduct,
     updateOrderStatus,
     deleteOrder,
+    addOrder,
     sendMessage,
     markConversationAsRead,
     updateCategory,

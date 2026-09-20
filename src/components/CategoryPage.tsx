@@ -13,7 +13,12 @@ import {
   Minus,
   Crown,
 } from "lucide-react";
-import { useStoreData, AdminProduct, CustomerOrder } from "@/lib/store-data";
+import {
+  useStoreData,
+  AdminProduct,
+  CustomerOrder,
+  getProductFallbackImage,
+} from "@/lib/store-data";
 
 export interface CategoryPageProps {
   title: string;
@@ -99,7 +104,7 @@ function formatDZD(amount: number): string {
 function resolveCategory(title: string, categoryKey?: string): string | null {
   if (categoryKey) return categoryKey;
   const t = title.trim();
-  if (t === "روب حجاب" || t === "روب الحجاب") return "hijab-robe";
+  if (t === "روب حجاب" || t === "روب الحجاب") return "abayas";
   if (t === "إكسسوارات" || t === "اكسسوارات") return "accessories";
   if (t === "عبايات" || t === "عباءات") return "abayas";
   if (t === "فساتين") return "dresses";
@@ -554,6 +559,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                 src={currentCategoryData.bannerImage}
                 alt={title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getProductFallbackImage(resolvedCat || undefined);
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#2B2119]/90 via-[#2B2119]/40 to-transparent flex flex-col items-center justify-end p-6 text-white text-center">
                 <div className="flex items-center gap-2 mb-1">
@@ -789,6 +797,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                       alt={product.name}
                       loading="lazy"
                       className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = getProductFallbackImage(product.category);
+                      }}
                     />
 
                     {/* Favorite Heart Button */}
@@ -977,6 +988,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                     src={orderModalProduct.image}
                     alt={orderModalProduct.name}
                     className="h-16 w-16 rounded-xl object-cover border border-[#D5C2AA] shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = getProductFallbackImage(orderModalProduct.category);
+                    }}
                   />
                   <div className="min-w-0 flex-1">
                     <span className="text-[11px] font-bold text-[#8C2A3E]">

@@ -9,6 +9,8 @@ import {
   CheckCircle,
   ChevronDown,
   Crown,
+  ShieldCheck,
+  LayoutDashboard,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import logoMark from "@/assets/hijab-soul-mark.png";
@@ -16,7 +18,6 @@ import { useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { label: "الرئيسيـة", to: "/" },
-  { label: "روب حجاب", to: "/hijab-robe" },
   { label: "الفساتين", to: "/dresses" },
   { label: "الإسدالات", to: "/isdalat" },
   { label: "الخمار", to: "/khimar" },
@@ -31,7 +32,7 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { user, profile, openAuthModal, signOut } = useAuth();
+  const { user, profile, isAdmin, openAuthModal, signOut } = useAuth();
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -122,9 +123,16 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
                     {profile?.firstName?.[0] || <User className="h-5 w-5" />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-black text-[#2B2119] truncate">
-                      {profile?.fullName || "مرحباً بكِ"}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-black text-[#2B2119] truncate">
+                        {profile?.fullName || "مرحباً بكِ"}
+                      </p>
+                      {isAdmin && (
+                        <span className="px-1.5 py-0.5 rounded-md bg-[#8C2A3E] text-white text-[10px] font-bold shrink-0">
+                          مدير
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-[#735A45] truncate" dir="ltr">
                       {profile?.email}
                     </p>
@@ -132,15 +140,26 @@ export function SiteHeader({ onMenuClick }: { onMenuClick?: () => void }) {
                 </div>
 
                 <div className="mt-2.5 space-y-1 text-xs font-semibold">
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="w-full flex items-center justify-start gap-2 px-2.5 py-2 rounded-xl bg-[#2B2119] text-[#FAF6F0] hover:bg-[#433225] transition-colors mb-1 font-bold shadow-xs"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-[#E5D2B8]" />
+                      <span>لوحة تحكم الإدارة</span>
+                    </Link>
+                  )}
+
                   <div className="flex items-center gap-2 px-2 py-1.5 text-[#5A412F]">
                     <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>حساب نشط</span>
+                    <span>{isAdmin ? "حساب المدير العام" : "حساب نشط"}</span>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-start gap-2 px-2.5 py-2 rounded-xl text-red-700 hover:bg-red-50 active:bg-red-100 transition-colors"
+                    className="w-full flex items-center justify-start gap-2 px-2.5 py-2 rounded-xl text-red-700 hover:bg-red-50 active:bg-red-100 transition-colors cursor-pointer"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>تسجيل الخروج</span>

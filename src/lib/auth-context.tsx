@@ -2,12 +2,22 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError, AuthResponse, OAuthResponse } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "./supabase";
 
+export const ADMIN_EMAILS = [
+  "nexa.am.dz@gmail.com",
+];
+
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.some((admin) => admin.toLowerCase() === email.trim().toLowerCase());
+}
+
 export interface UserProfile {
   firstName: string;
   lastName: string;
   fullName: string;
   email: string;
   avatarUrl?: string;
+  isAdmin: boolean;
 }
 
 interface SignUpParams {
@@ -26,6 +36,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
+  isAdmin: boolean;
   loading: boolean;
   isConfigured: boolean;
   authModalOpen: boolean;
@@ -69,34 +80,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const meta = u.user_metadata || {};
     const firstName =
-      (meta.first_name as string) ||
-      (meta.given_name as string) ||
-      (meta.full_name ? (meta.full_name as string).split(" ")[0] : "") ||
-      (meta.name ? (meta.name as string).split(" ")[0] : "") ||
+      (meta["first_name"] as string) ||
+      (meta["given_name"] as string) ||
+      (meta["full_name"] ? (meta["full_name"] as string).split(" ")[0] : "") ||
+      (meta["name"] ? (meta["name"] as string).split(" ")[0] : "") ||
       u.email?.split("@")[0] ||
       "المستخدم";
 
     const lastName =
-      (meta.last_name as string) ||
-      (meta.family_name as string) ||
-      (meta.full_name ? (meta.full_name as string).split(" ").slice(1).join(" ") : "") ||
+      (meta["last_name"] as string) ||
+      (meta["family_name"] as string) ||
+      (meta["full_name"] ? (meta["full_name"] as string).split(" ").slice(1).join(" ") : "") ||
       "";
 
     const fullName =
-      (meta.full_name as string) ||
-      (meta.name as string) ||
+      (meta["full_name"] as string) ||
+      (meta["name"] as string) ||
       `${firstName} ${lastName}`.trim() ||
       u.email?.split("@")[0] ||
       "المستخدم";
 
-    const avatarUrl = (meta.avatar_url as string) || (meta.picture as string) || "";
+    const avatarUrl = (meta["avatar_url"] as string) || (meta["picture"] as string) || "";
+    const email = u.email || "";
 
     return {
       firstName,
       lastName,
       fullName,
-      email: u.email || "",
+      email,
       avatarUrl,
+      isAdmin: isAdminEmail(email),
     };
   };
 
@@ -210,7 +223,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+          redirectTo: typeof window !== "undefined" ? window.location.origin : "",
           queryParams: {
             access_type: "offline",
             prompt: "consent",
@@ -244,6 +257,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         session,
         profile: getProfile(user),
+        isAdmin: isAdminEmail(user?.email),
         loading,
         isConfigured: isSupabaseConfigured,
         authModalOpen,

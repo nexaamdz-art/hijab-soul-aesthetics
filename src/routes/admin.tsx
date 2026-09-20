@@ -9,9 +9,11 @@ import {
   ArrowRight,
   Sparkles,
   Layers,
+  ShieldCheck,
 } from "lucide-react";
 import logoMark from "@/assets/hijab-soul-mark.png";
 import { useStoreData, CustomerOrder } from "@/lib/store-data";
+import { useAuth, ADMIN_EMAILS } from "@/lib/auth-context";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { AdminProducts } from "@/components/admin/AdminProducts";
 import { AdminCategories } from "@/components/admin/AdminCategories";
@@ -43,6 +45,9 @@ function AdminDashboardPage() {
     null,
   );
   const [activeChatConvId, setActiveChatConvId] = useState<string | undefined>(undefined);
+
+  const { user, profile } = useAuth();
+  const currentAdminEmail = user?.email || ADMIN_EMAILS[0] || "nexa.am.dz@gmail.com";
 
   const {
     products,
@@ -106,8 +111,15 @@ function AdminDashboardPage() {
             </span>
           </div>
 
-          {/* Left in RTL: Back to live store button */}
-          <div className="flex items-center gap-3">
+          {/* Left in RTL: Admin account indicator and back to live store button */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs text-[#E5D2B8]">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+              <span className="font-mono text-[11px]" dir="ltr">
+                {currentAdminEmail}
+              </span>
+            </div>
+
             <Link
               to="/"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#FAF6F0] text-xs font-bold transition-all border border-white/10 active:scale-95"

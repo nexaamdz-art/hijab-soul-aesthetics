@@ -8,7 +8,13 @@ import {
   ArrowUpRight,
   Layers,
 } from "lucide-react";
-import { AdminProduct, CustomerOrder, CustomerConversation, StoreCategory } from "@/lib/store-data";
+import {
+  AdminProduct,
+  CustomerOrder,
+  CustomerConversation,
+  StoreCategory,
+  getProductFallbackImage,
+} from "@/lib/store-data";
 
 interface AdminOverviewProps {
   products: AdminProduct[];
@@ -273,6 +279,9 @@ export function AdminOverview({
                         src={p.image}
                         alt={p.name}
                         className="h-9 w-9 rounded-lg object-cover border border-[#D5C2AA]"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getProductFallbackImage(p.category);
+                        }}
                       />
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-[#2B2119] truncate">{p.name}</p>

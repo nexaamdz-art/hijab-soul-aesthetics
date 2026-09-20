@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useStoreData } from "@/lib/store-data";
+import { useStoreData, getProductFallbackImage } from "@/lib/store-data";
 
 // Constants for smooth flowing hand-torn paper deckled edges
 const TEAR_AMPLITUDE = 0.7; // Amplitude about 0.4% - 1.0% of the size
@@ -181,7 +181,7 @@ export function CategoriesSection() {
                       decoding="async"
                       className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transform-none"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/categories/dresses.jpg";
+                        (e.target as HTMLImageElement).src = getProductFallbackImage(category.id);
                       }}
                     />
 

@@ -11,7 +11,7 @@ import {
   Sparkles,
   AlertTriangle,
 } from "lucide-react";
-import { AdminProduct } from "@/lib/store-data";
+import { AdminProduct, getProductFallbackImage } from "@/lib/store-data";
 
 interface AdminProductsProps {
   products: AdminProduct[];
@@ -276,6 +276,9 @@ export function AdminProducts({
                 src={product.image}
                 alt={product.name}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getProductFallbackImage(product.category);
+                }}
               />
               <span className="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-[#2B2119]/80 backdrop-blur-xs text-[11px] font-bold text-white">
                 {CATEGORY_MAP[product.category] || product.category}

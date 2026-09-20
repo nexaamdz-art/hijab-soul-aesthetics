@@ -4,7 +4,7 @@ import { CustomerConversation } from "@/lib/store-data";
 
 interface AdminChatProps {
   conversations: CustomerConversation[];
-  activeConversationId?: string;
+  activeConversationId?: string | undefined;
   onSendMessage: (conversationId: string, text: string) => void;
   onMarkAsRead: (conversationId: string) => void;
 }
@@ -24,7 +24,7 @@ export function AdminChat({
   onMarkAsRead,
 }: AdminChatProps) {
   const [selectedConvId, setSelectedConvId] = useState<string>(
-    initialActiveId || (conversations.length > 0 ? conversations[0].id : ""),
+    initialActiveId || (conversations[0]?.id || ""),
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [inputText, setInputText] = useState("");

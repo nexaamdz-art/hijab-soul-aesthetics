@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Crown, Heart } from "lucide-react";
-import { useStoreData } from "@/lib/store-data";
+import { useStoreData, getProductFallbackImage } from "@/lib/store-data";
 
 /**
  * Single source of truth for Latest Products data.
@@ -25,10 +25,10 @@ const LATEST_PRODUCTS_DATA: ProductItem[] = [
   },
   {
     id: "product-2",
-    name: "روب حجاب عاجي راقٍ",
+    name: "عباية استقبال عاجية راقية",
     price: 3800,
     image: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    href: "/hijab-robe",
+    href: "/abayas",
   },
   {
     id: "product-3",
@@ -439,6 +439,10 @@ export function LatestProductsSection() {
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transform-none rounded-[8px]"
+                          onError={(e) => {
+                            const cat = (product.href || "").replace(/^\//, "");
+                            (e.target as HTMLImageElement).src = getProductFallbackImage(cat);
+                          }}
                         />
                       </Link>
 

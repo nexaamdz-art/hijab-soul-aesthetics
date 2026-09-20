@@ -16,7 +16,12 @@ import {
   FolderPlus,
   LayoutGrid,
 } from "lucide-react";
-import { StoreCategory, CURATED_IMAGE_PRESETS, compressImageFile } from "@/lib/store-data";
+import {
+  StoreCategory,
+  CURATED_IMAGE_PRESETS,
+  compressImageFile,
+  getProductFallbackImage,
+} from "@/lib/store-data";
 
 interface AdminCategoriesProps {
   categories: StoreCategory[];
@@ -393,7 +398,7 @@ export function AdminCategories({
                     className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
                       // Fallback image if broken
-                      (e.target as HTMLImageElement).src = "/images/categories/dresses.jpg";
+                      (e.target as HTMLImageElement).src = getProductFallbackImage(cat.id);
                     }}
                   />
 
