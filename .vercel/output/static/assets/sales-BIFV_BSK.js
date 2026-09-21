@@ -1,1 +1,0 @@
-import{t as e}from"./SiteLayout-BLmEwphc.js";import{t}from"./CategoryPage-UBJq4Wwi.js";import{f as n}from"./index-DNMfOHSp.js";var r=n(),i=()=>(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`تخفيضات`})});export{i as component};

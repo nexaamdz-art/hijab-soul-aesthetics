@@ -398,16 +398,8 @@ export function LatestProductsSection() {
                   width: "var(--product-card-w)",
                 }}
               >
-                {/* Unclipped outer wrapper holding natural paper drop shadow */}
-                <div
-                  className="relative w-full h-full transition-[transform,filter] duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none"
-                  style={{
-                    filter:
-                      "drop-shadow(0 7px 14px rgba(44, 34, 30, 0.12)) drop-shadow(0 2px 4px rgba(44, 34, 30, 0.08))",
-                    WebkitFilter:
-                      "drop-shadow(0 7px 14px rgba(44, 34, 30, 0.12)) drop-shadow(0 2px 4px rgba(44, 34, 30, 0.08))",
-                  }}
-                >
+                {/* Unclipped outer wrapper holding natural paper drop shadow & hover zoom animation */}
+                <div className="relative w-full h-full product-card-deckle group-hover:-translate-y-1.5 group-hover:scale-[1.025] motion-reduce:transform-none">
                   {/* Card Body: Cream Paper (#F1E6D0) with smooth flowing torn deckled edges */}
                   <div
                     className="relative w-full h-full flex flex-col p-2 sm:p-2.5 md:p-3 select-none"
@@ -432,7 +424,7 @@ export function LatestProductsSection() {
                           alt={product.name}
                           loading="lazy"
                           decoding="async"
-                          className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transform-none rounded-[8px]"
+                          className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-108 motion-reduce:transform-none rounded-[8px]"
                           onError={(e) => {
                             const cat = (product.href || "").replace(/^\//, "");
                             (e.target as HTMLImageElement).src = getProductFallbackImage(cat);

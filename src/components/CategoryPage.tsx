@@ -785,7 +785,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
               return (
                 <div
                   key={product.id}
-                  className="group relative flex flex-col rounded-2xl bg-[#F1E6D0] p-2.5 sm:p-3 shadow-[0_4px_14px_rgba(43,33,25,0.08)] border border-[#E2D2BC] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(43,33,25,0.14)]"
+                  className="group relative flex flex-col rounded-2xl bg-[#F1E6D0] p-2.5 sm:p-3 shadow-[0_4px_14px_rgba(43,33,25,0.08)] border border-[#E2D2BC] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.025] hover:shadow-[0_16px_32px_rgba(43,33,25,0.20)] motion-reduce:transform-none"
                   style={{
                     backgroundImage: "linear-gradient(180deg, #FAF4E8 0%, #F1E6D0 100%)",
                   }}
@@ -796,7 +796,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                       src={product.image}
                       alt={product.name}
                       loading="lazy"
-                      className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-108 motion-reduce:transform-none"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = getProductFallbackImage(product.category);
                       }}

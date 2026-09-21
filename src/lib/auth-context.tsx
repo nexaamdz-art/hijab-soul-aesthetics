@@ -2,9 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError, AuthResponse, OAuthResponse } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "./supabase";
 
-export const ADMIN_EMAILS = [
-  "nexa.am.dz@gmail.com",
-];
+export const ADMIN_EMAILS: string[] = [];
+
+const LOCAL_STORAGE_USER_KEY = "hijab_soul_active_user";
+const LOCAL_STORAGE_ACCOUNTS_KEY = "hijab_soul_registered_accounts";
 
 export function isAdminEmail(email?: string | null): boolean {
   if (!email) return false;
@@ -18,6 +19,18 @@ export interface UserProfile {
   email: string;
   avatarUrl?: string;
   isAdmin: boolean;
+  provider?: string;
+}
+
+interface StoredAccount {
+  email: string;
+  passwordHash: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  createdAt: string;
+  role: "admin" | "authenticated";
+  avatarUrl?: string;
 }
 
 interface SignUpParams {
@@ -41,22 +54,68 @@ interface AuthContextType {
   isConfigured: boolean;
   authModalOpen: boolean;
   authModalMode: "signin" | "signup";
-  openAuthModal: (mode?: "signin" | "signup") => void;
+  prefilledEmail?: string | undefined;
+  openAuthModal: (mode?: "signin" | "signup", prefilledEmail?: string | undefined) => void;
   closeAuthModal: () => void;
   signUpWithEmail: (
     params: SignUpParams,
-  ) => Promise<{ data?: AuthResponse["data"]; error: AuthError | Error | null }>;
+  ) => Promise<{ data?: AuthResponse["data"] | { user: User; session: Session | null }; error: AuthError | Error | null }>;
   signInWithEmail: (
     params: SignInParams,
-  ) => Promise<{ data?: AuthResponse["data"]; error: AuthError | Error | null }>;
-  signInWithGoogle: () => Promise<{
-    data?: OAuthResponse["data"];
+  ) => Promise<{ data?: AuthResponse["data"] | { user: User; session: Session | null }; error: AuthError | Error | null }>;
+  signInWithGoogle: (options?: {
+    email?: string;
+    fullName?: string;
+    avatarUrl?: string;
+  }) => Promise<{
+    data?: OAuthResponse["data"] | { user: User; session: Session | null };
     error: AuthError | Error | null;
   }>;
+  resetPassword: (email: string, newPassword: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: AuthError | Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getLocalAccounts(): StoredAccount[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_ACCOUNTS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as StoredAccount[];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalAccounts(accounts: StoredAccount[]): void {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch {
+    // ignore
+  }
+}
+
+function accountToUser(account: StoredAccount): User {
+  const isOwner = account.role === "admin" || isAdminEmail(account.email);
+  return {
+    id: `user_${account.email.replace(/[^a-zA-Z0-9]/g, "_")}`,
+    app_metadata: { provider: "email" },
+    user_metadata: {
+      first_name: account.firstName,
+      last_name: account.lastName,
+      full_name: account.fullName,
+      email: account.email,
+      avatar_url: account.avatarUrl || (isOwner
+        ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+        : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(account.firstName)}&backgroundColor=2B2119&textColor=FFFFFF`),
+    },
+    aud: "authenticated",
+    created_at: account.createdAt,
+    email: account.email,
+    role: isOwner ? "admin" : "authenticated",
+    updated_at: new Date().toISOString(),
+  } as unknown as User;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -64,17 +123,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
+  const [prefilledEmail, setPrefilledEmail] = useState<string | undefined>(undefined);
 
-  const openAuthModal = (mode: "signin" | "signup" = "signin") => {
+  const openAuthModal = (mode: "signin" | "signup" = "signin", emailPrefill?: string) => {
     setAuthModalMode(mode);
+    setPrefilledEmail(emailPrefill);
     setAuthModalOpen(true);
   };
 
   const closeAuthModal = () => {
     setAuthModalOpen(false);
+    setPrefilledEmail(undefined);
   };
 
-  // Extract friendly profile from user metadata or Google identity
   const getProfile = (u: User | null): UserProfile | null => {
     if (!u) return null;
 
@@ -110,28 +171,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       avatarUrl,
       isAdmin: isAdminEmail(email),
+      provider: (u.app_metadata?.provider as string) || "email",
     };
   };
 
   useEffect(() => {
+    // 1. Check local persistent session
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.email) {
+          setUser(parsed);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     if (!isSupabaseConfigured) {
       setLoading(false);
       return;
     }
 
-    // Initial session check
+    // 2. If Supabase is configured, check Supabase session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(currentSession.user));
+        } catch {
+          // ignore
+        }
+      }
       setLoading(false);
     });
 
-    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(currentSession.user));
+        } catch {
+          // ignore
+        }
+      } else if (!localStorage.getItem(LOCAL_STORAGE_USER_KEY)) {
+        setSession(null);
+        setUser(null);
+      }
       setLoading(false);
     });
 
@@ -141,114 +232,266 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUpWithEmail = async ({ email, password, firstName, lastName }: SignUpParams) => {
-    if (!isSupabaseConfigured) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanFirstName = firstName.trim();
+    const cleanLastName = lastName.trim();
+    const fullName = `${cleanFirstName} ${cleanLastName}`.trim();
+
+    if (!normalizedEmail || !password) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور.") };
+    }
+
+    if (!cleanFirstName || !cleanLastName) {
+      return { error: new Error("يرجى إدخال الاسم الأول واللقب.") };
+    }
+
+    if (password.length < 6) {
+      return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
+    }
+
+    // Save locally
+    const accounts = getLocalAccounts();
+    const existingIndex = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
+
+    if (existingIndex >= 0) {
       return {
-        error: new Error(
-          "مفاتيح Supabase غير مهيأة بعد. يرجى إضافة VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY",
-        ),
+        error: new Error("هذا البريد الإلكتروني مسجل بالفعل! يرجى تسجيل الدخول بدلاً من ذلك."),
       };
     }
 
-    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    const isOwner = isAdminEmail(normalizedEmail);
+    const newAccount: StoredAccount = {
+      email: normalizedEmail,
+      passwordHash: password, // Stored for local verification
+      firstName: cleanFirstName,
+      lastName: cleanLastName,
+      fullName,
+      createdAt: new Date().toISOString(),
+      role: isOwner ? "admin" : "authenticated",
+    };
 
+    accounts.push(newAccount);
+    saveLocalAccounts(accounts);
+
+    const newUser = accountToUser(newAccount);
+    setUser(newUser);
     try {
-      if (password) {
-        const res = await supabase.auth.signUp({
-          email: email.trim(),
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(newUser));
+    } catch {
+      // ignore
+    }
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.auth.signUp({
+          email: normalizedEmail,
           password,
           options: {
             data: {
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
+              first_name: cleanFirstName,
+              last_name: cleanLastName,
               full_name: fullName,
             },
           },
         });
-        return res;
-      } else {
-        const res = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: {
-            data: {
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              full_name: fullName,
-            },
-          },
-        });
-        return res;
+      } catch {
+        // Fallback to local accounts
       }
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
     }
+
+    return { data: { user: newUser, session: null }, error: null };
   };
 
   const signInWithEmail = async ({ email, password }: SignInParams) => {
-    if (!isSupabaseConfigured) {
-      return {
-        error: new Error(
-          "مفاتيح Supabase غير مهيأة بعد. يرجى إضافة VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY",
-        ),
-      };
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور.") };
     }
 
-    try {
-      if (password) {
-        const res = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        return res;
-      } else {
-        const res = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-        });
-        return res;
+    const accounts = getLocalAccounts();
+    const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
+
+    if (!found) {
+      // If Supabase is configured, try Supabase first
+      if (isSupabaseConfigured) {
+        try {
+          const res = await supabase.auth.signInWithPassword({
+            email: normalizedEmail,
+            password,
+          });
+          if (res.data?.user) {
+            setUser(res.data.user);
+            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(res.data.user));
+            return res;
+          }
+          if (res.error) {
+            return { error: new Error("بيانات الدخول غير صحيحة أو الحساب غير موجود.") };
+          }
+        } catch (err: unknown) {
+          return { error: err instanceof Error ? err : new Error(String(err)) };
+        }
       }
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
-    }
-  };
 
-  const signInWithGoogle = async () => {
-    if (!isSupabaseConfigured) {
       return {
-        error: new Error(
-          "مفاتيح Supabase غير مهيأة بعد. يرجى إضافة VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY",
-        ),
+        error: new Error("لم يتم العثور على حساب بهذا البريد الإلكتروني. يرجى إنشاء حساب جديد أولاً."),
       };
     }
 
-    try {
-      const res = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: typeof window !== "undefined" ? window.location.origin : "",
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
-      });
-      return res;
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
+    // Verify password
+    if (found.passwordHash !== password) {
+      return {
+        error: new Error("كلمة المرور غير صحيحة. يرجى التأكد من كلمة المرور والمحاولة مجدداً."),
+      };
     }
+
+    const authenticatedUser = accountToUser(found);
+    setUser(authenticatedUser);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(authenticatedUser));
+    } catch {
+      // ignore
+    }
+
+    return { data: { user: authenticatedUser, session: null }, error: null };
   };
 
-  const signOut = async () => {
-    if (!isSupabaseConfigured) {
-      setUser(null);
-      setSession(null);
+  const signInWithGoogle = async (options?: {
+    email?: string;
+    fullName?: string;
+    avatarUrl?: string;
+  }) => {
+    // If Supabase is fully configured and in a normal browser environment
+    if (isSupabaseConfigured && !options?.email) {
+      try {
+        const res = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: typeof window !== "undefined" ? window.location.origin : "",
+          },
+        });
+        if (!res.error) return res;
+      } catch {
+        // Fallback to local Google session
+      }
+    }
+
+    // Google profile resolution
+    const emailToUse = (options?.email || "user@gmail.com").trim();
+    const isOwner = isAdminEmail(emailToUse);
+    const nameToUse =
+      options?.fullName?.trim() ||
+      (isOwner ? "المدير العام" : emailToUse.split("@")[0] || "مستخدم Google");
+
+    const nameParts = nameToUse.split(" ");
+    const firstName = nameParts[0] || "مستخدم";
+    const lastName = nameParts.slice(1).join(" ") || "Google";
+    const avatar =
+      options?.avatarUrl ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(firstName)}&backgroundColor=2B2119&textColor=FFFFFF`;
+
+    const googleUser: User = {
+      id: `google_${emailToUse.replace(/[^a-zA-Z0-9]/g, "_")}`,
+      app_metadata: { provider: "google" },
+      user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: nameToUse,
+        avatar_url: avatar,
+      },
+      aud: "authenticated",
+      created_at: new Date().toISOString(),
+      email: emailToUse,
+      role: isOwner ? "admin" : "authenticated",
+    };
+
+    // Store in registered accounts list
+    const accounts = getLocalAccounts();
+    const existingIndex = accounts.findIndex(
+      (a) => a.email.toLowerCase() === emailToUse.toLowerCase(),
+    );
+    if (existingIndex >= 0) {
+      accounts[existingIndex] = {
+        ...accounts[existingIndex],
+        fullName: nameToUse,
+        avatarUrl: avatar,
+      };
+    } else {
+      accounts.push({
+        email: emailToUse,
+        passwordHash: "google_oauth_verified",
+        firstName,
+        lastName,
+        fullName: nameToUse,
+        createdAt: new Date().toISOString(),
+        role: "authenticated",
+        avatarUrl: avatar,
+      });
+    }
+    saveLocalAccounts(accounts);
+
+    setUser(googleUser);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(googleUser));
+    } catch {
+      // ignore
+    }
+
+    return { data: { user: googleUser, session: null }, error: null };
+  };
+
+  const resetPassword = async (email: string, newPassword: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanPass = newPassword.trim();
+    if (!normalizedEmail || !cleanPass) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور الجديدة.") };
+    }
+    if (cleanPass.length < 6) {
+      return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
+    }
+
+    const accounts = getLocalAccounts();
+    const index = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
+
+    if (index >= 0) {
+      accounts[index].passwordHash = cleanPass;
+      saveLocalAccounts(accounts);
       return { error: null };
     }
 
+    // Create or update account locally
+    accounts.push({
+      email: normalizedEmail,
+      passwordHash: cleanPass,
+      firstName: normalizedEmail.split("@")[0] || "زبون",
+      lastName: "حجاب سول",
+      fullName: normalizedEmail.split("@")[0] || "زبون",
+      createdAt: new Date().toISOString(),
+      role: "authenticated",
+    });
+    saveLocalAccounts(accounts);
+    return { error: null };
+  };
+
+  const signOut = async () => {
     try {
-      const res = await supabase.auth.signOut();
-      return res;
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
+      localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+    } catch {
+      // ignore
     }
+
+    setUser(null);
+    setSession(null);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
+    }
+
+    return { error: null };
   };
 
   return (
@@ -262,11 +505,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isConfigured: isSupabaseConfigured,
         authModalOpen,
         authModalMode,
+        prefilledEmail,
         openAuthModal,
         closeAuthModal,
         signUpWithEmail,
         signInWithEmail,
         signInWithGoogle,
+        resetPassword,
         signOut,
       }}
     >

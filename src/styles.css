@@ -201,6 +201,25 @@
 }
 
 /*
+ * Product card subtle hover zoom and drop-shadow effects
+ */
+.product-card-deckle {
+  filter: drop-shadow(0 6px 12px rgba(44, 34, 30, 0.11)) drop-shadow(0 2px 4px rgba(44, 34, 30, 0.07));
+  transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: filter, transform;
+}
+
+.group:hover .product-card-deckle {
+  filter: drop-shadow(0 16px 30px rgba(44, 34, 30, 0.22)) drop-shadow(0 4px 10px rgba(44, 34, 30, 0.12));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card-deckle {
+    transition: none !important;
+  }
+}
+
+/*
  * Scrollbar suppression for smooth horizontal swipeable strips
  */
 @utility no-scrollbar {

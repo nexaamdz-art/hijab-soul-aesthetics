@@ -141,6 +141,21 @@ var ArrowUpRight = createLucideIcon("arrow-up-right", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Camera = createLucideIcon("camera", [["path", {
+	d: "M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z",
+	key: "18u6gg"
+}], ["circle", {
+	cx: "12",
+	cy: "13",
+	r: "3",
+	key: "1vg3eu"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var CheckCheck = createLucideIcon("check-check", [["path", {
 	d: "M18 6 7 17l-5-5",
 	key: "116fxf"
@@ -273,6 +288,65 @@ var Crown = createLucideIcon("crown", [["path", {
 }], ["path", {
 	d: "M5 21h14",
 	key: "11awu3"
+}]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Download = createLucideIcon("download", [
+	["path", {
+		d: "M12 15V3",
+		key: "m9g1x1"
+	}],
+	["path", {
+		d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+		key: "ih7n3h"
+	}],
+	["path", {
+		d: "m7 10 5 5 5-5",
+		key: "brsn70"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var EyeOff = createLucideIcon("eye-off", [
+	["path", {
+		d: "M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49",
+		key: "ct8e1f"
+	}],
+	["path", {
+		d: "M14.084 14.158a3 3 0 0 1-4.242-4.242",
+		key: "151rxh"
+	}],
+	["path", {
+		d: "M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143",
+		key: "13bj9a"
+	}],
+	["path", {
+		d: "m2 2 20 20",
+		key: "1ooewy"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Eye = createLucideIcon("eye", [["path", {
+	d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0",
+	key: "1nclc0"
+}], ["circle", {
+	cx: "12",
+	cy: "12",
+	r: "3",
+	key: "1v7zrd"
 }]]);
 /**
 * @license lucide-react v0.575.0 - ISC
@@ -532,6 +606,30 @@ var MapPin = createLucideIcon("map-pin", [["path", {
 	r: "3",
 	key: "ilqhr7"
 }]]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Maximize2 = createLucideIcon("maximize-2", [
+	["path", {
+		d: "M15 3h6v6",
+		key: "1q9fwt"
+	}],
+	["path", {
+		d: "m21 3-7 7",
+		key: "1l2asr"
+	}],
+	["path", {
+		d: "m3 21 7-7",
+		key: "tjx5ai"
+	}],
+	["path", {
+		d: "M9 21H3v-6",
+		key: "wtvkvv"
+	}]
+]);
 /**
 * @license lucide-react v0.575.0 - ISC
 *
@@ -996,4 +1094,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { LogOut as A, Crown as B, Package as C, Menu as D, MessageCircle as E, LayoutDashboard as F, CircleAlert as G, CircleX as H, Layers as I, CheckCheck as J, ChevronDown as K, Image as L, LoaderCircle as M, Link as N, MapPin as O, LayoutGrid as P, Heart as R, Pen as S, MessageSquare as T, CircleCheck as U, Clock as V, CircleCheckBig as W, ArrowRight as X, ArrowUpRight as Y, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, ShoppingBag as f, Search as g, Send as h, UserCheck as i, Lock as j, Mail as k, Trash2 as l, Settings as m, X as n, Truck as o, ShieldCheck as p, Check as q, User as r, TriangleAlert as s, Zap as t, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, FileText as z };
+export { Camera as $, Mail as A, FileText as B, Package as C, Menu as D, MessageCircle as E, LayoutGrid as F, Clock as G, EyeOff as H, LayoutDashboard as I, CircleCheckBig as J, CircleX as K, Layers as L, Lock as M, LoaderCircle as N, Maximize2 as O, Link as P, CheckCheck as Q, Image as R, Pen as S, MessageSquare as T, Download as U, Eye as V, Crown as W, ChevronDown as X, CircleAlert as Y, Check as Z, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, ArrowUpRight as et, ShoppingBag as f, Search as g, Send as h, UserCheck as i, LogOut as j, MapPin as k, Trash2 as l, Settings as m, X as n, Truck as o, ShieldCheck as p, CircleCheck as q, User as r, TriangleAlert as s, Zap as t, ArrowRight as tt, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, Heart as z };

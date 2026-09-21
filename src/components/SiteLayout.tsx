@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VintageSidebar } from "@/components/VintageSidebar";
 import { SiteFooter } from "@/components/SiteFooter";
+import { CustomerChatWidget } from "@/components/CustomerChatWidget";
 
 export function SiteLayout({ children }: { children?: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -25,6 +26,9 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
           </div>
         </aside>
       </div>
+
+      {/* Floating customer chat widget with photo support */}
+      <CustomerChatWidget />
 
       {/* Mobile drawer — slides in from the right */}
       {drawerOpen && (

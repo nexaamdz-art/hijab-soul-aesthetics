@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command, mode }) => ({
-  mode: process.env.NODE_ENV === "production" || command === "build" ? "production" : mode,
+  mode: process.env["NODE_ENV"] === "production" || command === "build" ? "production" : mode,
   server: {
     host: "0.0.0.0",
     port: 3000,

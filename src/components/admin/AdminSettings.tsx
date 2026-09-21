@@ -5,7 +5,7 @@ import { ADMIN_EMAILS } from "@/lib/auth-context";
 export function AdminSettings() {
   const [storeName, setStoreName] = useState("حجاب سول — Hijab Soul");
   const [supportPhone, setSupportPhone] = useState("0661234589");
-  const [adminEmail, setAdminEmail] = useState(ADMIN_EMAILS[0] || "nexa.am.dz@gmail.com");
+  const [adminEmail, setAdminEmail] = useState(ADMIN_EMAILS[0] || "admin@hijabsoul.dz");
   const [shippingAlgiers, setShippingAlgiers] = useState<number>(500);
   const [shippingMajorCities, setShippingMajorCities] = useState<number>(700);
   const [shippingSouth, setShippingSouth] = useState<number>(900);

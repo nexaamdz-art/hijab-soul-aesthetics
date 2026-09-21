@@ -68,11 +68,13 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
   isRead: boolean;
+  imageUrl?: string | undefined;
+  imageAttachment?: string | undefined;
   productAttachment?: {
     name: string;
     price: number;
     image: string;
-  };
+  } | undefined;
 }
 
 export interface CustomerConversation {
@@ -968,7 +970,8 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
         id: "m-1",
         conversationId: "conv-1",
         sender: "customer",
-        text: "السلام عليكم ورحمة الله، لقد قمت بطلب العباءة السوداء المطرزة والحجاب الشيفون.",
+        text: "السلام عليكم ورحمة الله، لقد قمت بطلب العباءة السوداء المطرزة وهذا وصل التأكيد.",
+        imageUrl: "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
         timestamp: "10:40 ص",
         isRead: true,
       },
@@ -976,7 +979,8 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
         id: "m-2",
         conversationId: "conv-1",
         sender: "admin",
-        text: "وعليكم السلام ورحمة الله وبركاته يا أمينة! أهلاً بكِ في حجاب سول. تم استقبال طلبكِ رقم #HS-9842 بنجاح.",
+        text: "وعليكم السلام ورحمة الله وبركاته يا أمينة! أهلاً بكِ في حجاب سول. تم استقبال طلبكِ رقم #HS-9842 بنجاح والقطعة مجهزة للشحن الفوري.",
+        imageUrl: "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
         timestamp: "10:42 ص",
         isRead: true,
       },
@@ -1004,6 +1008,7 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
         conversationId: "conv-2",
         sender: "customer",
         text: "مساء الخير، هل فستان التفاصيل الأنيقة متوفر بمقاس XL؟",
+        imageUrl: "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
         timestamp: "أمس 16:15",
         isRead: true,
       },
@@ -1039,6 +1044,7 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
         conversationId: "conv-3",
         sender: "customer",
         text: "مرحباً، أود الاستفسار عن مدة التوصيل وأسعار الخمارات المتوفرة.",
+        imageUrl: "/images/uploads/hijab_pearl_beaded_shawls_1789831343828.jpg",
         timestamp: "أمس 11:50",
         isRead: true,
       },
@@ -1054,7 +1060,7 @@ const INITIAL_CONVERSATIONS: CustomerConversation[] = [
   },
 ];
 
-const CURRENT_DATA_VERSION = "v15";
+const CURRENT_DATA_VERSION = "v16";
 const PRODUCTS_KEY = `hijab_soul_products_${CURRENT_DATA_VERSION}`;
 const ORDERS_KEY = `hijab_soul_orders_${CURRENT_DATA_VERSION}`;
 const CONVERSATIONS_KEY = `hijab_soul_conversations_${CURRENT_DATA_VERSION}`;
@@ -1593,7 +1599,6 @@ export function getStoredProducts(): AdminProduct[] {
         return {
           ...initProd,
           stock: typeof prod.stock === "number" ? prod.stock : initProd.stock,
-          isFeatured: typeof prod.isFeatured === "boolean" ? prod.isFeatured : initProd.isFeatured,
           price: typeof prod.price === "number" && prod.price > 0 ? prod.price : initProd.price,
         };
       }
@@ -1809,14 +1814,23 @@ export function useStoreData() {
 
   // Chat Actions
   const sendMessage = useCallback(
-    (conversationId: string, text: string, sender: "admin" | "customer" = "admin") => {
+    (
+      conversationId: string,
+      text: string,
+      sender: "admin" | "customer" = "admin",
+      imageUrl?: string | undefined,
+      productAttachment?: { name: string; price: number; image: string } | undefined,
+    ) => {
       const newMessage: ChatMessage = {
-        id: `msg-${Date.now()}`,
+        id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
         conversationId,
         sender,
-        text,
+        text: text || (imageUrl ? "📷 صورة مرفقة" : ""),
         timestamp: new Date().toLocaleTimeString("ar-DZ", { hour: "2-digit", minute: "2-digit" }),
         isRead: sender === "admin",
+        imageUrl: imageUrl || undefined,
+        imageAttachment: imageUrl || undefined,
+        productAttachment: productAttachment || undefined,
       };
 
       setConversations((prev) => {
@@ -1824,8 +1838,9 @@ export function useStoreData() {
           if (c.id === conversationId) {
             return {
               ...c,
-              lastMessage: text,
+              lastMessage: text || (imageUrl ? "📷 صورة مرفقة" : ""),
               lastMessageTime: newMessage.timestamp,
+              unreadCount: sender === "customer" ? c.unreadCount + 1 : c.unreadCount,
               messages: [...c.messages, newMessage],
             };
           }
@@ -1835,7 +1850,6 @@ export function useStoreData() {
         return next;
       });
 
-      // If admin sent message, simulate customer reading it or responding if test
       return newMessage;
     },
     [],
