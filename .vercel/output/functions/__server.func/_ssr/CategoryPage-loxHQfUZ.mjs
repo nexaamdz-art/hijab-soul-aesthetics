@@ -2,7 +2,7 @@ import { r as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react_tanstack__react-query.mjs";
 import { a as useStoreData, r as getProductFallbackImage } from "./store-data-Bc0o-mtj.mjs";
 import { h as Link } from "../_libs/@tanstack/react-router_chunks.mjs";
-import { W as Crown, Z as Check, b as Plus, d as Sparkles, f as ShoppingBag, g as Search, n as X, o as Truck, w as Minus, z as Heart } from "../_libs/lucide-react.mjs";
+import { B as Heart, G as Crown, Q as Check, b as Plus, d as Sparkles, f as ShoppingBag, g as Search, n as X, o as Truck, w as Minus } from "../_libs/lucide-react.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/CategoryPage-loxHQfUZ.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
