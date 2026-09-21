@@ -3,16 +3,13 @@ import { X } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VintageSidebar } from "@/components/VintageSidebar";
 import { SiteFooter } from "@/components/SiteFooter";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { MobileCategoryChips } from "@/components/MobileCategoryChips";
 
 export function SiteLayout({ children }: { children?: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-16 lg:pb-0">
+    <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader onMenuClick={() => setDrawerOpen(true)} />
-      <MobileCategoryChips />
 
       <div className="flex min-h-0 flex-1">
         {/* main content (right in RTL) */}
@@ -29,22 +26,19 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
         </aside>
       </div>
 
-      {/* Sticky Mobile Bottom Navigation Bar */}
-      <MobileBottomNav onOpenCategories={() => setDrawerOpen(true)} />
-
       {/* Mobile drawer — slides in from the right */}
       {drawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             aria-label="إغلاق القائمة"
             onClick={() => setDrawerOpen(false)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+            className="absolute inset-0 bg-black/50 animate-in fade-in"
           />
           <div className="absolute inset-y-0 right-0 h-[100dvh] max-h-[100dvh] w-fit max-w-[92vw] overflow-y-auto bg-paper shadow-2xl animate-in slide-in-from-right duration-300">
             <button
               aria-label="إغلاق"
               onClick={() => setDrawerOpen(false)}
-              className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-header/80 text-header-foreground hover:bg-header transition-colors"
+              className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-header/80 text-header-foreground"
             >
               <X className="h-4 w-4" strokeWidth={1.5} />
             </button>
@@ -55,4 +49,3 @@ export function SiteLayout({ children }: { children?: ReactNode }) {
     </div>
   );
 }
-
