@@ -16,17 +16,7 @@ import { useStoreData } from "@/lib/store-data";
 import { useAuth } from "@/lib/auth-context";
 
 export function CustomerChatWidget() {
-  const { user } = useAuth();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Ensure widget is NEVER present in SSG/SSR pre-rendered HTML or for unauthenticated guests
-  if (!isMounted || !user) return null;
-
-  return <CustomerChatWidgetContent />;
+  return null;
 }
 
 function CustomerChatWidgetContent() {
