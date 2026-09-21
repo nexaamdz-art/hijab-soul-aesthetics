@@ -17,9 +17,14 @@ import { useAuth } from "@/lib/auth-context";
 
 export function CustomerChatWidget() {
   const { user } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Hide widget completely if user is not logged in / has no account
-  if (!user) return null;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Ensure widget is NEVER present in SSG/SSR pre-rendered HTML or for unauthenticated guests
+  if (!isMounted || !user) return null;
 
   return <CustomerChatWidgetContent />;
 }
