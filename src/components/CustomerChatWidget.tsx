@@ -16,8 +16,17 @@ import { useStoreData } from "@/lib/store-data";
 import { useAuth } from "@/lib/auth-context";
 
 export function CustomerChatWidget() {
+  const { user } = useAuth();
+
+  // Hide widget completely if user is not logged in / has no account
+  if (!user) return null;
+
+  return <CustomerChatWidgetContent />;
+}
+
+function CustomerChatWidgetContent() {
   const { conversations, sendMessage } = useStoreData();
-  const { user, openAuthModal } = useAuth();
+  const { user } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
