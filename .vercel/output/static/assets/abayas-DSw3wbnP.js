@@ -1,1 +1,0 @@
-import{t as e}from"./SiteLayout-CFG-mjoa.js";import{t}from"./CategoryPage-B5p6X3sH.js";import{p as n}from"./index-XLzHg4I7.js";var r=n(),i=()=>(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`عبايات`})});export{i as component};
