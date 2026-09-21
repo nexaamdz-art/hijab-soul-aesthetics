@@ -230,13 +230,7 @@ export function LatestProductsSection() {
     <section
       id="latest-products-section"
       aria-label="أحدث المنتجات"
-      className="relative w-full max-w-full overflow-x-hidden mt-[28px] mb-[32px]"
-      style={
-        {
-          "--product-card-w": "clamp(150px, 46vw, 190px)",
-          "--product-gap": "14px",
-        } as React.CSSProperties
-      }
+      className="relative w-full max-w-full overflow-x-hidden mt-[20px] sm:mt-[28px] mb-[24px] sm:mb-[32px]"
     >
       {/* SECTION TITLE: Aligned to RTL start (right side) with black brush-stroke background, small white crown on the right, and bold white text */}
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 mb-4 sm:mb-5">

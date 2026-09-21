@@ -554,7 +554,7 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
         {/* Section Header with Artistic Banner & Custom Image Support */}
         <div className="relative mb-8 sm:mb-10 text-center">
           {currentCategoryData?.bannerImage && (
-            <div className="relative w-full h-36 sm:h-48 md:h-56 rounded-3xl overflow-hidden mb-6 shadow-md border border-[#E3D4C0]">
+            <div className="relative w-full h-28 sm:h-48 md:h-56 rounded-2xl sm:rounded-3xl overflow-hidden mb-5 sm:mb-6 shadow-md border border-[#E3D4C0]">
               <img
                 src={currentCategoryData.bannerImage}
                 alt={title}

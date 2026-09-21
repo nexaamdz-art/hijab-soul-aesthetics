@@ -113,17 +113,7 @@ export function CategoriesSection() {
     <section
       id="store-categories-section"
       aria-label="أقسام وتصنيفات المتجر"
-      className="relative w-full max-w-full overflow-x-hidden py-4 sm:py-5 lg:py-6"
-      style={
-        {
-          "--label-h": "35px",
-          "--label-inset": "11%",
-          "--label-bottom": "7%",
-          "--label-font": "15.5px",
-          "--label-bg": "#E2D0AC",
-          "--label-color": "#3B2A1A",
-        } as React.CSSProperties
-      }
+      className="relative w-full max-w-full overflow-x-hidden py-3 sm:py-5 lg:py-6"
     >
       <nav aria-label="تصفح أقسام المتجر" className="w-full">
         <div
@@ -156,7 +146,7 @@ export function CategoriesSection() {
                   className="relative w-full transition-[transform,filter] duration-300 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none"
                   style={{
                     aspectRatio: "var(--img-ratio)",
-                    maxHeight: "228px",
+                    maxHeight: "var(--max-card-h, 228px)",
                     filter:
                       "drop-shadow(0 8px 16px rgba(44, 34, 30, 0.14)) drop-shadow(0 2px 4px rgba(44, 34, 30, 0.08))",
                     WebkitFilter:

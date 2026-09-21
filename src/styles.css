@@ -135,30 +135,32 @@
  * All card dimensions reduced by ~12% across phone, tablet, and desktop breakpoints.
  */
 #store-categories-section {
-  --card-w: clamp(106px, 32vw, 140px);
-  --gap: 11px;
+  --card-w: clamp(74px, 22.5vw, 92px);
+  --gap: 8px;
   --img-ratio: 4 / 5;
-  --strip-h: 32px;
-  --strip-font-size: 12px;
+  --max-card-h: 135px;
+  --strip-h: 24px;
+  --strip-font-size: 11px;
 
-  /* Category Name Paper Label Variables (scaled by ~12%) */
-  --label-h: 35px;
-  --label-inset: 11%;
-  --label-bottom: 7%;
-  --label-font: 15.5px;
+  /* Category Name Paper Label Variables for Mobile */
+  --label-h: 24px;
+  --label-inset: 6%;
+  --label-bottom: 5%;
+  --label-font: 11.5px;
   --label-bg: #E2D0AC;
   --label-color: #3B2A1A;
 }
 
 @media (min-width: 640px) {
   #store-categories-section {
-    --card-w: clamp(132px, 19.5vw, 158px);
+    --card-w: clamp(120px, 18.5vw, 148px);
     --gap: 12px;
+    --max-card-h: 200px;
     --strip-h: 33px;
     --strip-font-size: 12.5px;
-    --label-h: 35px;
-    --label-inset: 11%;
-    --label-font: 16px;
+    --label-h: 32px;
+    --label-inset: 10%;
+    --label-font: 15px;
   }
 }
 
@@ -166,6 +168,7 @@
   #store-categories-section {
     --card-w: 1fr;
     --gap: 12px;
+    --max-card-h: 228px;
     --strip-h: 33px;
     --strip-font-size: 12.5px;
     --label-h: 35px;
@@ -176,11 +179,11 @@
 
 /*
  * Latest Products Section CSS Variables
- * Responsive card width and gap
+ * Compact card width and gap on mobile screens
  */
 #latest-products-section {
-  --product-card-w: clamp(150px, 46vw, 190px);
-  --product-gap: 14px;
+  --product-card-w: clamp(120px, 36vw, 148px);
+  --product-gap: 10px;
 }
 
 @media (min-width: 640px) {
