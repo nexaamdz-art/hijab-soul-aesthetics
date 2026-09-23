@@ -60,17 +60,23 @@ interface AuthContextType {
   signUpWithEmail: (
     params: SignUpParams,
   ) => Promise<{ data?: AuthResponse["data"] | { user: User; session: Session | null }; error: AuthError | Error | null }>;
+  verifySignUpOtp: (
+    email: string,
+    token: string,
+  ) => Promise<{ data?: AuthResponse["data"] | { user: User | null; session: Session | null }; error: AuthError | Error | null }>;
   signInWithEmail: (
     params: SignInParams,
   ) => Promise<{ data?: AuthResponse["data"] | { user: User; session: Session | null }; error: AuthError | Error | null }>;
-  signInWithGoogle: (options?: {
-    email?: string;
-    fullName?: string;
-    avatarUrl?: string;
-  }) => Promise<{
+  signInWithGoogle: () => Promise<{
     data?: OAuthResponse["data"] | { user: User; session: Session | null };
     error: AuthError | Error | null;
   }>;
+  sendPasswordResetOtp: (email: string) => Promise<{ error: AuthError | Error | null }>;
+  verifyPasswordResetOtpAndUpdate: (
+    email: string,
+    token: string,
+    newPassword: string,
+  ) => Promise<{ error: AuthError | Error | null }>;
   resetPassword: (email: string, newPassword: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: AuthError | Error | null }>;
 }
@@ -249,57 +255,83 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
-    // Save locally
-    const accounts = getLocalAccounts();
-    const existingIndex = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
-
-    if (existingIndex >= 0) {
+    if (!isSupabaseConfigured) {
       return {
-        error: new Error("هذا البريد الإلكتروني مسجل بالفعل! يرجى تسجيل الدخول بدلاً من ذلك."),
+        error: new Error(
+          "تنبيه أمني: إرسال بريد التفعيل يتطلب إعداد مفاتيح Supabase (VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY). يرجى ربط المفاتيح في ملف البيئة لتشغيل إرسال الأكواد الفعلية للبريد."
+        ),
       };
     }
 
-    const isOwner = isAdminEmail(normalizedEmail);
-    const newAccount: StoredAccount = {
-      email: normalizedEmail,
-      passwordHash: password, // Stored for local verification
-      firstName: cleanFirstName,
-      lastName: cleanLastName,
-      fullName,
-      createdAt: new Date().toISOString(),
-      role: isOwner ? "admin" : "authenticated",
-    };
-
-    accounts.push(newAccount);
-    saveLocalAccounts(accounts);
-
-    const newUser = accountToUser(newAccount);
-    setUser(newUser);
     try {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(newUser));
-    } catch {
-      // ignore
-    }
-
-    if (isSupabaseConfigured) {
-      try {
-        await supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
-          options: {
-            data: {
-              first_name: cleanFirstName,
-              last_name: cleanLastName,
-              full_name: fullName,
-            },
+      const res = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          data: {
+            first_name: cleanFirstName,
+            last_name: cleanLastName,
+            full_name: fullName,
           },
-        });
-      } catch {
-        // Fallback to local accounts
+          emailRedirectTo: typeof window !== "undefined" ? window.location.origin : "",
+        },
+      });
+
+      if (res.error) {
+        return { error: res.error };
       }
+
+      return { data: res.data, error: null };
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
+  };
+
+  const verifySignUpOtp = async (email: string, token: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim();
+
+    if (!normalizedEmail || !cleanToken) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني ورمز التحقق الكامل.") };
     }
 
-    return { data: { user: newUser, session: null }, error: null };
+    if (!isSupabaseConfigured) {
+      return { error: new Error("Supabase غير متصل. يرجى إعداد مفاتيح الاتصال أولاً.") };
+    }
+
+    try {
+      let res = await supabase.auth.verifyOtp({
+        email: normalizedEmail,
+        token: cleanToken,
+        type: "signup",
+      });
+
+      if (res.error) {
+        res = await supabase.auth.verifyOtp({
+          email: normalizedEmail,
+          token: cleanToken,
+          type: "email",
+        });
+      }
+
+      if (res.error) {
+        return { error: new Error("رمز التحقق غير صحيح أو منتهي الصلاحية. يرجى التأكد من البريد والمحاولة مجدداً.") };
+      }
+
+      if (res.data?.user) {
+        setUser(res.data.user);
+        setSession(res.data.session);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(res.data.user));
+        } catch {
+          // ignore
+        }
+      }
+
+      return { data: res.data, error: null };
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
   };
 
   const signInWithEmail = async ({ email, password }: SignInParams) => {
@@ -309,168 +341,135 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور.") };
     }
 
-    const accounts = getLocalAccounts();
-    const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
-
-    if (!found) {
-      // If Supabase is configured, try Supabase first
-      if (isSupabaseConfigured) {
-        try {
-          const res = await supabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password,
-          });
-          if (res.data?.user) {
-            setUser(res.data.user);
-            localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(res.data.user));
-            return res;
-          }
-          if (res.error) {
-            return { error: new Error("بيانات الدخول غير صحيحة أو الحساب غير موجود.") };
-          }
-        } catch (err: unknown) {
-          return { error: err instanceof Error ? err : new Error(String(err)) };
-        }
-      }
-
+    if (!isSupabaseConfigured) {
       return {
-        error: new Error("لم يتم العثور على حساب بهذا البريد الإلكتروني. يرجى إنشاء حساب جديد أولاً."),
+        error: new Error(
+          "تسجيل الدخول يتطلب ربط مفاتيح Supabase. يرجى إدخال VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY في البيئة."
+        ),
       };
     }
 
-    // Verify password
-    if (found.passwordHash !== password) {
-      return {
-        error: new Error("كلمة المرور غير صحيحة. يرجى التأكد من كلمة المرور والمحاولة مجدداً."),
-      };
-    }
-
-    const authenticatedUser = accountToUser(found);
-    setUser(authenticatedUser);
     try {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(authenticatedUser));
-    } catch {
-      // ignore
-    }
-
-    return { data: { user: authenticatedUser, session: null }, error: null };
-  };
-
-  const signInWithGoogle = async (options?: {
-    email?: string;
-    fullName?: string;
-    avatarUrl?: string;
-  }) => {
-    // If Supabase is fully configured and in a normal browser environment
-    if (isSupabaseConfigured && !options?.email) {
-      try {
-        const res = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: typeof window !== "undefined" ? window.location.origin : "",
-          },
-        });
-        if (!res.error) return res;
-      } catch {
-        // Fallback to local Google session
-      }
-    }
-
-    // Google profile resolution
-    const emailToUse = (options?.email || "user@gmail.com").trim();
-    const isOwner = isAdminEmail(emailToUse);
-    const nameToUse =
-      options?.fullName?.trim() ||
-      (isOwner ? "المدير العام" : emailToUse.split("@")[0] || "مستخدم Google");
-
-    const nameParts = nameToUse.split(" ");
-    const firstName = nameParts[0] || "مستخدم";
-    const lastName = nameParts.slice(1).join(" ") || "Google";
-    const avatar =
-      options?.avatarUrl ||
-      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(firstName)}&backgroundColor=2B2119&textColor=FFFFFF`;
-
-    const googleUser: User = {
-      id: `google_${emailToUse.replace(/[^a-zA-Z0-9]/g, "_")}`,
-      app_metadata: { provider: "google" },
-      user_metadata: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: nameToUse,
-        avatar_url: avatar,
-      },
-      aud: "authenticated",
-      created_at: new Date().toISOString(),
-      email: emailToUse,
-      role: isOwner ? "admin" : "authenticated",
-    };
-
-    // Store in registered accounts list
-    const accounts = getLocalAccounts();
-    const existingIndex = accounts.findIndex(
-      (a) => a.email.toLowerCase() === emailToUse.toLowerCase(),
-    );
-    if (existingIndex >= 0) {
-      accounts[existingIndex] = {
-        ...accounts[existingIndex],
-        fullName: nameToUse,
-        avatarUrl: avatar,
-      };
-    } else {
-      accounts.push({
-        email: emailToUse,
-        passwordHash: "google_oauth_verified",
-        firstName,
-        lastName,
-        fullName: nameToUse,
-        createdAt: new Date().toISOString(),
-        role: "authenticated",
-        avatarUrl: avatar,
+      const res = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
       });
-    }
-    saveLocalAccounts(accounts);
 
-    setUser(googleUser);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(googleUser));
-    } catch {
-      // ignore
-    }
+      if (res.error) {
+        return { error: new Error("بيانات الدخول غير صحيحة أو الحساب غير مؤكد عبر البريد الإلكتروني بعد.") };
+      }
 
-    return { data: { user: googleUser, session: null }, error: null };
+      if (res.data?.user) {
+        setUser(res.data.user);
+        setSession(res.data.session);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(res.data.user));
+        } catch {
+          // ignore
+        }
+        return res;
+      }
+
+      return { error: new Error("تعذر إكمال عملية تسجيل الدخول.") };
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
   };
 
-  const resetPassword = async (email: string, newPassword: string) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    const cleanPass = newPassword.trim();
-    if (!normalizedEmail || !cleanPass) {
-      return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور الجديدة.") };
+  const signInWithGoogle = async () => {
+    if (!isSupabaseConfigured) {
+      return {
+        error: new Error(
+          "تسجيل الدخول بـ Google يتطلب ربط مشروع Supabase وإدخال مفاتيح VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY وتفعيل Google Provider في لوحة Supabase."
+        ),
+      };
     }
+
+    try {
+      const res = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: typeof window !== "undefined" ? window.location.origin : "",
+        },
+      });
+
+      if (res.error) {
+        return { error: res.error };
+      }
+
+      return res;
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
+  };
+
+  const sendPasswordResetOtp = async (email: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني.") };
+    }
+
+    if (!isSupabaseConfigured) {
+      return { error: new Error("خدمة استرجاع كلمة المرور تتطلب ربط مفاتيح Supabase.") };
+    }
+
+    try {
+      const res = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: typeof window !== "undefined" ? window.location.origin : "",
+      });
+
+      if (res.error) return { error: res.error };
+      return { error: null };
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
+  };
+
+  const verifyPasswordResetOtpAndUpdate = async (
+    email: string,
+    token: string,
+    newPassword: string,
+  ) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanToken = token.trim();
+    const cleanPass = newPassword.trim();
+
+    if (!normalizedEmail || !cleanToken || !cleanPass) {
+      return { error: new Error("يرجى إدخال البريد والرمز وكلمة المرور الجديدة.") };
+    }
+
     if (cleanPass.length < 6) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
-    const accounts = getLocalAccounts();
-    const index = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
-
-    if (index >= 0) {
-      accounts[index].passwordHash = cleanPass;
-      saveLocalAccounts(accounts);
-      return { error: null };
+    if (!isSupabaseConfigured) {
+      return { error: new Error("تأكيد كلمة المرور يتطلب ربط Supabase.") };
     }
 
-    // Create or update account locally
-    accounts.push({
-      email: normalizedEmail,
-      passwordHash: cleanPass,
-      firstName: normalizedEmail.split("@")[0] || "زبون",
-      lastName: "حجاب سول",
-      fullName: normalizedEmail.split("@")[0] || "زبون",
-      createdAt: new Date().toISOString(),
-      role: "authenticated",
-    });
-    saveLocalAccounts(accounts);
-    return { error: null };
+    try {
+      const verifyRes = await supabase.auth.verifyOtp({
+        email: normalizedEmail,
+        token: cleanToken,
+        type: "recovery",
+      });
+
+      if (verifyRes.error) {
+        return { error: new Error("رمز الاسترجاع غير صحيح أو منتهي الصلاحية.") };
+      }
+
+      const updateRes = await supabase.auth.updateUser({ password: cleanPass });
+      if (updateRes.error) {
+        return { error: updateRes.error };
+      }
+
+      return { error: null };
+    } catch (err: unknown) {
+      return { error: err instanceof Error ? err : new Error(String(err)) };
+    }
+  };
+
+  const resetPassword = async (email: string, newPassword: string) => {
+    return verifyPasswordResetOtpAndUpdate(email, "", newPassword);
   };
 
   const signOut = async () => {
@@ -509,8 +508,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         openAuthModal,
         closeAuthModal,
         signUpWithEmail,
+        verifySignUpOtp,
         signInWithEmail,
         signInWithGoogle,
+        sendPasswordResetOtp,
+        verifyPasswordResetOtpAndUpdate,
         resetPassword,
         signOut,
       }}

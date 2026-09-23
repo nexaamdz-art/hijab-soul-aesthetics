@@ -28,8 +28,10 @@ export function AuthModal() {
     openAuthModal,
     signInWithEmail,
     signUpWithEmail,
+    verifySignUpOtp,
     signInWithGoogle,
-    resetPassword,
+    sendPasswordResetOtp,
+    verifyPasswordResetOtpAndUpdate,
   } = useAuth();
 
   const [currentView, setCurrentView] = useState<ModalView>("signin");
@@ -44,7 +46,6 @@ export function AuthModal() {
   const [isLoading, setIsLoading] = useState(false);
 
   // OTP State
-  const [generatedOtp, setGeneratedOtp] = useState<string>("");
   const [otpInput, setOtpInput] = useState<string[]>(["", "", "", "", "", ""]);
   const [resendTimer, setResendTimer] = useState<number>(60);
   const [newPassword, setNewPassword] = useState("");
@@ -83,10 +84,6 @@ export function AuthModal() {
 
   if (!authModalOpen) return null;
 
-  const generate6DigitOtp = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-
   const handleGoogleSignIn = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -96,10 +93,7 @@ export function AuthModal() {
       if (res.error) {
         setErrorMsg(res.error.message || "تعذر تسجيل الدخول بحساب Google.");
       } else {
-        setSuccessMsg("تم تسجيل الدخول بنجاح بحساب Google! مرحباً بكِ.");
-        setTimeout(() => {
-          closeAuthModal();
-        }, 1000);
+        setSuccessMsg("جاري التوجيه لحساب Google الخاص بكِ...");
       }
     } catch (err: unknown) {
       setErrorMsg(
@@ -112,8 +106,8 @@ export function AuthModal() {
     }
   };
 
-  // 1. Submit Registration Form -> Send OTP Code
-  const handleSignUpSubmit = (e: React.FormEvent) => {
+  // 1. Submit Registration Form -> Request Real Email OTP Code via Supabase
+  const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -138,12 +132,30 @@ export function AuthModal() {
       return;
     }
 
-    const code = generate6DigitOtp();
-    setGeneratedOtp(code);
-    setOtpInput(["", "", "", "", "", ""]);
-    setResendTimer(60);
-    setCurrentView("verify-otp");
-    setSuccessMsg(`📧 تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني (رمز التفعيل: ${code})`);
+    setIsLoading(true);
+    try {
+      const { error } = await signUpWithEmail({
+        email: cleanEmail,
+        password: cleanPass,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+
+      if (error) {
+        setErrorMsg(error.message || "حدث خطأ أثناء إرسال بريد التفعيل.");
+      } else {
+        setOtpInput(["", "", "", "", "", ""]);
+        setResendTimer(60);
+        setCurrentView("verify-otp");
+        setSuccessMsg(
+          `📧 تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني (${cleanEmail}). يرجى فحص صندوق الوارد (أو الرسائل غير المرغوب فيها Spam) وإدخال الرمز لتأكيد الحساب.`
+        );
+      }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 2. Verify Sign-Up OTP & Complete Registration
@@ -158,22 +170,12 @@ export function AuthModal() {
       return;
     }
 
-    if (enteredCode !== generatedOtp) {
-      setErrorMsg("رمز التحقق غير صحيح! يرجى التأكد وإعادة المحاولة.");
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const { error } = await signUpWithEmail({
-        email: email.trim(),
-        password: password.trim(),
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-      });
+      const { error } = await verifySignUpOtp(email.trim(), enteredCode);
 
       if (error) {
-        setErrorMsg(error.message || "حدث خطأ أثناء إنشاء الحساب.");
+        setErrorMsg(error.message || "رمز التحقق غير صحيح أو منتهي الصلاحية.");
       } else {
         setSuccessMsg("تم تأكيد البريد الإلكتروني وإنشاء حسابكِ بنجاح! أهلاً بكِ في حجاب سول.");
         setTimeout(() => {
@@ -223,8 +225,8 @@ export function AuthModal() {
     }
   };
 
-  // 4. Request Password Reset OTP
-  const handleForgotRequest = (e: React.FormEvent) => {
+  // 4. Request Password Reset OTP via Supabase
+  const handleForgotRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -235,12 +237,24 @@ export function AuthModal() {
       return;
     }
 
-    const code = generate6DigitOtp();
-    setGeneratedOtp(code);
-    setOtpInput(["", "", "", "", "", ""]);
-    setResendTimer(60);
-    setCurrentView("forgot-reset");
-    setSuccessMsg(`📧 تم إرسال رمز استرجاع كلمة المرور المكون من 6 أرقام إلى بريدك الإلكتروني (رمز التعديل: ${code})`);
+    setIsLoading(true);
+    try {
+      const { error } = await sendPasswordResetOtp(cleanEmail);
+      if (error) {
+        setErrorMsg(error.message || "تعذر إرسال رمز استرجاع كلمة المرور.");
+      } else {
+        setOtpInput(["", "", "", "", "", ""]);
+        setResendTimer(60);
+        setCurrentView("forgot-reset");
+        setSuccessMsg(
+          `📧 تم إرسال رمز استرجاع كلمة المرور إلى بريدك الإلكتروني (${cleanEmail}). يرجى مراجعة بريدك الإلكتروني للوصول إلى الرمز.`
+        );
+      }
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 5. Submit Password Reset
@@ -252,11 +266,6 @@ export function AuthModal() {
     const enteredCode = otpInput.join("");
     if (enteredCode.length < 6) {
       setErrorMsg("يرجى إدخال كامل أرقام الرمز الستة.");
-      return;
-    }
-
-    if (enteredCode !== generatedOtp) {
-      setErrorMsg("رمز الاسترجاع غير صحيح! يرجى التأكد وإعادة المحاولة.");
       return;
     }
 
@@ -272,19 +281,23 @@ export function AuthModal() {
 
     setIsLoading(true);
     try {
-      const { error } = await resetPassword(email, newPassword);
+      const { error } = await verifyPasswordResetOtpAndUpdate(
+        email.trim(),
+        enteredCode,
+        newPassword.trim(),
+      );
       if (error) {
         setErrorMsg(error.message || "فشل تحديث كلمة المرور.");
       } else {
-        setSuccessMsg("تم تغيير كلمة المرور بنجاح! يمكنكِ الآن تسجيل الدخول بكودكِ الجديد.");
+        setSuccessMsg("تم تغيير كلمة المرور بنجاح! يمكنكِ الآن تسجيل الدخول بكلمة المرور الجديدة.");
         setTimeout(() => {
           setCurrentView("signin");
           setPassword(newPassword);
-          setSuccessMsg("تم تحديث كلمة المرور! أدخلي كلمة المرور لتسجيل الدخول.");
+          setSuccessMsg("تم تحديث كلمة المرور! أدخلي كلمة المرور الجديدة لتسجيل الدخول.");
         }, 1200);
       }
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ أثنائ تحديث كلمة المرور.");
+      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ أثناء تحديث كلمة المرور.");
     } finally {
       setIsLoading(false);
     }
@@ -310,12 +323,35 @@ export function AuthModal() {
     }
   };
 
-  const handleResendOtp = () => {
-    const code = generate6DigitOtp();
-    setGeneratedOtp(code);
-    setResendTimer(60);
-    setOtpInput(["", "", "", "", "", ""]);
-    setSuccessMsg(`📧 تم إعادة إرسال رمز جديد المكون من 6 أرقام (الرمز الجديد: ${code})`);
+  const handleResendOtp = async () => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    if (!email.trim()) return;
+
+    if (currentView === "verify-otp") {
+      const { error } = await signUpWithEmail({
+        email: email.trim(),
+        password: password.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setResendTimer(60);
+        setOtpInput(["", "", "", "", "", ""]);
+        setSuccessMsg("📧 تم إعادة إرسال رمز تحقق جديد إلى بريدك الإلكتروني.");
+      }
+    } else if (currentView === "forgot-reset") {
+      const { error } = await sendPasswordResetOtp(email.trim());
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        setResendTimer(60);
+        setOtpInput(["", "", "", "", "", ""]);
+        setSuccessMsg("📧 تم إعادة إرسال رمز استرجاع جديد إلى بريدك الإلكتروني.");
+      }
+    }
   };
 
   return (

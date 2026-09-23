@@ -1,0 +1,1 @@
+import{t as e}from"./SiteLayout-DPpguyHD.js";import{t}from"./CategoryPage-BYW4CqDx.js";import{m as n}from"./index-BP4HmWbm.js";var r=n(),i=()=>(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`حجابات`,subtitle:`تشكيلة أرقى الحجابات والشالات التركية، شيفون جورجيت، كريب ناعم، شالات سهرة مرصعة، وأوشحة مريحة`})});export{i as component};

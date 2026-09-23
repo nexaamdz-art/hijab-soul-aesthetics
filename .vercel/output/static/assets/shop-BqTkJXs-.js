@@ -1,0 +1,1 @@
+import{t as e}from"./SiteLayout-DPpguyHD.js";import{t}from"./CategoryPage-BYW4CqDx.js";import{m as n}from"./index-BP4HmWbm.js";var r=n();function i(){return(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`تسوقي الآن`})})}export{i as component};

@@ -1,1 +1,0 @@
-import{t as e}from"./SiteLayout-CtzzLc3_.js";import{t}from"./CategoryPage-CU7l0flT.js";import{m as n}from"./index-BJPbs3GO.js";var r=n(),i=()=>(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`إكسسوارات`})});export{i as component};
