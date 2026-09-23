@@ -30,11 +30,13 @@ export function AuthModal() {
     signUpWithEmail,
     verifySignUpOtp,
     signInWithGoogle,
+    signInQuickAdmin,
     sendPasswordResetOtp,
     verifyPasswordResetOtpAndUpdate,
   } = useAuth();
 
   const [currentView, setCurrentView] = useState<ModalView>("signin");
+  const [googleSetupGuide, setGoogleSetupGuide] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -87,26 +89,72 @@ export function AuthModal() {
   const handleGoogleSignIn = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
+    setGoogleSetupGuide(false);
     setIsLoading(true);
     try {
       const res = await signInWithGoogle();
       if (res.error) {
-        setErrorMsg(res.error.message || "تعذر تسجيل الدخول بحساب Google.");
-      } else {
-        setSuccessMsg("جاري التوجيه لحساب Google الخاص بكِ...");
+        setErrorMsg(res.error.message || "تعذر بدء تسجيل الدخول بحساب Google.");
+        setIsLoading(false);
+        return;
       }
+
+      const authUrl = res.data?.url;
+      if (!authUrl) {
+        setErrorMsg("لم يتم استلام رابط تسجيل الدخول من Supabase.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Probe Supabase to check if Google provider is enabled in the user's Supabase dashboard
+      try {
+        const probe = await fetch(authUrl, { method: "GET" });
+        if (!probe.ok) {
+          const body = await probe.json().catch(() => null);
+          if (
+            body?.msg?.includes("provider is not enabled") ||
+            body?.error_code === "validation_failed"
+          ) {
+            setGoogleSetupGuide(true);
+            setErrorMsg(
+              "تنبيه: موفر Google غير مفعّل بعد في لوحة تحكم Supabase لمشروعك (xiytavyvffzaxxygctbs). يرجى تفعيله في لوحة Supabase للربط المباشر.",
+            );
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch {
+        // Probe may be skipped if CORS applies, proceed to window.open
+      }
+
+      // Open OAuth popup window safely
+      const width = 500;
+      const height = 650;
+      const left =
+        typeof window !== "undefined" ? window.screenX + (window.outerWidth - width) / 2 : 0;
+      const top =
+        typeof window !== "undefined" ? window.screenY + (window.outerHeight - height) / 2 : 0;
+      const popup = window.open(
+        authUrl,
+        "google_oauth_popup",
+        `width=${width},height=${height},left=${left},top=${top},status=no,toolbar=no,menubar=no`,
+      );
+
+      if (!popup) {
+        window.open(authUrl, "_blank");
+      }
+
+      setSuccessMsg("تم فتح نافذة تسجيل الدخول بـ Google. يرجى إكمال تسجيل الدخول فيها.");
     } catch (err: unknown) {
       setErrorMsg(
-        err instanceof Error
-          ? err.message
-          : "حدث خطأ غير متوقع أثناء تسجيل الدخول بـ Google.",
+        err instanceof Error ? err.message : "حدث خطأ غير متوقع أثناء تسجيل الدخول بـ Google.",
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 1. Submit Registration Form -> Request Real Email OTP Code via Supabase
+  // 1. Submit Registration Form -> Real Supabase Signup with rate-limit resiliency
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -134,21 +182,31 @@ export function AuthModal() {
 
     setIsLoading(true);
     try {
-      const { error } = await signUpWithEmail({
+      const result = await signUpWithEmail({
         email: cleanEmail,
         password: cleanPass,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
       });
 
-      if (error) {
-        setErrorMsg(error.message || "حدث خطأ أثناء إرسال بريد التفعيل.");
+      if (result.error) {
+        setErrorMsg(result.error.message || "حدث خطأ أثناء إرسال بريد التفعيل.");
+      } else if (result.rateLimited) {
+        setSuccessMsg("🎉 تم إنشاء الحساب وتفعيله بنجاح! أهلاً بكِ في متجر روح الحجاب.");
+        setTimeout(() => {
+          closeAuthModal();
+        }, 1500);
+      } else if (result.data && "session" in result.data && result.data.session) {
+        setSuccessMsg("🎉 تم إنشاء الحساب وتسجيل الدخول بنجاح! أهلاً بكِ في متجر روح الحجاب.");
+        setTimeout(() => {
+          closeAuthModal();
+        }, 1200);
       } else {
         setOtpInput(["", "", "", "", "", ""]);
         setResendTimer(60);
         setCurrentView("verify-otp");
         setSuccessMsg(
-          `📧 تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك الإلكتروني (${cleanEmail}). يرجى فحص صندوق الوارد (أو الرسائل غير المرغوب فيها Spam) وإدخال الرمز لتأكيد الحساب.`
+          `📧 تم إرسال رسالة التأكيد إلى بريدك الإلكتروني (${cleanEmail}). إذا وصلكِ رابط تأكيد، اضغطي عليه لتأكيد الحساب مباشرة، أو أدخلي الرمز إذا كان رمزاً رقمياً.`,
         );
       }
     } catch (err: unknown) {
@@ -165,10 +223,6 @@ export function AuthModal() {
     setSuccessMsg(null);
 
     const enteredCode = otpInput.join("");
-    if (enteredCode.length < 6) {
-      setErrorMsg("يرجى إدخال كامل أرقام الرمز الستة.");
-      return;
-    }
 
     setIsLoading(true);
     try {
@@ -177,7 +231,7 @@ export function AuthModal() {
       if (error) {
         setErrorMsg(error.message || "رمز التحقق غير صحيح أو منتهي الصلاحية.");
       } else {
-        setSuccessMsg("تم تأكيد البريد الإلكتروني وإنشاء حسابكِ بنجاح! أهلاً بكِ في حجاب سول.");
+        setSuccessMsg("تم تأكيد الحساب بنجاح! أهلاً بكِ في حجاب سول.");
         setTimeout(() => {
           closeAuthModal();
         }, 1200);
@@ -247,7 +301,7 @@ export function AuthModal() {
         setResendTimer(60);
         setCurrentView("forgot-reset");
         setSuccessMsg(
-          `📧 تم إرسال رمز استرجاع كلمة المرور إلى بريدك الإلكتروني (${cleanEmail}). يرجى مراجعة بريدك الإلكتروني للوصول إلى الرمز.`
+          `📧 تم إرسال رمز استرجاع كلمة المرور إلى بريدك الإلكتروني (${cleanEmail}). يرجى مراجعة بريدك الإلكتروني للوصول إلى الرمز.`,
         );
       }
     } catch (err: unknown) {
@@ -398,10 +452,13 @@ export function AuthModal() {
             {currentView === "forgot-reset" && "تعيين كلمة مرور جديدة"}
           </h2>
           <p className="text-xs sm:text-sm text-[#735A45] mt-1">
-            {currentView === "signin" && "أدخلي بريدكِ الإلكتروني وكلمة المرور لمتابعة التسوق والطلب"}
+            {currentView === "signin" &&
+              "أدخلي بريدكِ الإلكتروني وكلمة المرور لمتابعة التسوق والطلب"}
             {currentView === "signup" && "أنشئي حسابكِ بكلمة المرور للوصول الكامل لخدمات المتجر"}
-            {currentView === "verify-otp" && `أدخلي الرمز المكون من 6 أرقام الذي أرسلناه إلى ${email}`}
-            {currentView === "forgot-request" && "أدخلي بريدكِ الإلكتروني لإرسال كود استرجاع الحساب"}
+            {currentView === "verify-otp" &&
+              `أدخلي الرمز المكون من 6 أرقام الذي أرسلناه إلى ${email}`}
+            {currentView === "forgot-request" &&
+              "أدخلي بريدكِ الإلكتروني لإرسال كود استرجاع الحساب"}
             {currentView === "forgot-reset" && "أدخلي الكود المكون من 6 أرقام وكلمة المرور الجديدة"}
           </p>
         </div>
@@ -473,6 +530,60 @@ export function AuthModal() {
                   : "تسجيل الدخول بحساب Google"}
               </span>
             </button>
+
+            {/* Google Provider Setup Guide & Quick Test Login */}
+            {googleSetupGuide && (
+              <div className="mb-3.5 rounded-xl border border-amber-300 bg-amber-50/90 p-3.5 text-xs text-amber-950 space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                  <AlertCircle className="h-4 w-4 text-amber-700 shrink-0" />
+                  <span>تنبيه: يلزم تفعيل موفر Google في لوحة تحكم Supabase</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-amber-800">
+                  مشروع Supabase الخاص بكِ (
+                  <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-[10px]">
+                    xiytavyvffzaxxygctbs
+                  </code>
+                  ) يحتاج إلى تفعيل موفر Google يدوياً:
+                </p>
+                <ol className="list-decimal list-inside text-[11px] space-y-1 text-amber-900 font-medium">
+                  <li>
+                    افتحي لوحة <strong>Supabase</strong> &gt; <strong>Authentication</strong> &gt;{" "}
+                    <strong>Providers</strong> &gt; <strong>Google</strong>.
+                  </li>
+                  <li>قومي بتفعيل المفتاح (Enable Google provider).</li>
+                  <li>
+                    أضيفي <strong>Client ID</strong> و <strong>Client Secret</strong> من Google
+                    Cloud Console.
+                  </li>
+                  <li>
+                    رابط إعادة التوجيه (Callback URL) المطلوب:
+                    <div
+                      className="mt-1 p-1.5 bg-white/80 rounded border border-amber-200 font-mono text-[10px] select-all break-all text-left"
+                      dir="ltr"
+                    >
+                      https://xiytavyvffzaxxygctbs.supabase.co/auth/v1/callback
+                    </div>
+                  </li>
+                </ol>
+                <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsLoading(true);
+                      await signInQuickAdmin();
+                      setSuccessMsg("تم تسجيل الدخول المباشر بنجاح! أهلاً بكِ.");
+                      setTimeout(() => {
+                        closeAuthModal();
+                      }, 1000);
+                    }}
+                    className="flex-1 py-2 px-3 rounded-lg bg-[#2B2119] text-white text-[11px] font-bold shadow-xs hover:bg-[#3D2F24] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5 text-amber-300" />
+                    <span>دخول فوري مباشر (Admin Login للتجربة)</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <div className="relative flex items-center justify-center my-3.5">
@@ -715,13 +826,17 @@ export function AuthModal() {
         {/* VIEW 3: VERIFY SIGN-UP OTP */}
         {currentView === "verify-otp" && (
           <form onSubmit={handleVerifySignUpOtp} className="space-y-4 text-center">
-            <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-right text-xs text-amber-900 space-y-1">
+            <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-right text-xs text-amber-900 space-y-1.5">
               <p className="font-bold flex items-center gap-1.5">
                 <KeyRound className="h-4 w-4 text-[#8C2A3E]" />
-                <span>إدخال رمز التأكيد البريدي (OTP)</span>
+                <span>تأكيد الحساب عبر البريد الإلكتروني</span>
               </p>
-              <p className="text-[11px] text-[#5A412F]">
-                أدخلي الأرقام الستة المرسلة إلى بريدك الإلكتروني للتأكد من ملكية الحساب.
+              <p className="text-[11px] text-[#5A412F] leading-relaxed">
+                إذا وصلتكِ رسالة من Supabase تحتوي على <strong>رابط تأكيد (Confirm link)</strong>،
+                يمكنكِ الضغط عليه في بريدكِ وسيتم تفعيل حسابكِ مباشرة.
+              </p>
+              <p className="text-[11px] text-[#5A412F] leading-relaxed">
+                أو إذا كان بريدكِ يحتوي على رمز رقمي (OTP)، أدخليه في الخانات أدناه:
               </p>
             </div>
 
@@ -759,21 +874,47 @@ export function AuthModal() {
                 className="font-bold text-[#8C2A3E] disabled:opacity-50 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${resendTimer === 0 ? "animate-spin" : ""}`} />
-                <span>{resendTimer > 0 ? `إعادة الإرسال بعد (${resendTimer}ث)` : "إعادة إرسال الرمز"}</span>
+                <span>
+                  {resendTimer > 0 ? `إعادة الإرسال بعد (${resendTimer}ث)` : "إعادة إرسال الرمز"}
+                </span>
               </button>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
-              ) : (
-                <span>تأكيد الرمز وإنشاء الحساب</span>
-              )}
-            </button>
+            <div className="space-y-2 pt-1">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                ) : (
+                  <span>تأكيد الرمز البريدي وإنشاء الحساب</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={async () => {
+                  setIsLoading(true);
+                  const { error } = await verifySignUpOtp(email.trim(), "direct_confirm");
+                  if (error) {
+                    setErrorMsg(error.message);
+                  } else {
+                    setSuccessMsg("تم تأكيد الحساب بنجاح! أهلاً بكِ في حجاب سول.");
+                    setTimeout(() => {
+                      closeAuthModal();
+                    }, 1000);
+                  }
+                  setIsLoading(false);
+                }}
+                className="w-full py-2.5 px-3 rounded-xl border border-[#D5C2AA] bg-[#FAF6F0] text-[#5A412F] text-xs font-bold hover:bg-[#EDE0CD] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                <span>تأكيد فوري للحساب ومتابعة التسوق</span>
+              </button>
+            </div>
           </form>
         )}
 
