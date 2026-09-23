@@ -3,12 +3,12 @@ import heroArtwork from "@/assets/hijab-soul-hero.png";
 
 export function HeroArtwork() {
   return (
-    <section aria-label="أناقة الحجاب بأسلوبك الخاص" className="w-full">
+    <section aria-label="أناقة الحجاب بأسلوبك الخاص" className="w-full mt-0">
       <div className="relative aspect-[1034/485] w-full overflow-hidden">
         <img
           src={heroArtwork}
           alt="أناقة الحجاب بأسلوبك الخاص"
-          className="block h-full w-full object-contain"
+          className="block h-full w-full object-cover"
           fetchPriority="high"
         />
         <Link
