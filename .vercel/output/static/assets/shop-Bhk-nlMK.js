@@ -1,1 +1,0 @@
-import{t as e}from"./SiteLayout-R7xJC3w-.js";import{t}from"./CategoryPage-g8nN_Pok.js";import{h as n}from"./index-BACia_5x.js";var r=n();function i(){return(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`تسوقي الآن`})})}export{i as component};
