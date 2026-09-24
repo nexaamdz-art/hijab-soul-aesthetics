@@ -6,7 +6,10 @@ export const Route = createFileRoute("/hijab-robe")({
   head: () => ({
     meta: [
       { title: "روب حجاب | حجاب سول" },
-      { name: "description", content: "تشكيلة روب حجاب الفاخرة — أناقة ملكية ومحتشمة من حجاب سول الجزائر." },
+      {
+        name: "description",
+        content: "تشكيلة روب حجاب الفاخرة — أناقة ملكية ومحتشمة من حجاب سول الجزائر.",
+      },
       { property: "og:title", content: "روب حجاب | حجاب سول" },
       {
         property: "og:description",

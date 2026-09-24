@@ -111,4 +111,3 @@ export function renderErrorPage(errorMessage?: string): string {
   </body>
 </html>`;
 }
-

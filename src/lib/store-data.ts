@@ -70,11 +70,13 @@ export interface ChatMessage {
   isRead: boolean;
   imageUrl?: string | undefined;
   imageAttachment?: string | undefined;
-  productAttachment?: {
-    name: string;
-    price: number;
-    image: string;
-  } | undefined;
+  productAttachment?:
+    | {
+        name: string;
+        price: number;
+        image: string;
+      }
+    | undefined;
 }
 
 export interface CustomerConversation {
@@ -112,7 +114,8 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     category: "abayas",
     stock: 8,
     href: "/abayas",
-    description: "عباءة استقبال راقية بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
+    description:
+      "عباءة استقبال راقية بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
     createdAt: "2026-09-12",
   },
   {
@@ -168,7 +171,8 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     category: "accessories",
     stock: 15,
     href: "/accessories",
-    description: "طقم حقيبة يد راقية بلون عاجي فخم مع مقبض ملفوف بوشاح حريري ومحفظة نقود دائرية أنيقة.",
+    description:
+      "طقم حقيبة يد راقية بلون عاجي فخم مع مقبض ملفوف بوشاح حريري ومحفظة نقود دائرية أنيقة.",
     createdAt: "2026-09-17",
   },
   {
@@ -363,7 +367,8 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     category: "abayas",
     stock: 10,
     href: "/abayas",
-    description: "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
+    description:
+      "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
     createdAt: "2026-09-19",
   },
   {
@@ -387,7 +392,8 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
     category: "abayas",
     stock: 8,
     href: "/abayas",
-    description: "روب حجاب أسود انسيابي فخم مرصع بالكامل بأحجار كريستالية متدلية تعزز أناقتك الملكية.",
+    description:
+      "روب حجاب أسود انسيابي فخم مرصع بالكامل بأحجار كريستالية متدلية تعزز أناقتك الملكية.",
     createdAt: "2026-09-19",
   },
   {
@@ -1090,11 +1096,7 @@ function cleanupLegacyStorage() {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (
-        key &&
-        key.startsWith("hijab_soul_") &&
-        !key.endsWith(`_${CURRENT_DATA_VERSION}`)
-      ) {
+      if (key && key.startsWith("hijab_soul_") && !key.endsWith(`_${CURRENT_DATA_VERSION}`)) {
         localStorage.removeItem(key);
       }
     }
@@ -1518,7 +1520,7 @@ export function getStoredCategories(): StoreCategory[] {
     }
     const parsed: StoreCategory[] = JSON.parse(raw);
     const initialMap = new Map(INITIAL_CATEGORIES.map((c) => [c.id, c]));
-    
+
     // Filter out obsolete categories like "hijab-robe"
     const validParsed = parsed.filter((c) => c.id !== "hijab-robe");
 
@@ -1604,9 +1606,10 @@ export function getStoredProducts(): AdminProduct[] {
       }
       // Custom user product: validate image and normalize category
       const normalizedCat = prod.category === "hijab-robe" ? "abayas" : prod.category;
-      const validImage = prod.image && prod.image.trim() !== "" 
-        ? prod.image 
-        : getProductFallbackImage(normalizedCat);
+      const validImage =
+        prod.image && prod.image.trim() !== ""
+          ? prod.image
+          : getProductFallbackImage(normalizedCat);
       return {
         ...prod,
         category: normalizedCat,

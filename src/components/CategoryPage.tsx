@@ -560,7 +560,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                 alt={title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = getProductFallbackImage(resolvedCat || undefined);
+                  (e.target as HTMLImageElement).src = getProductFallbackImage(
+                    resolvedCat || undefined,
+                  );
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#2B2119]/90 via-[#2B2119]/40 to-transparent flex flex-col items-center justify-end p-6 text-white text-center">
@@ -798,7 +800,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                       loading="lazy"
                       className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-108 motion-reduce:transform-none"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = getProductFallbackImage(product.category);
+                        (e.target as HTMLImageElement).src = getProductFallbackImage(
+                          product.category,
+                        );
                       }}
                     />
 
@@ -989,7 +993,9 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
                     alt={orderModalProduct.name}
                     className="h-16 w-16 rounded-xl object-cover border border-[#D5C2AA] shrink-0"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = getProductFallbackImage(orderModalProduct.category);
+                      (e.target as HTMLImageElement).src = getProductFallbackImage(
+                        orderModalProduct.category,
+                      );
                     }}
                   />
                   <div className="min-w-0 flex-1">

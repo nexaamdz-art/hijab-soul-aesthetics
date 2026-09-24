@@ -131,3 +131,6 @@ async function prerenderInitialHtml() {
 }
 
 await prerenderInitialHtml();
+
+console.log("[postbuild] Completed successfully.");
+process.exit(0);
