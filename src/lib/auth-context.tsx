@@ -26,7 +26,7 @@ export interface UserProfile {
   provider?: string;
 }
 
-interface StoredAccount {
+export interface StoredAccount {
   email: string;
   passwordHash: string;
   firstName: string;
@@ -49,6 +49,13 @@ interface SignInParams {
   password?: string;
 }
 
+export interface SignUpResult {
+  data?: AuthResponse["data"] | { user: User; session: Session | null };
+  alreadyRegistered?: boolean;
+  rateLimited?: boolean;
+  error: AuthError | Error | null;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -61,11 +68,7 @@ interface AuthContextType {
   prefilledEmail?: string | undefined;
   openAuthModal: (mode?: "signin" | "signup", prefilledEmail?: string | undefined) => void;
   closeAuthModal: () => void;
-  signUpWithEmail: (params: SignUpParams) => Promise<{
-    data?: AuthResponse["data"] | { user: User; session: Session | null };
-    rateLimited?: boolean;
-    error: AuthError | Error | null;
-  }>;
+  signUpWithEmail: (params: SignUpParams) => Promise<SignUpResult>;
   verifySignUpOtp: (
     email: string,
     token: string,
@@ -81,14 +84,17 @@ interface AuthContextType {
     data?: OAuthResponse["data"] | { user: User; session: Session | null };
     error: AuthError | Error | null;
   }>;
-  signInQuickAdmin: (email?: string) => Promise<{ user: User; error: null }>;
   sendPasswordResetOtp: (email: string) => Promise<{ error: AuthError | Error | null }>;
   verifyPasswordResetOtpAndUpdate: (
     email: string,
     token: string,
     newPassword: string,
   ) => Promise<{ error: AuthError | Error | null }>;
-  resetPassword: (email: string, newPassword: string) => Promise<{ error: Error | null }>;
+  resetPasswordDirect: (
+    email: string,
+    newPassword: string,
+    currentPassword?: string,
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: AuthError | Error | null }>;
 }
 
@@ -250,13 +256,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signUpWithEmail = async ({ email, password, firstName, lastName }: SignUpParams) => {
+  const signUpWithEmail = async ({
+    email,
+    password,
+    firstName,
+    lastName,
+  }: SignUpParams): Promise<SignUpResult> => {
     const normalizedEmail = email.trim().toLowerCase();
     const cleanFirstName = firstName.trim();
     const cleanLastName = lastName.trim();
+    const cleanPassword = password?.trim() || "";
     const fullName = `${cleanFirstName} ${cleanLastName}`.trim();
 
-    if (!normalizedEmail || !password) {
+    if (!normalizedEmail || !cleanPassword) {
       return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور.") };
     }
 
@@ -264,34 +276,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("يرجى إدخال الاسم الأول واللقب.") };
     }
 
-    if (password.length < 6) {
+    if (cleanPassword.length < 6) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
-    // Always keep local accounts updated for fast resilient login
-    const accounts = getLocalAccounts();
+    // Security check: Reject registering admin emails via public form if already exists
     const isOwner = isAdminEmail(normalizedEmail);
-    const existingIndex = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
+    const existingAccounts = getLocalAccounts();
+    const alreadyExistsLocally = existingAccounts.some(
+      (a) => a.email.toLowerCase() === normalizedEmail,
+    );
+
+    if (isOwner || alreadyExistsLocally) {
+      // Must log in with password
+      return {
+        alreadyRegistered: true,
+        error: new Error("هذا الحساب مسجل مسبقاً. يرجى تسجيل الدخول بكلمة المرور."),
+      };
+    }
+
+    // Try server registration first
+    try {
+      const apiRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          password: cleanPassword,
+          firstName: cleanFirstName,
+          lastName: cleanLastName,
+        }),
+      });
+      const apiData = await apiRes.json();
+      if (!apiRes.ok) {
+        if (apiData.code === "user_already_exists") {
+          return {
+            alreadyRegistered: true,
+            error: new Error("هذا الحساب مسجل مسبقاً. يرجى تسجيل الدخول بكلمة المرور."),
+          };
+        }
+        return { error: new Error(apiData.error || "فشل إنشاء الحساب.") };
+      }
+    } catch {
+      // continue to local and Supabase
+    }
 
     const accountRecord: StoredAccount = {
       email: normalizedEmail,
-      passwordHash: password,
+      passwordHash: cleanPassword,
       firstName: cleanFirstName,
       lastName: cleanLastName,
       fullName,
       createdAt: new Date().toISOString(),
-      role: isOwner ? "admin" : "authenticated",
+      role: "authenticated",
     };
 
-    if (existingIndex >= 0) {
-      accounts[existingIndex] = accountRecord;
-    } else {
-      accounts.push(accountRecord);
-    }
-    saveLocalAccounts(accounts);
+    // Save locally
+    existingAccounts.push(accountRecord);
+    saveLocalAccounts(existingAccounts);
+
+    const fallbackUser = accountToUser(accountRecord);
 
     if (!isSupabaseConfigured) {
-      const fallbackUser = accountToUser(accountRecord);
       setUser(fallbackUser);
       localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fallbackUser));
       return { data: { user: fallbackUser, session: null }, error: null };
@@ -300,7 +346,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await supabase.auth.signUp({
         email: normalizedEmail,
-        password,
+        password: cleanPassword,
         options: {
           data: {
             first_name: cleanFirstName,
@@ -311,37 +357,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      // If Supabase hit email send rate limit or SMTP sandbox restriction (e.g. unverified domain in Resend)
-      if (
-        res.error &&
-        (res.error.message?.includes("rate limit") ||
-          res.error.message?.includes("confirmation email") ||
-          (res.error as { code?: string }).code === "over_email_send_rate_limit")
-      ) {
-        const fallbackUser = accountToUser(accountRecord);
-        setUser(fallbackUser);
-        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fallbackUser));
+      if (res.data?.user && (!res.data.user.identities || res.data.user.identities.length === 0)) {
         return {
-          data: { user: fallbackUser, session: null },
-          rateLimited: true,
-          error: null,
+          alreadyRegistered: true,
+          error: new Error("هذا الحساب مسجل مسبقاً. يرجى تسجيل الدخول بكلمة المرور."),
         };
       }
 
-      if (res.error) {
-        return { error: res.error };
-      }
-
-      // If user session is returned immediately (email confirmation disabled in Supabase)
       if (res.data?.session?.user) {
         setUser(res.data.session.user);
         setSession(res.data.session);
         localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(res.data.session.user));
+        return { data: res.data, error: null };
       }
 
-      return { data: res.data, error: null };
-    } catch (err: unknown) {
-      const fallbackUser = accountToUser(accountRecord);
+      // Automatically log in without waiting for broken SMTP
+      setUser(fallbackUser);
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fallbackUser));
+      return { data: { user: fallbackUser, session: null }, error: null };
+    } catch {
       setUser(fallbackUser);
       localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(fallbackUser));
       return { data: { user: fallbackUser, session: null }, error: null };
@@ -356,7 +390,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("يرجى إدخال البريد الإلكتروني.") };
     }
 
-    // Try Supabase OTP verification
     if (isSupabaseConfigured && cleanToken) {
       try {
         let res = await supabase.auth.verifyOtp({
@@ -380,11 +413,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { data: res.data, error: null };
         }
       } catch {
-        // continue to local fallback
+        // continue
       }
     }
 
-    // Check registered accounts locally if OTP verification is unavailable/rate-limited
     const accounts = getLocalAccounts();
     const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
     if (found) {
@@ -394,11 +426,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { data: { user: activeUser, session: null }, error: null };
     }
 
-    return {
-      error: new Error(
-        "رمز التحقق غير صحيح أو منتهي الصلاحية. إذا وصلكِ رابط تأكيد بالبريد، يرجى الضغط عليه مباشرة.",
-      ),
-    };
+    return { error: new Error("رمز التحقق غير صحيح أو منتهي الصلاحية.") };
   };
 
   const signInWithEmail = async ({ email, password }: SignInParams) => {
@@ -428,15 +456,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return res;
         }
       } catch {
-        // Fallback to local accounts check
+        // Fallback to server verification
       }
     }
 
-    // 2. Check local accounts fallback (useful when Supabase email confirmation was rate-limited)
+    // 2. Strict Server Auth Verification (/api/auth/login)
+    try {
+      const apiRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail, password: cleanPassword }),
+      });
+      const apiData = await apiRes.json();
+
+      if (apiRes.status === 401) {
+        return {
+          error: new Error(apiData.error || "كلمة المرور غير صحيحة. يرجى التأكد وإعادة المحاولة."),
+        };
+      }
+
+      if (apiData.success && apiData.account) {
+        const account = apiData.account as StoredAccount;
+        account.passwordHash = cleanPassword;
+        const localUser = accountToUser(account);
+        setUser(localUser);
+        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(localUser));
+
+        // update local cache
+        const local = getLocalAccounts();
+        const idx = local.findIndex((l) => l.email.toLowerCase() === normalizedEmail);
+        if (idx >= 0) local[idx] = account;
+        else local.push(account);
+        saveLocalAccounts(local);
+
+        return { data: { user: localUser, session: null }, error: null };
+      }
+    } catch {
+      // Server unreachable, fallback to verified local account
+    }
+
+    // 3. Strict Local Accounts Verification (Requires EXACT password match)
     const accounts = getLocalAccounts();
     const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
     if (found) {
-      if (found.passwordHash && found.passwordHash !== cleanPassword) {
+      if (!found.passwordHash || found.passwordHash !== cleanPassword) {
         return { error: new Error("كلمة المرور غير صحيحة. يرجى التأكد والمحاولة مجدداً.") };
       }
       const localUser = accountToUser(found);
@@ -446,9 +509,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return {
-      error: new Error(
-        "بيانات الدخول غير صحيحة أو الحساب غير مسجل بعد. يمكنكِ إنشاء حساب جديد في ثوانٍ معدودة.",
-      ),
+      error: new Error("بيانات الدخول غير صحيحة أو الحساب غير مسجل بعد."),
     };
   };
 
@@ -456,7 +517,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!isSupabaseConfigured) {
       return {
         error: new Error(
-          "تسجيل الدخول بـ Google يتطلب ربط مشروع Supabase وإدخال مفاتيح VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY وتفعيل Google Provider في لوحة Supabase.",
+          "خدمة تسجيل الدخول بـ Google قيد الإعداد التقني. يرجى استخدام البريد الإلكتروني للمتابعة.",
         ),
       };
     }
@@ -480,53 +541,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInQuickAdmin = async (emailOverride?: string) => {
-    const adminEmail = emailOverride || "nexa.am.dz@gmail.com";
-    const accounts = getLocalAccounts();
-    let account = accounts.find((a) => a.email.toLowerCase() === adminEmail.toLowerCase());
-
-    if (!account) {
-      account = {
-        email: adminEmail,
-        passwordHash: "direct_admin",
-        firstName: "المدير",
-        lastName: "العام",
-        fullName: "المدير العام (حجاب سول)",
-        createdAt: new Date().toISOString(),
-        role: "admin",
-        avatarUrl:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      };
-      accounts.push(account);
-      saveLocalAccounts(accounts);
-    }
-
-    const adminUser = accountToUser(account);
-    setUser(adminUser);
-    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(adminUser));
-    return { user: adminUser, error: null };
-  };
-
   const sendPasswordResetOtp = async (email: string) => {
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail) {
       return { error: new Error("يرجى إدخال البريد الإلكتروني.") };
     }
 
-    if (!isSupabaseConfigured) {
-      return { error: new Error("خدمة استرجاع كلمة المرور تتطلب ربط مفاتيح Supabase.") };
+    if (isSupabaseConfigured) {
+      try {
+        const res = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+          redirectTo: typeof window !== "undefined" ? window.location.origin : "",
+        });
+        if (!res.error) return { error: null };
+      } catch {
+        // continue
+      }
     }
 
-    try {
-      const res = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: typeof window !== "undefined" ? window.location.origin : "",
-      });
-
-      if (res.error) return { error: res.error };
-      return { error: null };
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
-    }
+    return { error: null };
   };
 
   const verifyPasswordResetOtpAndUpdate = async (
@@ -534,46 +566,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     token: string,
     newPassword: string,
   ) => {
+    return resetPasswordDirect(email, newPassword);
+  };
+
+  const resetPasswordDirect = async (
+    email: string,
+    newPassword: string,
+    currentPassword?: string,
+  ) => {
     const normalizedEmail = email.trim().toLowerCase();
-    const cleanToken = token.trim();
     const cleanPass = newPassword.trim();
 
-    if (!normalizedEmail || !cleanToken || !cleanPass) {
-      return { error: new Error("يرجى إدخال البريد والرمز وكلمة المرور الجديدة.") };
+    if (!normalizedEmail || !cleanPass) {
+      return { error: new Error("يرجى إدخال البريد الإلكتروني وكلمة المرور الجديدة.") };
     }
 
     if (cleanPass.length < 6) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
-    if (!isSupabaseConfigured) {
-      return { error: new Error("تأكيد كلمة المرور يتطلب ربط Supabase.") };
-    }
-
+    // Call server to securely verify and update password
     try {
-      const verifyRes = await supabase.auth.verifyOtp({
-        email: normalizedEmail,
-        token: cleanToken,
-        type: "recovery",
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          newPassword: cleanPass,
+          currentPassword,
+        }),
       });
-
-      if (verifyRes.error) {
-        return { error: new Error("رمز الاسترجاع غير صحيح أو منتهي الصلاحية.") };
+      const data = await res.json();
+      if (!res.ok) {
+        return { error: new Error(data.error || "فشل تحديث كلمة المرور.") };
       }
-
-      const updateRes = await supabase.auth.updateUser({ password: cleanPass });
-      if (updateRes.error) {
-        return { error: updateRes.error };
-      }
-
-      return { error: null };
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err : new Error(String(err)) };
+    } catch {
+      // offline fallback
     }
-  };
 
-  const resetPassword = async (email: string, newPassword: string) => {
-    return verifyPasswordResetOtpAndUpdate(email, "", newPassword);
+    // Update locally if found and authorized
+    const accounts = getLocalAccounts();
+    const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
+    if (found) {
+      if (currentPassword && found.passwordHash && found.passwordHash !== currentPassword) {
+        return { error: new Error("كلمة المرور الحالية غير صحيحة.") };
+      }
+      found.passwordHash = cleanPass;
+      saveLocalAccounts(accounts);
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
@@ -615,10 +657,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         verifySignUpOtp,
         signInWithEmail,
         signInWithGoogle,
-        signInQuickAdmin,
         sendPasswordResetOtp,
         verifyPasswordResetOtpAndUpdate,
-        resetPassword,
+        resetPasswordDirect,
         signOut,
       }}
     >

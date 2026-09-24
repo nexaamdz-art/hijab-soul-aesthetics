@@ -1,0 +1,30 @@
+[
+  {
+    "email": "nexa.am.dz@gmail.com",
+    "passwordHash": "admin123456",
+    "firstName": "المدير",
+    "lastName": "العام",
+    "fullName": "المدير العام (روح الحجاب)",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "role": "admin",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "email": "amina@hijab.dz",
+    "passwordHash": "mypassword123",
+    "firstName": "أمينة",
+    "lastName": "بلقاسم",
+    "fullName": "أمينة بلقاسم",
+    "createdAt": "2026-09-24T18:54:09.322Z",
+    "role": "authenticated"
+  },
+  {
+    "email": "customer@test.dz",
+    "passwordHash": "password123",
+    "firstName": "فاطمة",
+    "lastName": "الزهراء",
+    "fullName": "فاطمة الزهراء",
+    "createdAt": "2026-09-24T18:56:29.881Z",
+    "role": "authenticated"
+  }
+]

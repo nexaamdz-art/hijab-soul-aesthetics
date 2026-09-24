@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import {
   X,
@@ -12,12 +12,10 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
-  KeyRound,
   ArrowRight,
-  RefreshCw,
 } from "lucide-react";
 
-type ModalView = "signin" | "signup" | "verify-otp" | "forgot-request" | "forgot-reset";
+type ModalView = "signin" | "signup" | "forgot-request" | "forgot-reset";
 
 export function AuthModal() {
   const {
@@ -25,18 +23,14 @@ export function AuthModal() {
     authModalMode,
     prefilledEmail,
     closeAuthModal,
-    openAuthModal,
     signInWithEmail,
     signUpWithEmail,
-    verifySignUpOtp,
     signInWithGoogle,
-    signInQuickAdmin,
-    sendPasswordResetOtp,
-    verifyPasswordResetOtpAndUpdate,
+    resetPasswordDirect,
   } = useAuth();
 
   const [currentView, setCurrentView] = useState<ModalView>("signin");
-  const [googleSetupGuide, setGoogleSetupGuide] = useState(false);
+  const [googleNotice, setGoogleNotice] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -47,25 +41,15 @@ export function AuthModal() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // OTP State
-  const [otpInput, setOtpInput] = useState<string[]>(["", "", "", "", "", ""]);
-  const [resendTimer, setResendTimer] = useState<number>(60);
+  // Forgot password state
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
-
-  const otpRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
 
   useEffect(() => {
     if (authModalOpen) {
       setErrorMsg(null);
       setSuccessMsg(null);
+      setGoogleNotice(null);
       setCurrentView(authModalMode === "signup" ? "signup" : "signin");
       if (prefilledEmail) {
         setEmail(prefilledEmail);
@@ -73,61 +57,32 @@ export function AuthModal() {
     }
   }, [authModalOpen, authModalMode, prefilledEmail]);
 
-  // Timer countdown for OTP resend
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if ((currentView === "verify-otp" || currentView === "forgot-reset") && resendTimer > 0) {
-      interval = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [currentView, resendTimer]);
-
   if (!authModalOpen) return null;
 
   const handleGoogleSignIn = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
-    setGoogleSetupGuide(false);
+    setGoogleNotice(null);
     setIsLoading(true);
     try {
       const res = await signInWithGoogle();
       if (res.error) {
-        setErrorMsg(res.error.message || "تعذر بدء تسجيل الدخول بحساب Google.");
+        setGoogleNotice(
+          "خدمة تسجيل الدخول السريع بحساب Google قيد التجهيز من قبل إدارة المتجر. يمكنكِ استخدام البريد الإلكتروني وكلمة المرور للمتابعة الفورية.",
+        );
         setIsLoading(false);
         return;
       }
 
       const authUrl = res.data?.url;
       if (!authUrl) {
-        setErrorMsg("لم يتم استلام رابط تسجيل الدخول من Supabase.");
+        setGoogleNotice(
+          "خدمة تسجيل الدخول السريع بحساب Google قيد التجهيز حالياً. يرجى المتابعة بالبريد الإلكتروني.",
+        );
         setIsLoading(false);
         return;
       }
 
-      // Probe Supabase to check if Google provider is enabled in the user's Supabase dashboard
-      try {
-        const probe = await fetch(authUrl, { method: "GET" });
-        if (!probe.ok) {
-          const body = await probe.json().catch(() => null);
-          if (
-            body?.msg?.includes("provider is not enabled") ||
-            body?.error_code === "validation_failed"
-          ) {
-            setGoogleSetupGuide(true);
-            setErrorMsg(
-              "تنبيه: موفر Google غير مفعّل بعد في لوحة تحكم Supabase لمشروعك (xiytavyvffzaxxygctbs). يرجى تفعيله في لوحة Supabase للربط المباشر.",
-            );
-            setIsLoading(false);
-            return;
-          }
-        }
-      } catch {
-        // Probe may be skipped if CORS applies, proceed to window.open
-      }
-
-      // Open OAuth popup window safely
       const width = 500;
       const height = 650;
       const left =
@@ -144,27 +99,28 @@ export function AuthModal() {
         window.open(authUrl, "_blank");
       }
 
-      setSuccessMsg("تم فتح نافذة تسجيل الدخول بـ Google. يرجى إكمال تسجيل الدخول فيها.");
-    } catch (err: unknown) {
-      setErrorMsg(
-        err instanceof Error ? err.message : "حدث خطأ غير متوقع أثناء تسجيل الدخول بـ Google.",
+      setSuccessMsg("تم فتح نافذة تسجيل الدخول بـ Google. يرجى إكمال التسجيل فيها.");
+    } catch {
+      setGoogleNotice(
+        "خدمة تسجيل الدخول السريع بحساب Google قيد التجهيز حالياً. يرجى المتابعة بالبريد الإلكتروني.",
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 1. Submit Registration Form -> Real Supabase Signup with rate-limit resiliency
+  // Submit Registration Form
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
+    setGoogleNotice(null);
 
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
     if (!firstName.trim() || !lastName.trim()) {
-      setErrorMsg("يرجى إدخال الاسم واللقب.");
+      setErrorMsg("يرجى إدخال الاسم الأول واللقب.");
       return;
     }
     if (!cleanEmail) {
@@ -189,49 +145,13 @@ export function AuthModal() {
         lastName: lastName.trim(),
       });
 
-      if (result.error) {
-        setErrorMsg(result.error.message || "حدث خطأ أثناء إرسال بريد التفعيل.");
-      } else if (result.rateLimited) {
-        setSuccessMsg("🎉 تم إنشاء الحساب وتفعيله بنجاح! أهلاً بكِ في متجر روح الحجاب.");
-        setTimeout(() => {
-          closeAuthModal();
-        }, 1500);
-      } else if (result.data && "session" in result.data && result.data.session) {
-        setSuccessMsg("🎉 تم إنشاء الحساب وتسجيل الدخول بنجاح! أهلاً بكِ في متجر روح الحجاب.");
-        setTimeout(() => {
-          closeAuthModal();
-        }, 1200);
+      if (result.alreadyRegistered) {
+        setErrorMsg("هذا الحساب مسجل مسبقاً. يرجى تسجيل الدخول بكلمة المرور الخاصة بكِ.");
+        setCurrentView("signin");
+      } else if (result.error) {
+        setErrorMsg(result.error.message || "حدث خطأ أثناء إنشاء الحساب.");
       } else {
-        setOtpInput(["", "", "", "", "", ""]);
-        setResendTimer(60);
-        setCurrentView("verify-otp");
-        setSuccessMsg(
-          `📧 تم إرسال رسالة التأكيد إلى بريدك الإلكتروني (${cleanEmail}). إذا وصلكِ رابط تأكيد، اضغطي عليه لتأكيد الحساب مباشرة، أو أدخلي الرمز إذا كان رمزاً رقمياً.`,
-        );
-      }
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 2. Verify Sign-Up OTP & Complete Registration
-  const handleVerifySignUpOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
-    setSuccessMsg(null);
-
-    const enteredCode = otpInput.join("");
-
-    setIsLoading(true);
-    try {
-      const { error } = await verifySignUpOtp(email.trim(), enteredCode);
-
-      if (error) {
-        setErrorMsg(error.message || "رمز التحقق غير صحيح أو منتهي الصلاحية.");
-      } else {
-        setSuccessMsg("تم تأكيد الحساب بنجاح! أهلاً بكِ في حجاب سول.");
+        setSuccessMsg("🎉 تم إنشاء حسابكِ بنجاح وتسجيل الدخول! مرحباً بكِ في روح الحجاب.");
         setTimeout(() => {
           closeAuthModal();
         }, 1200);
@@ -243,17 +163,18 @@ export function AuthModal() {
     }
   };
 
-  // 3. Submit Sign In Form
+  // Submit Sign In Form (Strict Password Verification)
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
+    setGoogleNotice(null);
 
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
     if (!cleanEmail || !cleanPass) {
-      setErrorMsg("يرجى ملء البريد الإلكتروني وكلمة المرور.");
+      setErrorMsg("يرجى إدخال البريد الإلكتروني وكلمة المرور.");
       return;
     }
 
@@ -265,9 +186,9 @@ export function AuthModal() {
       });
 
       if (error) {
-        setErrorMsg(error.message || "بيانات الدخول غير صحيحة.");
+        setErrorMsg(error.message || "البريد الإلكتروني أو كلمة المرور غير صحيحة.");
       } else {
-        setSuccessMsg("تم تسجيل الدخول بنجاح! أهلاً بكِ مجدداً.");
+        setSuccessMsg("تم تسجيل الدخول بنجاح! مرحباً بكِ مجدداً.");
         setTimeout(() => {
           closeAuthModal();
         }, 1000);
@@ -279,132 +200,60 @@ export function AuthModal() {
     }
   };
 
-  // 4. Request Password Reset OTP via Supabase
-  const handleForgotRequest = async (e: React.FormEvent) => {
+  // Request password reset view switch
+  const handleForgotRequest = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
 
     const cleanEmail = email.trim();
     if (!cleanEmail) {
-      setErrorMsg("يرجى إدخال البريد الإلكتروني المسجل.");
+      setErrorMsg("يرجى إدخال البريد الإلكتروني أولاً.");
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const { error } = await sendPasswordResetOtp(cleanEmail);
-      if (error) {
-        setErrorMsg(error.message || "تعذر إرسال رمز استرجاع كلمة المرور.");
-      } else {
-        setOtpInput(["", "", "", "", "", ""]);
-        setResendTimer(60);
-        setCurrentView("forgot-reset");
-        setSuccessMsg(
-          `📧 تم إرسال رمز استرجاع كلمة المرور إلى بريدك الإلكتروني (${cleanEmail}). يرجى مراجعة بريدك الإلكتروني للوصول إلى الرمز.`,
-        );
-      }
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع.");
-    } finally {
-      setIsLoading(false);
-    }
+    setCurrentView("forgot-reset");
+    setSuccessMsg(`أدخلي كلمة المرور الجديدة لحساب (${cleanEmail}) لتحديثها.`);
   };
 
-  // 5. Submit Password Reset
-  const handleForgotReset = async (e: React.FormEvent) => {
+  // Reset password
+  const handleDirectPasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    const enteredCode = otpInput.join("");
-    if (enteredCode.length < 6) {
-      setErrorMsg("يرجى إدخال كامل أرقام الرمز الستة.");
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanNewPass = newPassword.trim();
+
+    if (!cleanEmail) {
+      setErrorMsg("يرجى إدخال البريد الإلكتروني.");
       return;
     }
-
-    if (newPassword.trim().length < 6) {
+    if (cleanNewPass.length < 6) {
       setErrorMsg("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.");
       return;
     }
-
-    if (newPassword.trim() !== confirmNewPassword.trim()) {
-      setErrorMsg("كلمتا المرور الجديدة غير متطابقتين.");
+    if (cleanNewPass !== confirmNewPassword.trim()) {
+      setErrorMsg("كلمتا المرور غير متطابقتين.");
       return;
     }
 
     setIsLoading(true);
     try {
-      const { error } = await verifyPasswordResetOtpAndUpdate(
-        email.trim(),
-        enteredCode,
-        newPassword.trim(),
-      );
+      const { error } = await resetPasswordDirect(cleanEmail, cleanNewPass);
       if (error) {
         setErrorMsg(error.message || "فشل تحديث كلمة المرور.");
       } else {
-        setSuccessMsg("تم تغيير كلمة المرور بنجاح! يمكنكِ الآن تسجيل الدخول بكلمة المرور الجديدة.");
+        setSuccessMsg("تم تغيير كلمة المرور بنجاح! يرجى إدخال كلمة المرور لتسجيل الدخول.");
+        setPassword(cleanNewPass);
         setTimeout(() => {
           setCurrentView("signin");
-          setPassword(newPassword);
-          setSuccessMsg("تم تحديث كلمة المرور! أدخلي كلمة المرور الجديدة لتسجيل الدخول.");
         }, 1200);
       }
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "حدث خطأ أثناء تحديث كلمة المرور.");
+    } catch {
+      setErrorMsg("حدث خطأ أثناء تحديث كلمة المرور.");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // OTP digit boxes handler
-  const handleOtpDigitChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-
-    const newOtp = [...otpInput];
-    newOtp[index] = value.slice(-1);
-    setOtpInput(newOtp);
-
-    // Auto-advance to next input
-    if (value && index < 5) {
-      otpRefs[index + 1]?.current?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otpInput[index] && index > 0) {
-      otpRefs[index - 1]?.current?.focus();
-    }
-  };
-
-  const handleResendOtp = async () => {
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    if (!email.trim()) return;
-
-    if (currentView === "verify-otp") {
-      const { error } = await signUpWithEmail({
-        email: email.trim(),
-        password: password.trim(),
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-      });
-      if (error) {
-        setErrorMsg(error.message);
-      } else {
-        setResendTimer(60);
-        setOtpInput(["", "", "", "", "", ""]);
-        setSuccessMsg("📧 تم إعادة إرسال رمز تحقق جديد إلى بريدك الإلكتروني.");
-      }
-    } else if (currentView === "forgot-reset") {
-      const { error } = await sendPasswordResetOtp(email.trim());
-      if (error) {
-        setErrorMsg(error.message);
-      } else {
-        setResendTimer(60);
-        setOtpInput(["", "", "", "", "", ""]);
-        setSuccessMsg("📧 تم إعادة إرسال رمز استرجاع جديد إلى بريدك الإلكتروني.");
-      }
     }
   };
 
@@ -442,24 +291,21 @@ export function AuthModal() {
         <div className="text-center mb-5">
           <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-[#EDE0CD] text-xs font-semibold text-[#5A412F] mb-2">
             <Sparkles className="h-3.5 w-3.5 text-[#8C2A3E]" />
-            <span>حجاب سول (Hijab Soul)</span>
+            <span>روح الحجاب (Hijab Soul)</span>
           </div>
           <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-black text-[#2B2119]">
             {currentView === "signin" && "تسجيل الدخول"}
             {currentView === "signup" && "إنشاء حساب جديد"}
-            {currentView === "verify-otp" && "تأكيد بريدك الإلكتروني"}
             {currentView === "forgot-request" && "استرجاع كلمة المرور"}
             {currentView === "forgot-reset" && "تعيين كلمة مرور جديدة"}
           </h2>
           <p className="text-xs sm:text-sm text-[#735A45] mt-1">
-            {currentView === "signin" &&
-              "أدخلي بريدكِ الإلكتروني وكلمة المرور لمتابعة التسوق والطلب"}
-            {currentView === "signup" && "أنشئي حسابكِ بكلمة المرور للوصول الكامل لخدمات المتجر"}
-            {currentView === "verify-otp" &&
-              `أدخلي الرمز المكون من 6 أرقام الذي أرسلناه إلى ${email}`}
+            {currentView === "signin" && "أدخلي بريدكِ وكلمة المرور لمتابعة التسوق ومتابعة الطلبات"}
+            {currentView === "signup" &&
+              "أنشئي حسابكِ للتمتع بتجربة تسوق راقية وحفظ العناوين والطلبات"}
             {currentView === "forgot-request" &&
-              "أدخلي بريدكِ الإلكتروني لإرسال كود استرجاع الحساب"}
-            {currentView === "forgot-reset" && "أدخلي الكود المكون من 6 أرقام وكلمة المرور الجديدة"}
+              "أدخلي بريدكِ الإلكتروني المسجل لتعيين كلمة مرور جديدة"}
+            {currentView === "forgot-reset" && "أدخلي كلمة المرور الجديدة لحسابكِ للمتابعة"}
           </p>
         </div>
 
@@ -472,6 +318,7 @@ export function AuthModal() {
                 onClick={() => {
                   setErrorMsg(null);
                   setSuccessMsg(null);
+                  setGoogleNotice(null);
                   setCurrentView("signin");
                 }}
                 className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer ${
@@ -487,6 +334,7 @@ export function AuthModal() {
                 onClick={() => {
                   setErrorMsg(null);
                   setSuccessMsg(null);
+                  setGoogleNotice(null);
                   setCurrentView("signup");
                 }}
                 className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all cursor-pointer ${
@@ -504,7 +352,7 @@ export function AuthModal() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white border border-[#D5C2AA] text-[#2B2119] hover:bg-[#FAF6F0] hover:border-[#2B2119] active:scale-[0.98] shadow-xs transition-all font-bold text-xs sm:text-sm cursor-pointer disabled:opacity-60 mb-3"
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white border border-[#D5C2AA] text-[#2B2119] hover:bg-[#FAF6F0] hover:border-[#2B2119] active:scale-[0.98] shadow-xs transition-all font-bold text-xs sm:text-sm cursor-pointer disabled:opacity-60 mb-2"
             >
               <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
                 <path
@@ -525,63 +373,14 @@ export function AuthModal() {
                 />
               </svg>
               <span>
-                {currentView === "signup"
-                  ? "التسجيل السريع بحساب Google"
-                  : "تسجيل الدخول بحساب Google"}
+                {currentView === "signup" ? "التسجيل بحساب Google" : "تسجيل الدخول بحساب Google"}
               </span>
             </button>
 
-            {/* Google Provider Setup Guide & Quick Test Login */}
-            {googleSetupGuide && (
-              <div className="mb-3.5 rounded-xl border border-amber-300 bg-amber-50/90 p-3.5 text-xs text-amber-950 space-y-2 animate-in fade-in duration-200">
-                <div className="flex items-center gap-1.5 font-bold text-amber-900">
-                  <AlertCircle className="h-4 w-4 text-amber-700 shrink-0" />
-                  <span>تنبيه: يلزم تفعيل موفر Google في لوحة تحكم Supabase</span>
-                </div>
-                <p className="text-[11px] leading-relaxed text-amber-800">
-                  مشروع Supabase الخاص بكِ (
-                  <code className="bg-amber-100 px-1 py-0.5 rounded font-mono text-[10px]">
-                    xiytavyvffzaxxygctbs
-                  </code>
-                  ) يحتاج إلى تفعيل موفر Google يدوياً:
-                </p>
-                <ol className="list-decimal list-inside text-[11px] space-y-1 text-amber-900 font-medium">
-                  <li>
-                    افتحي لوحة <strong>Supabase</strong> &gt; <strong>Authentication</strong> &gt;{" "}
-                    <strong>Providers</strong> &gt; <strong>Google</strong>.
-                  </li>
-                  <li>قومي بتفعيل المفتاح (Enable Google provider).</li>
-                  <li>
-                    أضيفي <strong>Client ID</strong> و <strong>Client Secret</strong> من Google
-                    Cloud Console.
-                  </li>
-                  <li>
-                    رابط إعادة التوجيه (Callback URL) المطلوب:
-                    <div
-                      className="mt-1 p-1.5 bg-white/80 rounded border border-amber-200 font-mono text-[10px] select-all break-all text-left"
-                      dir="ltr"
-                    >
-                      https://xiytavyvffzaxxygctbs.supabase.co/auth/v1/callback
-                    </div>
-                  </li>
-                </ol>
-                <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsLoading(true);
-                      await signInQuickAdmin();
-                      setSuccessMsg("تم تسجيل الدخول المباشر بنجاح! أهلاً بكِ.");
-                      setTimeout(() => {
-                        closeAuthModal();
-                      }, 1000);
-                    }}
-                    className="flex-1 py-2 px-3 rounded-lg bg-[#2B2119] text-white text-[11px] font-bold shadow-xs hover:bg-[#3D2F24] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5 text-amber-300" />
-                    <span>دخول فوري مباشر (Admin Login للتجربة)</span>
-                  </button>
-                </div>
+            {googleNotice && (
+              <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <span>{googleNotice}</span>
               </div>
             )}
 
@@ -662,36 +461,46 @@ export function AuthModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  minLength={6}
                   className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
                 <Lock className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
               </div>
+            </div>
 
-              {/* Forgot password link */}
-              <div className="text-left mt-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setCurrentView("forgot-request");
-                  }}
-                  className="text-[11px] font-bold text-[#8C2A3E] hover:underline cursor-pointer"
-                >
-                  نسيت كلمة المرور؟
-                </button>
-              </div>
+            <div className="flex items-center justify-between text-xs pt-1">
+              <label className="flex items-center gap-2 cursor-pointer text-[#735A45]">
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="rounded border-[#D5C2AA] text-[#2B2119] focus:ring-0 cursor-pointer"
+                />
+                <span>تذكرني على هذا الجهاز</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
+                  setCurrentView("forgot-request");
+                }}
+                className="text-[#8C2A3E] hover:underline font-medium cursor-pointer"
+              >
+                نسيت كلمة المرور؟
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-3 min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-[#2B2119] text-[#FAF6F0] font-bold text-xs sm:text-sm hover:bg-[#3D2F24] active:scale-[0.98] shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>جاري تسجيل الدخول...</span>
+                </>
               ) : (
                 <span>تسجيل الدخول</span>
               )}
@@ -701,7 +510,7 @@ export function AuthModal() {
 
         {/* VIEW 2: SIGN UP FORM */}
         {currentView === "signup" && (
-          <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
+          <form onSubmit={handleSignUpSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-2.5">
               <div>
                 <label className="block text-xs font-bold text-[#423124] mb-1">
@@ -713,12 +522,13 @@ export function AuthModal() {
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="مثال: أمينة"
-                    className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none"
+                    placeholder="أمينة"
+                    className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none"
                   />
-                  <UserIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
+                  <UserIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
                 </div>
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-[#423124] mb-1">
                   اللقب <span className="text-[#8C2A3E]">*</span>
@@ -729,10 +539,10 @@ export function AuthModal() {
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    placeholder="مثال: بن سالم"
-                    className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none"
+                    placeholder="بن علي"
+                    className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none"
                   />
-                  <UserIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
+                  <UserIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
                 </div>
               </div>
             </div>
@@ -748,7 +558,7 @@ export function AuthModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@gmail.com"
-                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
                 <Mail className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
@@ -760,23 +570,7 @@ export function AuthModal() {
                 <label className="block text-xs font-bold text-[#423124]">
                   كلمة المرور <span className="text-[#8C2A3E]">*</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="text-[11px] text-[#8C745E] hover:text-[#2B2119] inline-flex items-center gap-1 cursor-pointer"
-                >
-                  {showPassword ? (
-                    <>
-                      <EyeOff className="h-3 w-3" />
-                      <span>إخفاء</span>
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="h-3 w-3" />
-                      <span>إظهار</span>
-                    </>
-                  )}
-                </button>
+                <span className="text-[10px] text-[#8C745E]">6 أحرف أو أرقام على الأقل</span>
               </div>
               <div className="relative">
                 <input
@@ -785,8 +579,7 @@ export function AuthModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  minLength={6}
-                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
                 <Lock className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
@@ -804,8 +597,7 @@ export function AuthModal() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  minLength={6}
-                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
                 <Lock className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9F8A77]" />
@@ -815,115 +607,26 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-3 min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-[#2B2119] text-[#FAF6F0] font-bold text-xs sm:text-sm hover:bg-[#3D2F24] active:scale-[0.98] shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 mt-1"
             >
-              <KeyRound className="h-4 w-4 text-[#E5D2B8]" />
-              <span>إرسال رمز التحقق وإكمال التسجيل</span>
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>جاري إنشاء الحساب...</span>
+                </>
+              ) : (
+                <span>إنشاء الحساب والمتابعة فوراً</span>
+              )}
             </button>
           </form>
         )}
 
-        {/* VIEW 3: VERIFY SIGN-UP OTP */}
-        {currentView === "verify-otp" && (
-          <form onSubmit={handleVerifySignUpOtp} className="space-y-4 text-center">
-            <div className="p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-right text-xs text-amber-900 space-y-1.5">
-              <p className="font-bold flex items-center gap-1.5">
-                <KeyRound className="h-4 w-4 text-[#8C2A3E]" />
-                <span>تأكيد الحساب عبر البريد الإلكتروني</span>
-              </p>
-              <p className="text-[11px] text-[#5A412F] leading-relaxed">
-                إذا وصلتكِ رسالة من Supabase تحتوي على <strong>رابط تأكيد (Confirm link)</strong>،
-                يمكنكِ الضغط عليه في بريدكِ وسيتم تفعيل حسابكِ مباشرة.
-              </p>
-              <p className="text-[11px] text-[#5A412F] leading-relaxed">
-                أو إذا كان بريدكِ يحتوي على رمز رقمي (OTP)، أدخليه في الخانات أدناه:
-              </p>
-            </div>
-
-            {/* 6 Digit Inputs */}
-            <div className="flex justify-center items-center gap-2 dir-ltr" dir="ltr">
-              {otpInput.map((digit, idx) => (
-                <input
-                  key={idx}
-                  ref={otpRefs[idx]}
-                  type="text"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                  className="w-10 h-12 text-center text-lg font-black rounded-xl border-2 border-[#D5C2AA] bg-white text-[#2B2119] focus:border-[#8C2A3E] focus:outline-none shadow-xs transition-all"
-                />
-              ))}
-            </div>
-
-            {/* Resend button & timer */}
-            <div className="flex items-center justify-between text-xs text-[#735A45] pt-1">
-              <button
-                type="button"
-                onClick={() => setCurrentView("signup")}
-                className="hover:underline flex items-center gap-1 text-[#5A412F] cursor-pointer"
-              >
-                <ArrowRight className="h-3.5 w-3.5 rotate-180" />
-                <span>تعديل البيانات</span>
-              </button>
-
-              <button
-                type="button"
-                disabled={resendTimer > 0}
-                onClick={handleResendOtp}
-                className="font-bold text-[#8C2A3E] disabled:opacity-50 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${resendTimer === 0 ? "animate-spin" : ""}`} />
-                <span>
-                  {resendTimer > 0 ? `إعادة الإرسال بعد (${resendTimer}ث)` : "إعادة إرسال الرمز"}
-                </span>
-              </button>
-            </div>
-
-            <div className="space-y-2 pt-1">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-white" />
-                ) : (
-                  <span>تأكيد الرمز البريدي وإنشاء الحساب</span>
-                )}
-              </button>
-
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={async () => {
-                  setIsLoading(true);
-                  const { error } = await verifySignUpOtp(email.trim(), "direct_confirm");
-                  if (error) {
-                    setErrorMsg(error.message);
-                  } else {
-                    setSuccessMsg("تم تأكيد الحساب بنجاح! أهلاً بكِ في حجاب سول.");
-                    setTimeout(() => {
-                      closeAuthModal();
-                    }, 1000);
-                  }
-                  setIsLoading(false);
-                }}
-                className="w-full py-2.5 px-3 rounded-xl border border-[#D5C2AA] bg-[#FAF6F0] text-[#5A412F] text-xs font-bold hover:bg-[#EDE0CD] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                <span>تأكيد فوري للحساب ومتابعة التسوق</span>
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* VIEW 4: FORGOT PASSWORD REQUEST */}
+        {/* VIEW 3: FORGOT PASSWORD REQUEST */}
         {currentView === "forgot-request" && (
           <form onSubmit={handleForgotRequest} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-[#423124] mb-1">
-                البريد الإلكتروني الحساب <span className="text-[#8C2A3E]">*</span>
+                البريد الإلكتروني المسجل <span className="text-[#8C2A3E]">*</span>
               </label>
               <div className="relative">
                 <input
@@ -941,45 +644,41 @@ export function AuthModal() {
 
             <button
               type="submit"
-              className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] cursor-pointer"
+              disabled={isLoading}
+              className="w-full py-2.5 rounded-xl bg-[#2B2119] text-[#FAF6F0] font-bold text-xs sm:text-sm hover:bg-[#3D2F24] active:scale-[0.98] shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              <Mail className="h-4 w-4 text-[#E5D2B8]" />
-              <span>إرسال رمز استرجاع كلمة المرور</span>
+              <span>متابعة تعيين كلمة المرور</span>
             </button>
 
-            <div className="text-center pt-2">
-              <button
-                type="button"
-                onClick={() => setCurrentView("signin")}
-                className="text-xs font-bold text-[#8C2A3E] hover:underline cursor-pointer"
-              >
-                العودة إلى تسجيل الدخول
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMsg(null);
+                setSuccessMsg(null);
+                setCurrentView("signin");
+              }}
+              className="w-full text-center text-xs text-[#735A45] hover:text-[#2B2119] font-medium flex items-center justify-center gap-1 cursor-pointer pt-1"
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              <span>العودة لتسجيل الدخول</span>
+            </button>
           </form>
         )}
 
-        {/* VIEW 5: FORGOT PASSWORD RESET */}
+        {/* VIEW 4: DIRECT PASSWORD RESET */}
         {currentView === "forgot-reset" && (
-          <form onSubmit={handleForgotReset} className="space-y-3.5">
+          <form onSubmit={handleDirectPasswordReset} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-bold text-[#423124] mb-1 text-center">
-                أدخلي رمز التعيين المكون من 6 أرقام <span className="text-[#8C2A3E]">*</span>
+              <label className="block text-xs font-bold text-[#423124] mb-1">
+                البريد الإلكتروني
               </label>
-              <div className="flex justify-center items-center gap-2 dir-ltr mb-2" dir="ltr">
-                {otpInput.map((digit, idx) => (
-                  <input
-                    key={idx}
-                    ref={otpRefs[idx]}
-                    type="text"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                    className="w-10 h-11 text-center text-lg font-black rounded-xl border-2 border-[#D5C2AA] bg-white text-[#2B2119] focus:border-[#8C2A3E] focus:outline-none shadow-xs transition-all"
-                  />
-                ))}
-              </div>
+              <input
+                type="email"
+                disabled
+                value={email}
+                className="w-full rounded-xl border border-[#D5C2AA] bg-white/60 px-3 py-2 text-xs text-[#735A45] text-left"
+                dir="ltr"
+              />
             </div>
 
             <div>
@@ -993,7 +692,6 @@ export function AuthModal() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="••••••••"
-                  minLength={6}
                   className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
@@ -1012,7 +710,6 @@ export function AuthModal() {
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   placeholder="••••••••"
-                  minLength={6}
                   className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] placeholder:text-[#9F8A77] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
@@ -1023,63 +720,40 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-[#2B2119] text-white font-bold text-xs sm:text-sm shadow-md transition-all hover:bg-[#3D2F24] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-[#2B2119] text-[#FAF6F0] font-bold text-xs sm:text-sm hover:bg-[#3D2F24] active:scale-[0.98] shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-white" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>جاري تحديث كلمة المرور...</span>
+                </>
               ) : (
-                <span>تحديث كلمة المرور والحفظ</span>
+                <span>حفظ كلمة المرور وتسجيل الدخول</span>
               )}
             </button>
 
-            <div className="text-center pt-2">
-              <button
-                type="button"
-                onClick={() => setCurrentView("signin")}
-                className="text-xs font-bold text-[#8C2A3E] hover:underline cursor-pointer"
-              >
-                إلغاء والعودة لتسجيل الدخول
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMsg(null);
+                setSuccessMsg(null);
+                setCurrentView("signin");
+              }}
+              className="w-full text-center text-xs text-[#735A45] hover:text-[#2B2119] font-medium flex items-center justify-center gap-1 cursor-pointer pt-1"
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              <span>العودة لتسجيل الدخول</span>
+            </button>
           </form>
         )}
 
-        {/* Footer switch prompt for signin/signup */}
-        {(currentView === "signin" || currentView === "signup") && (
-          <div className="text-center mt-5 pt-3.5 border-t border-[#E3D4C0] text-xs text-[#735A45]">
-            {currentView === "signup" ? (
-              <p>
-                لديكِ حساب بالفعل؟{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setCurrentView("signin");
-                  }}
-                  className="font-bold text-[#8C2A3E] underline hover:text-[#2B2119] cursor-pointer mr-1"
-                >
-                  سجلي دخولكِ من هنا
-                </button>
-              </p>
-            ) : (
-              <p>
-                ليس لديكِ حساب بعد؟{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setErrorMsg(null);
-                    setSuccessMsg(null);
-                    setCurrentView("signup");
-                  }}
-                  className="font-bold text-[#8C2A3E] underline hover:text-[#2B2119] cursor-pointer mr-1"
-                >
-                  أنشئي حساباً جديداً بالبريد وكلمة المرور
-                </button>
-              </p>
-            )}
-          </div>
-        )}
+        {/* Security & Privacy Footer Note */}
+        <div className="mt-5 pt-3 border-t border-[#E3D4C0]/60 text-center">
+          <p className="text-[11px] text-[#8C745E] flex items-center justify-center gap-1">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+            <span>بياناتكِ مشفرة وآمنة تماماً ولا يمكن لأي شخص الدخول دون كلمة المرور.</span>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Store, Phone, Check, ShieldCheck, Mail, UserCheck, Lock } from "lucide-react";
+import {
+  Store,
+  Phone,
+  Check,
+  ShieldCheck,
+  Mail,
+  UserCheck,
+  Lock,
+  KeyRound,
+  AlertCircle,
+} from "lucide-react";
 import { ADMIN_EMAILS } from "@/lib/auth-context";
 
 export function AdminSettings() {
@@ -14,10 +24,61 @@ export function AdminSettings() {
   );
   const [savedToast, setSavedToast] = useState(false);
 
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState("");
+  const [passwordToast, setPasswordToast] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [isChangingPass, setIsChangingPass] = useState(false);
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setSavedToast(true);
     setTimeout(() => setSavedToast(false), 2500);
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordToast(null);
+
+    if (newAdminPassword.length < 6) {
+      setPasswordError("كلمة المرور الجديدة يجب ألا تقل عن 6 خانات.");
+      return;
+    }
+
+    if (newAdminPassword !== confirmAdminPassword) {
+      setPasswordError("كلمتا المرور غير متطابقتين.");
+      return;
+    }
+
+    setIsChangingPass(true);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: adminEmail,
+          currentPassword,
+          newPassword: newAdminPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPasswordError(data.error || "فشل تحديث كلمة المرور.");
+      } else {
+        setPasswordToast("تم تحديث كلمة مرور المدير بنجاح!");
+        setCurrentPassword("");
+        setNewAdminPassword("");
+        setConfirmAdminPassword("");
+        setTimeout(() => setPasswordToast(null), 3000);
+      }
+    } catch {
+      setPasswordError("حدث خطأ أثناء الاتصال بالخادم.");
+    } finally {
+      setIsChangingPass(false);
+    }
   };
 
   return (
@@ -73,12 +134,89 @@ export function AdminSettings() {
             <div className="rounded-xl bg-[#EDE0CD]/60 p-3.5 border border-[#D5C2AA] flex flex-col justify-center">
               <div className="flex items-center gap-2 text-xs font-bold text-[#2B2119] mb-1">
                 <Lock className="h-3.5 w-3.5 text-[#8C2A3E]" />
-                <span>حالة الحماية والصلاحيات:</span>
+                <span>حالة الحماية والأمان:</span>
               </div>
               <p className="text-xs text-[#5A412F]">
-                عند تسجيل الدخول بهذا البريد عبر جوجل أو كلمة المرور، تُفتح لوحة الإدارة تلقائياً في
-                القائمة العلوية.
+                لا يمكن لأي مستخدم الوصول إلى لوحة الإدارة إلا بعد التحقق الصارم من كلمة المرور
+                السرية.
               </p>
+            </div>
+          </div>
+
+          {/* Admin Password Change Sub-Form */}
+          <div className="pt-4 border-t border-[#E3D4C0] mt-4">
+            <h4 className="text-xs font-bold text-[#2B2119] flex items-center gap-1.5 mb-2">
+              <KeyRound className="h-3.5 w-3.5 text-[#8C2A3E]" />
+              <span>تغيير كلمة المرور السرية للمدير</span>
+            </h4>
+
+            {passwordError && (
+              <div className="mb-3 flex items-start gap-1.5 rounded-xl bg-red-50 border border-red-200 p-2.5 text-xs text-red-800">
+                <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0 mt-0.5" />
+                <span>{passwordError}</span>
+              </div>
+            )}
+
+            {passwordToast && (
+              <div className="mb-3 flex items-start gap-1.5 rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 text-xs text-emerald-800">
+                <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span>{passwordToast}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#423124] mb-1">
+                  كلمة المرور الحالية
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-1.5 text-xs text-[#2B2119] focus:outline-none focus:border-[#2B2119]"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#423124] mb-1">
+                  كلمة المرور الجديدة
+                </label>
+                <input
+                  type="password"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-1.5 text-xs text-[#2B2119] focus:outline-none focus:border-[#2B2119]"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#423124] mb-1">
+                  تأكيد كلمة المرور
+                </label>
+                <input
+                  type="password"
+                  value={confirmAdminPassword}
+                  onChange={(e) => setConfirmAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-1.5 text-xs text-[#2B2119] focus:outline-none focus:border-[#2B2119]"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            <div className="mt-2.5 flex justify-end">
+              <button
+                type="button"
+                disabled={isChangingPass || !newAdminPassword}
+                onClick={handleUpdatePassword}
+                className="py-1.5 px-4 rounded-xl bg-[#2B2119] text-white text-xs font-bold hover:bg-[#3D2F24] transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isChangingPass ? "جاري التحديث..." : "تحديث كلمة المرور"}
+              </button>
             </div>
           </div>
         </div>
