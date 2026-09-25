@@ -1,27 +1,69 @@
 [
   {
-    "id": "product-1",
-    "name": "عباءة سوداء مطرزة",
-    "price": 4500,
-    "originalPrice": 5200,
-    "image": "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
-    "category": "abayas",
-    "stock": 14,
-    "href": "/abayas",
-    "description": "عباءة بتصميم خليجي فاخر وقماش كريب ناعم مع تطريز يدوي على الأكمام.",
-    "createdAt": "2026-09-10"
+    "id": "product-1790340198473",
+    "name": "فستان أخضر زيتوني",
+    "price": 3500,
+    "image": "/images/uploads/upload_1790340196012_yuga3l.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
   },
   {
-    "id": "product-2",
-    "name": "عباية استقبال عاجية راقية",
-    "price": 3800,
-    "originalPrice": 4200,
-    "image": "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    "category": "abayas",
-    "stock": 8,
-    "href": "/abayas",
-    "description": "عباءة استقبال راقية بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
-    "createdAt": "2026-09-12"
+    "id": "product-1790340176206",
+    "name": "فستان وردي",
+    "price": 3500,
+    "image": "/images/uploads/upload_1790340174444_h06meh.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
+  },
+  {
+    "id": "product-1790340159004",
+    "name": "فستان بني",
+    "price": 3500,
+    "image": "/images/products/product-1.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
+  },
+  {
+    "id": "product-1790340140768",
+    "name": "فستان وردي",
+    "price": 3500,
+    "image": "/images/uploads/upload_1790340138296_37pma2.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
+  },
+  {
+    "id": "product-1790340110620",
+    "name": "فستان احمر",
+    "price": 3500,
+    "image": "/images/products/product-1.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
+  },
+  {
+    "id": "product-1790340091825",
+    "name": "فستان بنفسجي",
+    "price": 3500,
+    "image": "/images/uploads/upload_1790340089433_u58q94.jpg",
+    "category": "dresses",
+    "stock": 15,
+    "href": "/dresses",
+    "description": "",
+    "createdAt": "2026-09-25"
   },
   {
     "id": "product-3",
@@ -35,34 +77,11 @@
     "createdAt": "2026-09-14"
   },
   {
-    "id": "product-4",
-    "name": "كاب شوكولاتة فخم",
-    "price": 3400,
-    "originalPrice": 3900,
-    "image": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
-    "category": "dresses",
-    "stock": 12,
-    "href": "/dresses",
-    "description": "فستان طويل عملي بقماش ناعم لا يتجعد مناسب لجميع فصول السنة.",
-    "createdAt": "2026-09-15"
-  },
-  {
-    "id": "product-5",
-    "name": "إسدال صلاة سماوي وأبيض",
-    "price": 3000,
-    "image": "/images/uploads/isdal_pastel_blue_white_1789832048044.jpg",
-    "category": "isdalat",
-    "stock": 19,
-    "href": "/isdalat",
-    "description": "إسدال صلاة وخروج مريح جداً بخامة قطنية ناعمة وساترة ومزود بسحاب مخفي.",
-    "createdAt": "2026-09-16"
-  },
-  {
     "id": "product-6",
     "name": "حجاب شيفون أسود حريري",
     "price": 1200,
     "image": "/images/uploads/hijab_black_silk_chiffon_1789831330976.jpg",
-    "category": "hijab-supplies",
+    "category": "khimar",
     "stock": 40,
     "href": "/hijab-supplies",
     "description": "حجاب شيفون كريب ممتاز غير شفاف ومثالي للتثبيت السريع.",
@@ -242,29 +261,6 @@
     "createdAt": "2026-09-19"
   },
   {
-    "id": "acc-14",
-    "name": "أكمام معصم محتشمة فاخرة للعبايات",
-    "price": 1400,
-    "image": "/images/accessories/modest-wrist-cuffs.jpg",
-    "category": "accessories",
-    "stock": 35,
-    "href": "/accessories",
-    "description": "معاصم وأكمام قماشية أنيقة ومحتشمة لستر الذراعين تحت العبايات والفساتين بتصاميم كشكش وفيونكات وأزرار.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "robe-1",
-    "name": "روب حجاب ملكي بتطريز زهور عاجية فاخرة",
-    "price": 7500,
-    "originalPrice": 8600,
-    "image": "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    "category": "abayas",
-    "stock": 10,
-    "href": "/abayas",
-    "description": "روب حجاب راقٍ بلون عاجي ملكي مع نقوش زهور مائية وتطريز ناعم يناسب الاستقبال والمناسبات.",
-    "createdAt": "2026-09-19"
-  },
-  {
     "id": "robe-2",
     "name": "روب حجاب سهرة مخملي عنابي بتطريز فضي ملكي",
     "price": 9800,
@@ -361,18 +357,6 @@
     "createdAt": "2026-09-19"
   },
   {
-    "id": "abaya-5",
-    "name": "عباءة عصرية بلون أخضر مريمي مع أساور كريستال",
-    "price": 7200,
-    "originalPrice": 8200,
-    "image": "/images/abayas/sage-green-crystal.jpg",
-    "category": "abayas",
-    "stock": 12,
-    "href": "/abayas",
-    "description": "عباءة كيمونو مفتوحة بلون أخضر ساجي هادئ بقماش صيفي مريح، تتألق بأساور عريضة مرصعة بصفائح أحجار الكريستال اللامعة على المعصمين.",
-    "createdAt": "2026-09-19"
-  },
-  {
     "id": "abaya-6",
     "name": "عباءة بوردو فاخرة بأكمام دانتيل فرنسي وشراشيب لؤلؤ",
     "price": 9200,
@@ -382,18 +366,6 @@
     "stock": 5,
     "href": "/abayas",
     "description": "تصميم استثنائي من دار آدري بلون عنابي دافئ يجمع بين الأناقة والترف، مع أكمام دانتيل زهري عاجي وشراشيب حبات اللؤلؤ المتدلية.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "abaya-7",
-    "name": "عباءة حريرية عاجية بنقوش زهور مائية فحمية",
-    "price": 6900,
-    "originalPrice": 7900,
-    "image": "/images/abayas/ivory-watercolor-floral.jpg",
-    "category": "abayas",
-    "stock": 11,
-    "href": "/abayas",
-    "description": "عباءة مفتوحة كلاسيكية بلون عاجي فخم مزينة بطبعات زهور مائية فنية سوداء رمادية مستوحاة من اللوحات الكلاسيكية، مناسبة للزيارات والمناسبات النهارية.",
     "createdAt": "2026-09-19"
   },
   {
@@ -426,7 +398,7 @@
     "price": 2400,
     "originalPrice": 2800,
     "image": "/images/hijabs/pearl-beaded-shawls.jpg",
-    "category": "hijab-supplies",
+    "category": "khimar",
     "stock": 18,
     "href": "/hijab-supplies",
     "description": "شالات شيفون فاخرة للمناسبات والسهرات متوفرة بألوان عاجي، كحلي داكن، وزيتي برونزي، تزدان بحواف مرصعة بخرزات لؤلؤ فضي لامع.",
@@ -438,7 +410,7 @@
     "price": 2600,
     "originalPrice": 3100,
     "image": "/images/hijabs/metallic-bead-grey.jpg",
-    "category": "hijab-supplies",
+    "category": "khimar",
     "stock": 15,
     "href": "/hijab-supplies",
     "description": "شال سهرة راقٍ بخامة كريب حرير ميتاليك رمادي فحمي لامع، يزدان بحلقات وأطواق خرزية ذهبية ناعمة على ثنية الرأس الأمامية.",
@@ -450,22 +422,10 @@
     "price": 1900,
     "originalPrice": 2300,
     "image": "/images/hijabs/instant-beige-crepe.jpg",
-    "category": "hijab-supplies",
+    "category": "khimar",
     "stock": 30,
     "href": "/hijab-supplies",
     "description": "حجاب تركي عملي وسريع اللبس بقماش كريب كوري ناعم لا يتطلب دبابيس، ينسدل بطبقات انسيابية تغطي الرأس والرقبة بارتياح تام.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "hijab-5",
-    "name": "باليت شالات شيفون جورجيت الفاخرة (18 لوناً غنياً)",
-    "price": 1500,
-    "originalPrice": 1800,
-    "image": "/images/hijabs/rainbow-ladder-palette.jpg",
-    "category": "hijab-supplies",
-    "stock": 50,
-    "href": "/hijab-supplies",
-    "description": "مجموعة متكاملة من أجود خامات شيفون جورجيت الأصلي غير الشفاف، متوفرة بباقة ألوان ترابية وباستيل وملكية تناسب جميع إطلالاتك اليومية والمناسبات.",
     "createdAt": "2026-09-19"
   },
   {
@@ -474,22 +434,10 @@
     "price": 1700,
     "originalPrice": 2000,
     "image": "/images/hijabs/burgundy-jersey-instant.jpg",
-    "category": "hijab-supplies",
+    "category": "khimar",
     "stock": 22,
     "href": "/hijab-supplies",
     "description": "حجاب قطني جيرسي عالي الجودة والمرونة بخامة مودال تركية ناعمة وخفيفة، يثبت بسلاسة دون الحاجة لدبابيس بلون بوردو دافئ وجذاب.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "isdal-2",
-    "name": "طقم إسدال سماوي باستيل مع خمار أبيض منسدل",
-    "price": 4800,
-    "originalPrice": 5600,
-    "image": "/images/uploads/isdal_pastel_blue_white_1789832048044.jpg",
-    "category": "isdalat",
-    "stock": 14,
-    "href": "/isdalat",
-    "description": "طقم إسدال راقٍ بلون أزرق سماوي باستيل هادئ مع خمار أبيض ناصع طويل ساتر ينسدل على الظهر والأكتاف برقة، قماش كريب ناعم وخفيف للصلاة والخروج.",
     "createdAt": "2026-09-19"
   },
   {
@@ -517,87 +465,15 @@
     "createdAt": "2026-09-19"
   },
   {
-    "id": "isdal-5",
-    "name": "إسدال وجلباب شوكولاتة مع خمار أسود ساتر للمناسبات",
-    "price": 4900,
-    "originalPrice": 5700,
-    "image": "/images/uploads/modest_black_isdal_1789749094153.jpg",
-    "category": "isdalat",
-    "stock": 15,
-    "href": "/isdalat",
-    "description": "طقم جلباب وإسدال متكامل بخامة كريب ملكي بلون بني شوكولاتة دافئ بأكمام مزمومة مريحة، مع خمار أسود طويل منسدل ساتر للصدر والظهر.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "isdal-6",
-    "name": "خمار وإسدال شيفون شوكولاتة متدرج بطبقات كشكش انسيابية",
-    "price": 4600,
-    "originalPrice": 5300,
-    "image": "/images/uploads/modest_clothing_sale_1789749140662.jpg",
-    "category": "isdalat",
-    "stock": 18,
-    "href": "/isdalat",
-    "description": "خمار وإسدال فريد بطبقات شيفون جورجيت متتالية بلون شوكولاتة عميق مع أطراف كشكش ناعمة تمنح حجماً وانسيابية ساحرة فوق الفساتين والعبايات.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-linen-grey",
-    "name": "فستان كتان رمادي فاتح مريح بقصة بوهيمية",
-    "price": 4600,
-    "originalPrice": 5200,
-    "image": "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
-    "category": "dresses",
-    "stock": 14,
-    "href": "/dresses",
-    "description": "فستان كتان طبيعي فاخر بلون رمادي فاتح مريح، بياقة دائرية أنيقة وزمزمة ناعمة أسفل الصدر وأكمام بوف واسعة مع مطاط معصم مرن للإطلالات اليومية والعملية.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-floral-chiffon",
-    "name": "فستان شيفون صيفي عاجي مورد بزهور اللافندر",
-    "price": 4900,
-    "originalPrice": 5600,
-    "image": "/images/uploads/mauve_hijab_model_1789749104873.jpg",
-    "category": "dresses",
-    "stock": 16,
-    "href": "/dresses",
-    "description": "فستان صيفي رقيق ومحتشم بخامة شيفون حريري بارد مع بطانة ناعمة، منقوش بزهور بنفسجية لافندر أنثوية مع ياقة عالية وخصر مطاطي مريح وأكمام واسعة.",
-    "createdAt": "2026-09-19"
-  },
-  {
     "id": "dress-vintage-green",
     "name": "فستان فينتج زيتي بكسرات كلاسيكية وأكمام دانتيل",
     "price": 5500,
     "originalPrice": 6400,
     "image": "/images/uploads/sage_green_crystal_abaya_1789830162620.jpg",
-    "category": "dresses",
+    "category": "abayas",
     "stock": 11,
     "href": "/dresses",
     "description": "تصميم كلاسيكي راقٍ بلون أخضر زيتي ملكي بياقة مرتفعة وكسرات بليسيه متوازية على الخصر، مع تفاصيل أكمام دانتيل فرنسي أبيض مفرغ مع فيونكة رقيقة.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-mauve-crepe",
-    "name": "فستان كريب كشمير ناعم برباط جانبي أنيق",
-    "price": 4700,
-    "originalPrice": 5300,
-    "image": "/images/uploads/black_embroidered_abaya_1789749117503.jpg",
-    "category": "dresses",
-    "stock": 18,
-    "href": "/dresses",
-    "description": "فستان كريب تركي انسيابي بلون وردي موف كشميري دافئ، يتميز برباطين جانبيين لضبط المقاس والخصر حسب الرغبة وأكمام واسعة أنيقة لراحة يومية محتشمة.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-chocolate-cape",
-    "name": "فستان سهرة كاب ملكي فاخر بلون شوكولاتة داكنة",
-    "price": 6800,
-    "originalPrice": 7800,
-    "image": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
-    "category": "dresses",
-    "stock": 9,
-    "href": "/dresses",
-    "description": "فستان سهرة مهيب بلون بني شوكولاتة غني، مزود بكاب ملكي ممتد على الظهر والأكتاف مع ثنيات وكسرات عمودية طويلة وحزام نحيف يبرز جمال التصميم المحتشم.",
     "createdAt": "2026-09-19"
   },
   {
@@ -606,22 +482,10 @@
     "price": 7200,
     "originalPrice": 8400,
     "image": "/images/uploads/burgundy_pearl_lace_abaya_1789830171852.jpg",
-    "category": "dresses",
+    "category": "abayas",
     "stock": 8,
     "href": "/dresses",
     "description": "قطعة كوتور فاخرة للمناسبات الكبرى بلون وردي بودري ناعم، مرصع بتطريز زهور مجسمة وخرز ولؤلؤ على الخصر، مع أكمام جرس شيفون واسعة ووشاح كاب متدفق.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-burgundy-tiered",
-    "name": "فستان ماكسي عنابي بوردو واسع بطبقات كشكش انسيابية",
-    "price": 5100,
-    "originalPrice": 5900,
-    "image": "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg",
-    "category": "dresses",
-    "stock": 15,
-    "href": "/dresses",
-    "description": "فستان ماكسي فضفاض محتشم بلون عنابي بوردو ملكي دافئ، بطبقات كشكش سفلية واسعة وأكمام بوف منسدلة وحزام خصر قماشي ناعم، رائع للنزهات والزيارات.",
     "createdAt": "2026-09-19"
   },
   {
@@ -630,34 +494,10 @@
     "price": 5800,
     "originalPrice": 6600,
     "image": "/images/uploads/crystal_sparkle_black_abaya_1789830134113.jpg",
-    "category": "dresses",
+    "category": "abayas",
     "stock": 10,
     "href": "/dresses",
     "description": "فستان استثنائي بلون بنفسجي لافندر فاتح مع تفاصيل رباط كورسيه جانبي كلاسيكي وشرائط منسدلة، بأكمام بوف درامية واسعة تمنح حضوراً سينمائياً ساحراً.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-white-cape-bridal",
-    "name": "فستان كاب سهرة وعرائس ملكي أبيض ناصع",
-    "price": 7900,
-    "originalPrice": 9200,
-    "image": "/images/uploads/black_embroidered_abaya_1789749117503.jpg",
-    "category": "dresses",
-    "stock": 7,
-    "href": "/dresses",
-    "description": "تصميم عرائسي ومناسبات مهيب بقماش كريب وحرير أبيض ناصع مع كاب ملكي ينسدل فوق الأكتاف والظهر وياقة عالية ساترة وأكمام بوف مزمومة بكشكش ناعم.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-lilac-evening-set",
-    "name": "طقم فستان سهرة ليلكي ملكي مع شال وكلتش لؤلؤ",
-    "price": 6900,
-    "originalPrice": 7900,
-    "image": "/images/uploads/mauve_hijab_model_1789749104873.jpg",
-    "category": "dresses",
-    "stock": 9,
-    "href": "/dresses",
-    "description": "إطلالة سهرة متكاملة راقية بفستان كريب استرتش ليلكي بخصر درابيه وأكمام كاب واسعة، منسق مع شال شيفون ليلكي متناغم وحقيبة كلتش لؤلؤية فاخرة.",
     "createdAt": "2026-09-19"
   },
   {
@@ -666,22 +506,10 @@
     "price": 4800,
     "originalPrice": 5500,
     "image": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
-    "category": "dresses",
+    "category": "abayas",
     "stock": 17,
     "href": "/dresses",
     "description": "فستان كريب أنيق وعملي بلون بني شوكولاتة سادة بقصة مينيمال مستقيمة، يتميز بأكمام مروحية واسعة وحزام خصر خلفي أنيق يضفي لمسة رقي وانسيابية عصرية.",
-    "createdAt": "2026-09-19"
-  },
-  {
-    "id": "dress-sage-tiered-set",
-    "name": "طقم فستان مريمي كاجوال بطبقات مع شال وحقيبة",
-    "price": 5300,
-    "originalPrice": 6100,
-    "image": "/images/uploads/sage_green_crystal_abaya_1789830162620.jpg",
-    "category": "dresses",
-    "stock": 13,
-    "href": "/dresses",
-    "description": "فستان أخضر مريمي / زيتي فاتح كاجوال بياقة عالية وأزرار صدر كلاسيكية وقصة طبقات كشكش واسعة، منسق بإتقان مع شال بيج نيود وحقيبة جلدية ناعمة.",
     "createdAt": "2026-09-19"
   }
 ]

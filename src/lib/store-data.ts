@@ -1509,6 +1509,24 @@ export function compressImageFile(file: File, maxWidth = 1000, quality = 0.85): 
   });
 }
 
+export function deduplicateProducts(list: AdminProduct[]): AdminProduct[] {
+  const seen = new Set<string>();
+  return list.filter((p) => {
+    if (!p || !p.id || seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
+}
+
+export function deduplicateCategories(list: StoreCategory[]): StoreCategory[] {
+  const seen = new Set<string>();
+  return list.filter((c) => {
+    if (!c || !c.id || seen.has(c.id)) return false;
+    seen.add(c.id);
+    return true;
+  });
+}
+
 export function getStoredCategories(): StoreCategory[] {
   if (typeof window === "undefined") return INITIAL_CATEGORIES;
   try {
@@ -1520,7 +1538,7 @@ export function getStoredCategories(): StoreCategory[] {
     }
     const parsed: StoreCategory[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed.sort((a, b) => a.order - b.order);
+      return deduplicateCategories(parsed).sort((a, b) => a.order - b.order);
     }
     return INITIAL_CATEGORIES;
   } catch {
@@ -1530,7 +1548,8 @@ export function getStoredCategories(): StoreCategory[] {
 
 export function saveStoredCategories(categories: StoreCategory[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+  const deduped = deduplicateCategories(categories);
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(deduped));
   window.dispatchEvent(new Event("hijab_categories_updated"));
 }
 
@@ -1564,7 +1583,7 @@ export function getStoredProducts(): AdminProduct[] {
     }
     const parsed: AdminProduct[] = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed;
+      return deduplicateProducts(parsed);
     }
     return INITIAL_PRODUCTS;
   } catch {
@@ -1574,7 +1593,8 @@ export function getStoredProducts(): AdminProduct[] {
 
 export function saveStoredProducts(products: AdminProduct[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  const deduped = deduplicateProducts(products);
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(deduped));
   window.dispatchEvent(new Event("hijab_products_updated"));
 }
 
@@ -1621,17 +1641,28 @@ export function saveStoredConversations(conversations: CustomerConversation[]) {
 }
 
 export function useStoreData() {
-  const [products, setProducts] = useState<AdminProduct[]>(() => getStoredProducts());
-  const [orders, setOrders] = useState<CustomerOrder[]>(() => getStoredOrders());
-  const [conversations, setConversations] = useState<CustomerConversation[]>(() =>
-    getStoredConversations(),
-  );
-  const [categories, setCategories] = useState<StoreCategory[]>(() => getStoredCategories());
-  const [heroBanner, setHeroBanner] = useState<string | null>(() => getStoredHeroBanner());
+  const [products, setProducts] = useState<AdminProduct[]>(INITIAL_PRODUCTS);
+  const [orders, setOrders] = useState<CustomerOrder[]>(INITIAL_ORDERS);
+  const [conversations, setConversations] = useState<CustomerConversation[]>(INITIAL_CONVERSATIONS);
+  const [categories, setCategories] = useState<StoreCategory[]>(INITIAL_CATEGORIES);
+  const [heroBanner, setHeroBanner] = useState<string | null>(null);
 
   // Fetch real server data on initial mount to sync database with client
   useEffect(() => {
     let isMounted = true;
+
+    // First load from localStorage on client side
+    const localProds = getStoredProducts();
+    const localCats = getStoredCategories();
+    const localOrders = getStoredOrders();
+    const localConvs = getStoredConversations();
+    const localHero = getStoredHeroBanner();
+
+    setProducts(deduplicateProducts(localProds));
+    setCategories(deduplicateCategories(localCats));
+    setOrders(localOrders);
+    setConversations(localConvs);
+    setHeroBanner(localHero);
 
     async function syncFromServer() {
       try {
@@ -1640,8 +1671,9 @@ export function useStoreData() {
         if (prodRes.ok && isMounted) {
           const serverProducts = await prodRes.json();
           if (Array.isArray(serverProducts)) {
-            setProducts(serverProducts);
-            saveStoredProducts(serverProducts);
+            const deduped = deduplicateProducts(serverProducts);
+            setProducts(deduped);
+            saveStoredProducts(deduped);
           }
         }
       } catch (err) {
@@ -1654,8 +1686,9 @@ export function useStoreData() {
         if (catRes.ok && isMounted) {
           const serverCategories = await catRes.json();
           if (Array.isArray(serverCategories)) {
-            setCategories(serverCategories);
-            saveStoredCategories(serverCategories);
+            const deduped = deduplicateCategories(serverCategories);
+            setCategories(deduped);
+            saveStoredCategories(deduped);
           }
         }
       } catch (err) {
@@ -1707,10 +1740,10 @@ export function useStoreData() {
 
     syncFromServer();
 
-    const updateProducts = () => setProducts(getStoredProducts());
+    const updateProducts = () => setProducts(deduplicateProducts(getStoredProducts()));
     const updateOrders = () => setOrders(getStoredOrders());
     const updateConvs = () => setConversations(getStoredConversations());
-    const updateCats = () => setCategories(getStoredCategories());
+    const updateCats = () => setCategories(deduplicateCategories(getStoredCategories()));
     const updateHero = () => setHeroBanner(getStoredHeroBanner());
 
     window.addEventListener("hijab_products_updated", updateProducts);

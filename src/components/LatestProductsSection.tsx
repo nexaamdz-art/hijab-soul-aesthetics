@@ -392,7 +392,7 @@ export function LatestProductsSection() {
 
             return (
               <div
-                key={product.id}
+                key={`${product.id}-${index}`}
                 className="group snap-item relative flex-none snap-start lg:w-full lg:max-w-none lg:min-w-0 transition-transform duration-300 motion-reduce:transition-none"
                 style={{
                   width: "var(--product-card-w)",

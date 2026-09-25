@@ -289,9 +289,9 @@ export function AdminProducts({
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {filteredProducts.map((product) => (
+        {filteredProducts.map((product, idx) => (
           <div
-            key={product.id}
+            key={`${product.id}-${idx}`}
             className="group relative rounded-2xl bg-[#FAF6F0] p-3.5 sm:p-4 border border-[#E3D4C0] shadow-sm hover:shadow-md hover:border-[#2B2119] transition-all flex flex-col justify-between"
           >
             {/* Image & Badges */}

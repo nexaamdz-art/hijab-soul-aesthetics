@@ -11,6 +11,8 @@ import {
   INITIAL_CATEGORIES,
   INITIAL_ORDERS,
   INITIAL_CONVERSATIONS,
+  deduplicateProducts,
+  deduplicateCategories,
 } from "./store-data";
 
 const DATA_DIR = path.resolve(process.cwd(), ".data");
@@ -50,7 +52,8 @@ export function readStoredProducts(initialDefaults?: AdminProduct[]): AdminProdu
 export function writeStoredProducts(products: AdminProduct[]): void {
   ensureDirectoryExists(DATA_DIR);
   try {
-    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2), "utf8");
+    const deduped = deduplicateProducts(products);
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(deduped, null, 2), "utf8");
   } catch (err) {
     console.error("Failed to write products file:", err);
   }
@@ -68,7 +71,7 @@ export function readStoredCategories(initialDefaults?: StoreCategory[]): StoreCa
   try {
     const raw = fs.readFileSync(CATEGORIES_FILE, "utf8");
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
+    if (Array.isArray(parsed)) return deduplicateCategories(parsed);
     return [];
   } catch (err) {
     console.error("Failed to read categories file:", err);
@@ -79,7 +82,8 @@ export function readStoredCategories(initialDefaults?: StoreCategory[]): StoreCa
 export function writeStoredCategories(categories: StoreCategory[]): void {
   ensureDirectoryExists(DATA_DIR);
   try {
-    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(categories, null, 2), "utf8");
+    const deduped = deduplicateCategories(categories);
+    fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(deduped, null, 2), "utf8");
   } catch (err) {
     console.error("Failed to write categories file:", err);
   }
@@ -288,7 +292,10 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
         };
 
         const products = readStoredProducts();
-        const updated = [newProduct, ...products];
+        const updated = deduplicateProducts([
+          newProduct,
+          ...products.filter((p) => p.id !== newProduct.id),
+        ]);
         writeStoredProducts(updated);
 
         return new Response(

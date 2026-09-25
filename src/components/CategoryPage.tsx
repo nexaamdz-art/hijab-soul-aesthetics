@@ -779,14 +779,14 @@ export function CategoryPage({ title, categoryKey, subtitle }: CategoryPageProps
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
-            {displayProducts.map((product) => {
+            {displayProducts.map((product, idx) => {
               const isFav = favorites.has(product.id);
               const isAdded = addedProductId === product.id;
               const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
               return (
                 <div
-                  key={product.id}
+                  key={`${product.id}-${idx}`}
                   className="group relative flex flex-col rounded-2xl bg-[#F1E6D0] p-2.5 sm:p-3 shadow-[0_4px_14px_rgba(43,33,25,0.08)] border border-[#E2D2BC] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-[1.025] hover:shadow-[0_16px_32px_rgba(43,33,25,0.20)] motion-reduce:transform-none"
                   style={{
                     backgroundImage: "linear-gradient(180deg, #FAF4E8 0%, #F1E6D0 100%)",

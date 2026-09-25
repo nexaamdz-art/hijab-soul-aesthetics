@@ -3,7 +3,7 @@
     "id": "dresses",
     "name": "فساتين",
     "href": "/dresses",
-    "image": "/images/categories/dresses.jpg",
+    "image": "/images/uploads/upload_1790339352478_x3w9iv.jpg",
     "bannerImage": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
     "alt": "فساتين محتشمة وأنيقة - حجاب سول",
     "description": "فساتين محتشمة وأنيقة بقصات راقية وأقمشة فاخرة تناسب كل المناسبات",
@@ -14,7 +14,7 @@
     "id": "isdalat",
     "name": "اسدالات",
     "href": "/isdalat",
-    "image": "/images/categories/isdalat.jpg",
+    "image": "/images/uploads/upload_1790339379642_xgxe51.jpg",
     "bannerImage": "/images/uploads/isdal_pastel_blue_white_1789832048044.jpg",
     "alt": "إسدالات صلاة وخروج راقية - حجاب سول",
     "description": "إسدالات صلاة وخروج ساترة ومريحة بخامات قطنية نقية وتصاميم عملية",
@@ -30,13 +30,13 @@
     "alt": "حجابات وخمارات بأقمشة ناعمة فاخرة - حجاب سول",
     "description": "شالات وحجابات شيفون وكريب قطني بألوان ساحرة تناسب إطلالتك اليومية",
     "order": 3,
-    "isActive": true
+    "isActive": false
   },
   {
     "id": "abayas",
     "name": "عبايات",
     "href": "/abayas",
-    "image": "/images/categories/abayas.jpg",
+    "image": "/images/uploads/upload_1790339444157_2m1ao9.jpg",
     "bannerImage": "/images/abayas/black-floral-embroidered.jpg",
     "alt": "عبايات عصرية بتطريز راقٍ - حجاب سول",
     "description": "عبايات خليجية سوداء وملونة بتطريزات يدوية راقية وكريستال فاخر",
@@ -85,6 +85,6 @@
     "alt": "أحذية وأطقم شرعية مريحة - حجاب سول",
     "description": "أحذية نسائية طبية ومريحة تتناسق مع الإطلالة المحتشمة",
     "order": 8,
-    "isActive": true
+    "isActive": false
   }
 ]
