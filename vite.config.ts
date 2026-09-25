@@ -10,16 +10,16 @@ import type { Plugin } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-function devAuthApiPlugin(): Plugin {
+function devApiPlugin(): Plugin {
   return {
-    name: "dev-auth-api-plugin",
+    name: "dev-api-plugin",
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith("/api/auth")) {
+        if (!req.url?.startsWith("/api")) {
           return next();
         }
         try {
-          const { handleAuthApi } = await import("./src/lib/server-auth-handler");
+          const { handleCombinedApi } = await import("./src/lib/server-api-handler");
           const protocol = req.headers["x-forwarded-proto"] || "http";
           const host = req.headers.host || "localhost:3000";
           const fullUrl = `${protocol}://${host}${req.url}`;
@@ -48,7 +48,7 @@ function devAuthApiPlugin(): Plugin {
             body: body ? body : undefined,
           });
 
-          const response = await handleAuthApi(webReq);
+          const response = await handleCombinedApi(webReq);
           if (!response) {
             return next();
           }
@@ -60,10 +60,10 @@ function devAuthApiPlugin(): Plugin {
           const text = await response.text();
           res.end(text);
         } catch (err) {
-          console.error("Auth API dev error:", err);
+          console.error("API dev server error:", err);
           res.statusCode = 500;
           res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify({ error: "Internal Auth Error" }));
+          res.end(JSON.stringify({ error: "Internal API Error" }));
         }
       });
     },
@@ -90,7 +90,7 @@ export default defineConfig(({ command, mode }) => ({
     ],
   },
   plugins: [
-    devAuthApiPlugin(),
+    devApiPlugin(),
     tailwindcss(),
     tsConfigPaths({ projects: ["./tsconfig.json"] }),
     tanstackStart({

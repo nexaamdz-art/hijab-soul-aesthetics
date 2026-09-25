@@ -1,0 +1,103 @@
+[
+  {
+    "id": "conv-1",
+    "customerName": "أمينة بن ساسي",
+    "customerPhone": "0661234589",
+    "wilaya": "الجزائر العاصمة",
+    "lastMessage": "السلام عليكم، هل يمكن شحن طلبي اليوم مساءً؟",
+    "lastMessageTime": "10:45 ص",
+    "unreadCount": 1,
+    "messages": [
+      {
+        "id": "m-1",
+        "conversationId": "conv-1",
+        "sender": "customer",
+        "text": "السلام عليكم ورحمة الله، لقد قمت بطلب العباءة السوداء المطرزة وهذا وصل التأكيد.",
+        "imageUrl": "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
+        "timestamp": "10:40 ص",
+        "isRead": true
+      },
+      {
+        "id": "m-2",
+        "conversationId": "conv-1",
+        "sender": "admin",
+        "text": "وعليكم السلام ورحمة الله وبركاته يا أمينة! أهلاً بكِ في حجاب سول. تم استقبال طلبكِ رقم #HS-9842 بنجاح والقطعة مجهزة للشحن الفوري.",
+        "imageUrl": "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
+        "timestamp": "10:42 ص",
+        "isRead": true
+      },
+      {
+        "id": "m-3",
+        "conversationId": "conv-1",
+        "sender": "customer",
+        "text": "السلام عليكم، هل يمكن شحن طلبي اليوم مساءً؟",
+        "timestamp": "10:45 ص",
+        "isRead": false
+      }
+    ]
+  },
+  {
+    "id": "conv-2",
+    "customerName": "فاطمة الزهراء قادري",
+    "customerPhone": "0770981234",
+    "wilaya": "وهران",
+    "lastMessage": "شكراً جزيلاً، جودة القماش ممتازة جداً ما شاء الله",
+    "lastMessageTime": "أمس 18:20",
+    "unreadCount": 0,
+    "messages": [
+      {
+        "id": "m-201",
+        "conversationId": "conv-2",
+        "sender": "customer",
+        "text": "مساء الخير، هل فستان التفاصيل الأنيقة متوفر بمقاس XL؟",
+        "imageUrl": "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg",
+        "timestamp": "أمس 16:15",
+        "isRead": true
+      },
+      {
+        "id": "m-202",
+        "conversationId": "conv-2",
+        "sender": "admin",
+        "text": "أهلاً بكِ فاطمة، نعم متوفر وجاهز للشحن الفوري إلى وهران.",
+        "timestamp": "أمس 16:30",
+        "isRead": true
+      },
+      {
+        "id": "m-203",
+        "conversationId": "conv-2",
+        "sender": "customer",
+        "text": "شكراً جزيلاً، جودة القماش ممتازة جداً ما شاء الله",
+        "timestamp": "أمس 18:20",
+        "isRead": true
+      }
+    ]
+  },
+  {
+    "id": "conv-3",
+    "customerName": "نورهان الشريف",
+    "customerPhone": "0550112233",
+    "wilaya": "عنابة",
+    "lastMessage": "كم يستغرق التوصيل إلى ولاية عنابة؟",
+    "lastMessageTime": "أمس 12:00",
+    "unreadCount": 0,
+    "messages": [
+      {
+        "id": "m-301",
+        "conversationId": "conv-3",
+        "sender": "customer",
+        "text": "مرحباً، أود الاستفسار عن مدة التوصيل وأسعار الخمارات المتوفرة.",
+        "imageUrl": "/images/uploads/hijab_pearl_beaded_shawls_1789831343828.jpg",
+        "timestamp": "أمس 11:50",
+        "isRead": true
+      },
+      {
+        "id": "m-302",
+        "conversationId": "conv-3",
+        "sender": "customer",
+        "text": "كم يستغرق التوصيل إلى ولاية عنابة؟",
+        "timestamp": "أمس 12:00",
+        "isRead": true
+      }
+    ]
+  }
+]

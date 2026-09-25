@@ -44,14 +44,14 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-import { handleAuthApi } from "./lib/server-auth-handler";
+import { handleCombinedApi } from "./lib/server-api-handler";
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
-      const authResponse = await handleAuthApi(request);
-      if (authResponse) {
-        return authResponse;
+      const apiResponse = await handleCombinedApi(request);
+      if (apiResponse) {
+        return apiResponse;
       }
 
       const handler = await getServerEntry();

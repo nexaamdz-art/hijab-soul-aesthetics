@@ -1,0 +1,157 @@
+[
+  {
+    "id": "ord-1790339138867",
+    "orderNumber": "HS-5109",
+    "customerName": "زائرة حقيقية",
+    "phone": "0555001122",
+    "wilaya": "16 - الجزائر العاصمة",
+    "commune": "المرادية",
+    "address": "شارع ديدوش مراد",
+    "items": [
+      {
+        "productId": "product-1",
+        "name": "عباءة سوداء مطرزة",
+        "price": 4500,
+        "quantity": 1,
+        "image": "/test.jpg"
+      }
+    ],
+    "totalAmount": 4500,
+    "shippingCost": 500,
+    "grandTotal": 5000,
+    "status": "pending",
+    "createdAt": "25 سبتمبر 2026"
+  },
+  {
+    "id": "ord-101",
+    "orderNumber": "HS-9842",
+    "customerName": "أمينة بن ساسي",
+    "phone": "0661234589",
+    "wilaya": "16 - الجزائر العاصمة",
+    "commune": "المرادية",
+    "address": "حي 5 جويلية، عمارة 12، الطابق 2",
+    "items": [
+      {
+        "productId": "product-1",
+        "name": "عباءة سوداء مطرزة",
+        "price": 4500,
+        "quantity": 1,
+        "image": "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg"
+      },
+      {
+        "productId": "product-6",
+        "name": "حجاب شيفون أسود حريري",
+        "price": 1200,
+        "quantity": 1,
+        "image": "/images/uploads/hijab_black_silk_chiffon_1789831330976.jpg"
+      }
+    ],
+    "totalAmount": 5700,
+    "shippingCost": 500,
+    "grandTotal": 6200,
+    "status": "pending",
+    "createdAt": "منذ 15 دقيقة",
+    "notes": "يرجى الاتصال قبل التوصيل في الفترة المسائية"
+  },
+  {
+    "id": "ord-102",
+    "orderNumber": "HS-9841",
+    "customerName": "فاطمة الزهراء قادري",
+    "phone": "0770981234",
+    "wilaya": "31 - وهران",
+    "commune": "بئر الجير",
+    "address": "شارع العقيد لطفي، فيلا 44",
+    "items": [
+      {
+        "productId": "product-2",
+        "name": "روب حجاب عاجي راقٍ",
+        "price": 3800,
+        "quantity": 1,
+        "image": "/images/uploads/ivory_watercolor_floral_abaya_1789830182632.jpg"
+      }
+    ],
+    "totalAmount": 3800,
+    "shippingCost": 700,
+    "grandTotal": 4500,
+    "status": "processing",
+    "createdAt": "منذ ساعتين",
+    "notes": "المقاس: L"
+  },
+  {
+    "id": "ord-103",
+    "orderNumber": "HS-9839",
+    "customerName": "سمية بوزيد",
+    "phone": "0555432190",
+    "wilaya": "25 - قسنطينة",
+    "commune": "علي منجلي",
+    "address": "الوحدة الجوارية 08، عمارة C4",
+    "items": [
+      {
+        "productId": "product-5",
+        "name": "إسدال صلاة سماوي وأبيض",
+        "price": 3000,
+        "quantity": 2,
+        "image": "/images/uploads/isdal_pastel_blue_white_1789832048044.jpg"
+      },
+      {
+        "productId": "product-3",
+        "name": "خمار شيفون ولؤلؤ فاخر",
+        "price": 2200,
+        "quantity": 1,
+        "image": "/images/uploads/hijab_pearl_beaded_shawls_1789831343828.jpg"
+      }
+    ],
+    "totalAmount": 8200,
+    "shippingCost": 700,
+    "grandTotal": 8900,
+    "status": "shipped",
+    "createdAt": "أمس 14:30"
+  },
+  {
+    "id": "ord-104",
+    "orderNumber": "HS-9835",
+    "customerName": "خديجة العيداني",
+    "phone": "0672118844",
+    "wilaya": "09 - البليدة",
+    "commune": "أولاد يعيش",
+    "address": "حي النخيل، مقابل المسجد الكبير",
+    "items": [
+      {
+        "productId": "product-8",
+        "name": "عباءة عنابي بتطريز فضي",
+        "price": 5200,
+        "quantity": 1,
+        "image": "/images/uploads/burgundy_silver_embroidery_abaya_1789830112029.jpg"
+      }
+    ],
+    "totalAmount": 5200,
+    "shippingCost": 600,
+    "grandTotal": 5800,
+    "status": "delivered",
+    "createdAt": "16 سبتمبر 2026"
+  },
+  {
+    "id": "ord-105",
+    "orderNumber": "HS-9830",
+    "customerName": "مريم بلمهدي",
+    "phone": "0799443322",
+    "wilaya": "19 - سطيف",
+    "commune": "العلمة",
+    "address": "شارع دبي التجاري",
+    "items": [
+      {
+        "productId": "product-4",
+        "name": "كاب شوكولاتة فخم",
+        "price": 3400,
+        "quantity": 1,
+        "image": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg"
+      }
+    ],
+    "totalAmount": 3400,
+    "shippingCost": 700,
+    "grandTotal": 4100,
+    "status": "cancelled",
+    "createdAt": "15 سبتمبر 2026",
+    "notes": "ألغت الزبونة الطلب بسبب تغيير المقاس"
+  }
+]

@@ -106,9 +106,24 @@ export function AdminCategories({
       setUploadError(null);
       const compressedDataUrl = await compressImageFile(file, 1000, 0.85);
 
+      let finalImageUrl = compressedDataUrl;
+      try {
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: compressedDataUrl }),
+        });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          if (uploadData.url) finalImageUrl = uploadData.url;
+        }
+      } catch (err) {
+        console.error("Upload error:", err);
+      }
+
       if (activeImagePickerCat) {
         onUpdateCategory(activeImagePickerCat.category.id, {
-          [activeImagePickerCat.targetField]: compressedDataUrl,
+          [activeImagePickerCat.targetField]: finalImageUrl,
         });
         showToast(
           activeImagePickerCat.targetField === "image"
@@ -154,7 +169,21 @@ export function AdminCategories({
     try {
       setIsUploading(true);
       const dataUrl = await compressImageFile(file, 1400, 0.88);
-      onUpdateHeroBanner(dataUrl);
+      let finalBannerUrl = dataUrl;
+      try {
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: dataUrl }),
+        });
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          if (uploadData.url) finalBannerUrl = uploadData.url;
+        }
+      } catch (err) {
+        console.error("Hero upload error:", err);
+      }
+      onUpdateHeroBanner(finalBannerUrl);
       showToast("تم تحديث بنر الواجهة الرئيسية بنجاح!");
       setIsHeroModalOpen(false);
     } catch {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Store,
   Phone,
@@ -10,12 +10,15 @@ import {
   KeyRound,
   AlertCircle,
 } from "lucide-react";
-import { ADMIN_EMAILS } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth-context";
 
 export function AdminSettings() {
+  const { user, profile } = useAuth();
   const [storeName, setStoreName] = useState("حجاب سول — Hijab Soul");
   const [supportPhone, setSupportPhone] = useState("0661234589");
-  const [adminEmail, setAdminEmail] = useState(ADMIN_EMAILS[0] || "admin@hijabsoul.dz");
+  const [adminEmail, setAdminEmail] = useState(
+    user?.email || profile?.email || "admin@hijabsoul.dz",
+  );
   const [shippingAlgiers, setShippingAlgiers] = useState<number>(500);
   const [shippingMajorCities, setShippingMajorCities] = useState<number>(700);
   const [shippingSouth, setShippingSouth] = useState<number>(900);
@@ -23,6 +26,23 @@ export function AdminSettings() {
     "توصيل سريع لكافة الـ 58 ولاية والدفع عند الاستلام ♡",
   );
   const [savedToast, setSavedToast] = useState(false);
+
+  // Load existing settings from server
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          if (data.storeName) setStoreName(data.storeName);
+          if (data.supportPhone) setSupportPhone(data.supportPhone);
+          if (data.shippingAlgiers) setShippingAlgiers(data.shippingAlgiers);
+          if (data.shippingMajorCities) setShippingMajorCities(data.shippingMajorCities);
+          if (data.shippingSouth) setShippingSouth(data.shippingSouth);
+          if (data.announcement) setAnnouncement(data.announcement);
+        }
+      })
+      .catch((err) => console.error("Failed to load settings:", err));
+  }, []);
 
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -32,8 +52,24 @@ export function AdminSettings() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isChangingPass, setIsChangingPass] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeName,
+          supportPhone,
+          shippingAlgiers,
+          shippingMajorCities,
+          shippingSouth,
+          announcement,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+    }
     setSavedToast(true);
     setTimeout(() => setSavedToast(false), 2500);
   };
@@ -59,7 +95,7 @@ export function AdminSettings() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: adminEmail,
+          email: user?.email || profile?.email || adminEmail,
           currentPassword,
           newPassword: newAdminPassword,
         }),

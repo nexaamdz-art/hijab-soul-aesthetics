@@ -51,9 +51,7 @@ function sanitizeFolder(baseDir) {
   for (const filePath of allFiles) {
     const fileName = path.basename(filePath);
     if (/[+\[\]]/.test(fileName)) {
-      const sanitizedName = fileName
-        .replace(/\+\[\.\.\.\]/g, "_chunks")
-        .replace(/[+\[\]]/g, "_");
+      const sanitizedName = fileName.replace(/\+\[\.\.\.\]/g, "_chunks").replace(/[+\[\]]/g, "_");
       const newPath = path.join(path.dirname(filePath), sanitizedName);
       renames.push({
         oldPath: filePath,
@@ -99,7 +97,11 @@ sanitizeFolder(path.join(root, ".output", "server"));
 async function prerenderInitialHtml() {
   const funcEntry = path.join(root, ".vercel", "output", "functions", "__server.func", "index.mjs");
   const serverEntry = path.join(root, ".output", "server", "index.mjs");
-  const targetEntry = fs.existsSync(funcEntry) ? funcEntry : fs.existsSync(serverEntry) ? serverEntry : null;
+  const targetEntry = fs.existsSync(funcEntry)
+    ? funcEntry
+    : fs.existsSync(serverEntry)
+      ? serverEntry
+      : null;
 
   if (!targetEntry) return;
 
@@ -119,7 +121,9 @@ async function prerenderInitialHtml() {
             const dir = path.dirname(dest);
             if (fs.existsSync(dir)) {
               fs.writeFileSync(dest, html, "utf-8");
-              console.log(`[postbuild] Generated pre-rendered HTML at ${path.relative(root, dest)}`);
+              console.log(
+                `[postbuild] Generated pre-rendered HTML at ${path.relative(root, dest)}`,
+              );
             }
           }
         }

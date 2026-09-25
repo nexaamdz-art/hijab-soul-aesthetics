@@ -104,7 +104,9 @@ function getLocalAccounts(): StoredAccount[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_ACCOUNTS_KEY);
     if (!raw) return [];
-    return JSON.parse(raw) as StoredAccount[];
+    const accounts = JSON.parse(raw) as StoredAccount[];
+    // Security: Filter out any accounts with insecure default passwords
+    return accounts.filter((a) => a.passwordHash !== "admin123456");
   } catch {
     return [];
   }
@@ -112,14 +114,16 @@ function getLocalAccounts(): StoredAccount[] {
 
 function saveLocalAccounts(accounts: StoredAccount[]): void {
   try {
-    localStorage.setItem(LOCAL_STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts));
+    const sanitized = accounts.filter((a) => a.passwordHash !== "admin123456");
+    localStorage.setItem(LOCAL_STORAGE_ACCOUNTS_KEY, JSON.stringify(sanitized));
   } catch {
     // ignore
   }
 }
 
 function accountToUser(account: StoredAccount): User {
-  const isOwner = account.role === "admin" || isAdminEmail(account.email);
+  // STRICT SECURITY: An account is ONLY an admin if their email is in the authorized ADMIN_EMAILS list!
+  const isOwner = isAdminEmail(account.email);
   return {
     id: `user_${account.email.replace(/[^a-zA-Z0-9]/g, "_")}`,
     app_metadata: { provider: "email" },
@@ -280,14 +284,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
-    // Security check: Reject registering admin emails via public form if already exists
+    // Security check: Strictly block registering admin emails via public form
     const isOwner = isAdminEmail(normalizedEmail);
+    if (isOwner) {
+      return {
+        alreadyRegistered: true,
+        error: new Error(
+          "هذا البريد الإلكتروني محجوز لإدارة المتجر ولا يمكن تسجيله كحساب زبون جديد. يرجى تسجيل الدخول مباشرة بكلمة المرور الخاصة بك.",
+        ),
+      };
+    }
+
     const existingAccounts = getLocalAccounts();
     const alreadyExistsLocally = existingAccounts.some(
       (a) => a.email.toLowerCase() === normalizedEmail,
     );
 
-    if (isOwner || alreadyExistsLocally) {
+    if (alreadyExistsLocally) {
       // Must log in with password
       return {
         alreadyRegistered: true,
@@ -585,6 +598,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: new Error("كلمة المرور يجب ألا تقل عن 6 خانات.") };
     }
 
+    // Security: Require currentPassword to prevent unauthorized takeover
+    if (!currentPassword) {
+      return {
+        error: new Error("كلمة المرور الحالية مطلوبة لتأكيد هويتك وتحديث كلمة المرور بأمان."),
+      };
+    }
+
     // Call server to securely verify and update password
     try {
       const res = await fetch("/api/auth/reset-password", {
@@ -604,11 +624,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // offline fallback
     }
 
-    // Update locally if found and authorized
+    // Update locally if found and verified
     const accounts = getLocalAccounts();
     const found = accounts.find((a) => a.email.toLowerCase() === normalizedEmail);
     if (found) {
-      if (currentPassword && found.passwordHash && found.passwordHash !== currentPassword) {
+      if (found.passwordHash && found.passwordHash !== currentPassword) {
         return { error: new Error("كلمة المرور الحالية غير صحيحة.") };
       }
       found.passwordHash = cleanPass;

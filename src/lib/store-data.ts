@@ -92,7 +92,7 @@ export interface CustomerConversation {
 }
 
 // Initial Default Products Data
-const INITIAL_PRODUCTS: AdminProduct[] = [
+export const INITIAL_PRODUCTS: AdminProduct[] = [
   {
     id: "product-1",
     name: "عباءة سوداء مطرزة",
@@ -826,7 +826,7 @@ const INITIAL_PRODUCTS: AdminProduct[] = [
 ];
 
 // Initial Algerian Orders Data
-const INITIAL_ORDERS: CustomerOrder[] = [
+export const INITIAL_ORDERS: CustomerOrder[] = [
   {
     id: "ord-101",
     orderNumber: "HS-9842",
@@ -962,7 +962,7 @@ const INITIAL_ORDERS: CustomerOrder[] = [
 ];
 
 // Initial Customer Conversations Data
-const INITIAL_CONVERSATIONS: CustomerConversation[] = [
+export const INITIAL_CONVERSATIONS: CustomerConversation[] = [
   {
     id: "conv-1",
     customerName: "أمينة بن ساسي",
@@ -1519,38 +1519,10 @@ export function getStoredCategories(): StoreCategory[] {
       return INITIAL_CATEGORIES;
     }
     const parsed: StoreCategory[] = JSON.parse(raw);
-    const initialMap = new Map(INITIAL_CATEGORIES.map((c) => [c.id, c]));
-
-    // Filter out obsolete categories like "hijab-robe"
-    const validParsed = parsed.filter((c) => c.id !== "hijab-robe");
-
-    // Synchronize initial categories with verified assets
-    const synchronized: StoreCategory[] = validParsed.map((cat) => {
-      const initCat = initialMap.get(cat.id);
-      if (initCat) {
-        return {
-          ...cat,
-          name: initCat.name,
-          href: initCat.href,
-          image: initCat.image,
-          bannerImage: initCat.bannerImage || cat.bannerImage,
-          alt: initCat.alt,
-          description: initCat.description || cat.description,
-        };
-      }
-      return cat;
-    });
-
-    // Add any new initial categories not yet present
-    const existingIds = new Set(synchronized.map((c) => c.id));
-    for (const initCat of INITIAL_CATEGORIES) {
-      if (!existingIds.has(initCat.id)) {
-        synchronized.push(initCat);
-      }
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.sort((a, b) => a.order - b.order);
     }
-
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(synchronized));
-    return synchronized.sort((a, b) => a.order - b.order);
+    return INITIAL_CATEGORIES;
   } catch {
     return INITIAL_CATEGORIES;
   }
@@ -1591,43 +1563,10 @@ export function getStoredProducts(): AdminProduct[] {
       return INITIAL_PRODUCTS;
     }
     const parsed: AdminProduct[] = JSON.parse(raw);
-    const initialMap = new Map(INITIAL_PRODUCTS.map((p) => [p.id, p]));
-
-    // Synchronize and heal products
-    const synchronized: AdminProduct[] = parsed.map((prod) => {
-      const initProd = initialMap.get(prod.id);
-      if (initProd) {
-        // Built-in catalog item: guarantee latest verified image and category
-        return {
-          ...initProd,
-          stock: typeof prod.stock === "number" ? prod.stock : initProd.stock,
-          price: typeof prod.price === "number" && prod.price > 0 ? prod.price : initProd.price,
-        };
-      }
-      // Custom user product: validate image and normalize category
-      const normalizedCat = prod.category === "hijab-robe" ? "abayas" : prod.category;
-      const validImage =
-        prod.image && prod.image.trim() !== ""
-          ? prod.image
-          : getProductFallbackImage(normalizedCat);
-      return {
-        ...prod,
-        category: normalizedCat,
-        href: normalizedCat ? `/${normalizedCat}` : "/abayas",
-        image: validImage,
-      };
-    });
-
-    // Add any initial products that might be missing
-    const existingIds = new Set(synchronized.map((p) => p.id));
-    for (const initProd of INITIAL_PRODUCTS) {
-      if (!existingIds.has(initProd.id)) {
-        synchronized.push(initProd);
-      }
+    if (Array.isArray(parsed)) {
+      return parsed;
     }
-
-    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(synchronized));
-    return synchronized;
+    return INITIAL_PRODUCTS;
   } catch {
     return INITIAL_PRODUCTS;
   }
@@ -1647,7 +1586,8 @@ export function getStoredOrders(): CustomerOrder[] {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(INITIAL_ORDERS));
       return INITIAL_ORDERS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : INITIAL_ORDERS;
   } catch {
     return INITIAL_ORDERS;
   }
@@ -1667,7 +1607,8 @@ export function getStoredConversations(): CustomerConversation[] {
       localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(INITIAL_CONVERSATIONS));
       return INITIAL_CONVERSATIONS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : INITIAL_CONVERSATIONS;
   } catch {
     return INITIAL_CONVERSATIONS;
   }
@@ -1680,18 +1621,91 @@ export function saveStoredConversations(conversations: CustomerConversation[]) {
 }
 
 export function useStoreData() {
-  const [products, setProducts] = useState<AdminProduct[]>(INITIAL_PRODUCTS);
-  const [orders, setOrders] = useState<CustomerOrder[]>(INITIAL_ORDERS);
-  const [conversations, setConversations] = useState<CustomerConversation[]>(INITIAL_CONVERSATIONS);
-  const [categories, setCategories] = useState<StoreCategory[]>(INITIAL_CATEGORIES);
-  const [heroBanner, setHeroBanner] = useState<string | null>(null);
+  const [products, setProducts] = useState<AdminProduct[]>(() => getStoredProducts());
+  const [orders, setOrders] = useState<CustomerOrder[]>(() => getStoredOrders());
+  const [conversations, setConversations] = useState<CustomerConversation[]>(() =>
+    getStoredConversations(),
+  );
+  const [categories, setCategories] = useState<StoreCategory[]>(() => getStoredCategories());
+  const [heroBanner, setHeroBanner] = useState<string | null>(() => getStoredHeroBanner());
 
+  // Fetch real server data on initial mount to sync database with client
   useEffect(() => {
-    setProducts(getStoredProducts());
-    setOrders(getStoredOrders());
-    setConversations(getStoredConversations());
-    setCategories(getStoredCategories());
-    setHeroBanner(getStoredHeroBanner());
+    let isMounted = true;
+
+    async function syncFromServer() {
+      try {
+        // 1. Fetch real products from server
+        const prodRes = await fetch("/api/products");
+        if (prodRes.ok && isMounted) {
+          const serverProducts = await prodRes.json();
+          if (Array.isArray(serverProducts)) {
+            setProducts(serverProducts);
+            saveStoredProducts(serverProducts);
+          }
+        }
+      } catch (err) {
+        console.error("Products server sync error:", err);
+      }
+
+      try {
+        // 2. Fetch real categories from server
+        const catRes = await fetch("/api/categories");
+        if (catRes.ok && isMounted) {
+          const serverCategories = await catRes.json();
+          if (Array.isArray(serverCategories)) {
+            setCategories(serverCategories);
+            saveStoredCategories(serverCategories);
+          }
+        }
+      } catch (err) {
+        console.error("Categories server sync error:", err);
+      }
+
+      try {
+        // 3. Fetch real orders from server
+        const ordRes = await fetch("/api/orders");
+        if (ordRes.ok && isMounted) {
+          const serverOrders = await ordRes.json();
+          if (Array.isArray(serverOrders)) {
+            setOrders(serverOrders);
+            saveStoredOrders(serverOrders);
+          }
+        }
+      } catch (err) {
+        console.error("Orders server sync error:", err);
+      }
+
+      try {
+        // 4. Fetch real conversations from server
+        const convRes = await fetch("/api/conversations");
+        if (convRes.ok && isMounted) {
+          const serverConvs = await convRes.json();
+          if (Array.isArray(serverConvs)) {
+            setConversations(serverConvs);
+            saveStoredConversations(serverConvs);
+          }
+        }
+      } catch (err) {
+        console.error("Conversations server sync error:", err);
+      }
+
+      try {
+        // 5. Fetch settings from server
+        const setRes = await fetch("/api/settings");
+        if (setRes.ok && isMounted) {
+          const serverSettings = await setRes.json();
+          if (serverSettings && typeof serverSettings.heroBanner !== "undefined") {
+            setHeroBanner(serverSettings.heroBanner);
+            saveStoredHeroBanner(serverSettings.heroBanner);
+          }
+        }
+      } catch (err) {
+        console.error("Settings server sync error:", err);
+      }
+    }
+
+    syncFromServer();
 
     const updateProducts = () => setProducts(getStoredProducts());
     const updateOrders = () => setOrders(getStoredOrders());
@@ -1706,6 +1720,7 @@ export function useStoreData() {
     window.addEventListener("hijab_hero_banner_updated", updateHero);
 
     return () => {
+      isMounted = false;
       window.removeEventListener("hijab_products_updated", updateProducts);
       window.removeEventListener("hijab_orders_updated", updateOrders);
       window.removeEventListener("hijab_conversations_updated", updateConvs);
@@ -1714,13 +1729,20 @@ export function useStoreData() {
     };
   }, []);
 
-  // Category CRUD
+  // Category CRUD with real server API persistence
   const updateCategory = useCallback((id: string, updates: Partial<StoreCategory>) => {
     setCategories((prev) => {
       const next = prev.map((cat) => (cat.id === id ? { ...cat, ...updates } : cat));
       saveStoredCategories(next);
       return next;
     });
+
+    // Save permanently to server
+    fetch("/api/categories", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...updates }),
+    }).catch((err) => console.error("Failed to save category update to server:", err));
   }, []);
 
   const addCategory = useCallback((newCat: Omit<StoreCategory, "id"> & { id?: string }) => {
@@ -1737,6 +1759,14 @@ export function useStoreData() {
       saveStoredCategories(next);
       return next;
     });
+
+    // Save permanently to server
+    fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
+    }).catch((err) => console.error("Failed to add category to server:", err));
+
     return item;
   }, []);
 
@@ -1746,56 +1776,120 @@ export function useStoreData() {
       saveStoredCategories(next);
       return next;
     });
+
+    // Delete permanently on server
+    fetch(`/api/categories?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }).catch((err) => console.error("Failed to delete category on server:", err));
   }, []);
 
   const resetCategoriesToDefault = useCallback(() => {
     setCategories(INITIAL_CATEGORIES);
     saveStoredCategories(INITIAL_CATEGORIES);
+    fetch("/api/categories/reset", {
+      method: "POST",
+    }).catch((err) => console.error("Failed to reset categories on server:", err));
   }, []);
 
   const updateHeroBanner = useCallback((url: string | null) => {
     setHeroBanner(url);
     saveStoredHeroBanner(url);
+    fetch("/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ heroBanner: url }),
+    }).catch((err) => console.error("Failed to save hero banner to server:", err));
   }, []);
 
-  // Product CRUD
+  // Product CRUD with real server API persistence
   const updateProduct = useCallback((updated: AdminProduct) => {
     setProducts((prev) => {
       const next = prev.map((p) => (p.id === updated.id ? updated : p));
       saveStoredProducts(next);
       return next;
     });
+
+    // Save permanently to server
+    fetch("/api/products", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.product) {
+          setProducts((prev) => {
+            const next = prev.map((p) => (p.id === data.product.id ? data.product : p));
+            saveStoredProducts(next);
+            return next;
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to update product on server:", err));
   }, []);
 
   const addProduct = useCallback((newProd: Omit<AdminProduct, "id" | "createdAt">) => {
+    const tempId = `product-${Date.now()}`;
     const item: AdminProduct = {
       ...newProd,
-      id: `product-${Date.now()}`,
+      id: tempId,
       createdAt: new Date().toISOString().split("T")[0]!,
     };
+
     setProducts((prev) => {
       const next = [item, ...prev];
       saveStoredProducts(next);
       return next;
     });
+
+    // Save permanently to server
+    fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.product) {
+          setProducts((prev) => {
+            const next = prev.map((p) => (p.id === tempId ? data.product : p));
+            saveStoredProducts(next);
+            return next;
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to create product on server:", err));
+
     return item;
   }, []);
 
   const deleteProduct = useCallback((id: string) => {
+    // Delete immediately and permanently
     setProducts((prev) => {
       const next = prev.filter((p) => p.id !== id);
       saveStoredProducts(next);
       return next;
     });
+
+    // Delete permanently on server
+    fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }).catch((err) => console.error("Failed to delete product on server:", err));
   }, []);
 
-  // Order CRUD
+  // Order CRUD with real server API persistence
   const updateOrderStatus = useCallback((orderId: string, status: OrderStatus) => {
     setOrders((prev) => {
       const next = prev.map((ord) => (ord.id === orderId ? { ...ord, status } : ord));
       saveStoredOrders(next);
       return next;
     });
+
+    fetch("/api/orders", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: orderId, status }),
+    }).catch((err) => console.error("Failed to update order status on server:", err));
   }, []);
 
   const deleteOrder = useCallback((orderId: string) => {
@@ -1804,6 +1898,10 @@ export function useStoreData() {
       saveStoredOrders(next);
       return next;
     });
+
+    fetch(`/api/orders?id=${encodeURIComponent(orderId)}`, {
+      method: "DELETE",
+    }).catch((err) => console.error("Failed to delete order on server:", err));
   }, []);
 
   const addOrder = useCallback((newOrder: CustomerOrder) => {
@@ -1812,10 +1910,18 @@ export function useStoreData() {
       saveStoredOrders(next);
       return next;
     });
+
+    // Real customer order posted to server database
+    fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newOrder),
+    }).catch((err) => console.error("Failed to save order to server:", err));
+
     return newOrder;
   }, []);
 
-  // Chat Actions
+  // Chat Actions with real server API persistence
   const sendMessage = useCallback(
     (
       conversationId: string,
@@ -1853,6 +1959,18 @@ export function useStoreData() {
         return next;
       });
 
+      fetch("/api/conversations/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId,
+          text,
+          sender,
+          imageUrl,
+          productAttachment,
+        }),
+      }).catch((err) => console.error("Failed to send message to server:", err));
+
       return newMessage;
     },
     [],
@@ -1873,6 +1991,12 @@ export function useStoreData() {
       saveStoredConversations(next);
       return next;
     });
+
+    fetch("/api/conversations/read", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId }),
+    }).catch((err) => console.error("Failed to mark conversation read on server:", err));
   }, []);
 
   return {

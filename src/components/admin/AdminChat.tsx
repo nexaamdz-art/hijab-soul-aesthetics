@@ -50,7 +50,7 @@ export function AdminChat({
   onMarkAsRead,
 }: AdminChatProps) {
   const [selectedConvId, setSelectedConvId] = useState<string>(
-    initialActiveId || (conversations[0]?.id || ""),
+    initialActiveId || conversations[0]?.id || "",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [inputText, setInputText] = useState("");
@@ -62,7 +62,9 @@ export function AdminChat({
   const [isProductPickerOpen, setIsProductPickerOpen] = useState(false);
   const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
   const [customImageUrl, setCustomImageUrl] = useState("");
-  const [lightboxImage, setLightboxImage] = useState<{ url: string; caption?: string } | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; caption?: string } | null>(
+    null,
+  );
   const [productSearch, setProductSearch] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -214,7 +216,9 @@ export function AdminChat({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-[#2B2119]">الدردشة الحية مع العملاء</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[#2B2119]">
+            الدردشة الحية مع العملاء
+          </h2>
           <p className="text-xs sm:text-sm text-[#735A45]">
             التواصل المباشر، إرسال واستقبال صور المنتجات والوصولات، وتأكيد طلبات الزبائن فورياً
           </p>
@@ -307,7 +311,9 @@ export function AdminChat({
             })}
 
             {filteredConversations.length === 0 && (
-              <div className="text-center py-8 text-xs text-[#735A45]">لا توجد محادثات مطابقة للبحث</div>
+              <div className="text-center py-8 text-xs text-[#735A45]">
+                لا توجد محادثات مطابقة للبحث
+              </div>
             )}
           </div>
         </div>
@@ -388,12 +394,16 @@ export function AdminChat({
                                 src={imageUrl}
                                 alt="مرفق صورة"
                                 className="w-full max-h-64 object-cover rounded-lg cursor-pointer transition-transform duration-200 group-hover:scale-[1.02]"
-                                onClick={() => setLightboxImage({ url: imageUrl, caption: msg.text })}
+                                onClick={() =>
+                                  setLightboxImage({ url: imageUrl, caption: msg.text })
+                                }
                                 loading="lazy"
                               />
                               <button
                                 type="button"
-                                onClick={() => setLightboxImage({ url: imageUrl, caption: msg.text })}
+                                onClick={() =>
+                                  setLightboxImage({ url: imageUrl, caption: msg.text })
+                                }
                                 className="absolute bottom-2 left-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] cursor-pointer hover:bg-black/80"
                                 title="تكبير الصورة"
                               >
@@ -412,7 +422,9 @@ export function AdminChat({
                                 className="h-12 w-12 rounded-lg object-cover"
                               />
                               <div className="flex-1 min-w-0">
-                                <p className="font-bold text-xs truncate">{msg.productAttachment.name}</p>
+                                <p className="font-bold text-xs truncate">
+                                  {msg.productAttachment.name}
+                                </p>
                                 <p className="text-[11px] font-mono text-emerald-300">
                                   {msg.productAttachment.price.toLocaleString("ar-DZ")} دج
                                 </p>
@@ -587,7 +599,9 @@ export function AdminChat({
             <div className="flex items-center justify-between pb-3 border-b border-[#E3D4C0]">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-[#8C2A3E]" />
-                <h3 className="font-bold text-base text-[#2B2119]">اختيار صورة منتج من كتالوج المتجر</h3>
+                <h3 className="font-bold text-base text-[#2B2119]">
+                  اختيار صورة منتج من كتالوج المتجر
+                </h3>
               </div>
               <button
                 type="button"

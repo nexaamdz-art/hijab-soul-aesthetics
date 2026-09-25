@@ -25,6 +25,7 @@ import {
   ArrowRight,
   ExternalLink,
   Store,
+  LogOut,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -40,13 +41,13 @@ export const Route = createFileRoute("/admin")({
 type AdminTab = "overview" | "products" | "categories" | "orders" | "chat" | "settings";
 
 function AdminPage() {
-  const { user, profile, isAdmin, signInWithEmail } = useAuth();
+  const { user, profile, isAdmin, signInWithEmail, signOut } = useAuth();
   const store = useStoreData();
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [selectedOrder, setSelectedOrder] = useState<CustomerOrder | null>(null);
 
-  // Admin Login Gate State
-  const [adminEmail, setAdminEmail] = useState("nexa.am.dz@gmail.com");
+  // Admin Login Gate State - Strictly secure with empty default
+  const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -117,7 +118,7 @@ function AdminPage() {
                   required
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
-                  placeholder="nexa.am.dz@gmail.com"
+                  placeholder="admin@hijabsoul.dz"
                   className="w-full rounded-xl border border-[#D5C2AA] bg-white px-3 py-2.5 text-xs text-[#2B2119] focus:border-[#2B2119] focus:outline-none text-left"
                   dir="ltr"
                 />
@@ -230,6 +231,14 @@ function AdminPage() {
               <ExternalLink className="h-3.5 w-3.5" />
               <span>معاينة المتجر</span>
             </Link>
+            <button
+              type="button"
+              onClick={() => signOut()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-xs font-bold text-red-200 transition-colors border border-red-500/30 cursor-pointer"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>خروج</span>
+            </button>
           </div>
         </div>
 

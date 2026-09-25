@@ -315,6 +315,26 @@ var Download = createLucideIcon("download", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var ExternalLink = createLucideIcon("external-link", [
+	["path", {
+		d: "M15 3h6v6",
+		key: "1q9fwt"
+	}],
+	["path", {
+		d: "M10 14 21 3",
+		key: "gplh6r"
+	}],
+	["path", {
+		d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",
+		key: "a6xqqp"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var EyeOff = createLucideIcon("eye-off", [
 	["path", {
 		d: "M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49",
@@ -1110,4 +1130,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { CheckCheck as $, Mail as A, Heart as B, Package as C, Menu as D, MessageCircle as E, LayoutGrid as F, Crown as G, Eye as H, LayoutDashboard as I, CircleCheck as J, Clock as K, Layers as L, Lock as M, LoaderCircle as N, Maximize2 as O, Link as P, Check as Q, KeyRound as R, Pen as S, MessageSquare as T, EyeOff as U, FileText as V, Download as W, CircleAlert as X, CircleCheckBig as Y, ChevronDown as Z, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, Camera as et, ShoppingBag as f, Search as g, Send as h, UserCheck as i, LogOut as j, MapPin as k, Trash2 as l, Settings as m, X as n, ArrowRight as nt, Truck as o, ShieldCheck as p, CircleX as q, User as r, TriangleAlert as s, Zap as t, ArrowUpRight as tt, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, Image as z };
+export { Check as $, Mail as A, Heart as B, Package as C, Menu as D, MessageCircle as E, LayoutGrid as F, Download as G, Eye as H, LayoutDashboard as I, CircleX as J, Crown as K, Layers as L, Lock as M, LoaderCircle as N, Maximize2 as O, Link as P, ChevronDown as Q, KeyRound as R, Pen as S, MessageSquare as T, EyeOff as U, FileText as V, ExternalLink as W, CircleCheckBig as X, CircleCheck as Y, CircleAlert as Z, RotateCcw as _, Upload as a, Plus as b, TrendingUp as c, Sparkles as d, CheckCheck as et, ShoppingBag as f, Search as g, Send as h, UserCheck as i, LogOut as j, MapPin as k, Trash2 as l, Settings as m, X as n, ArrowUpRight as nt, Truck as o, ShieldCheck as p, Clock as q, User as r, ArrowRight as rt, TriangleAlert as s, Zap as t, Camera as tt, Store as u, RefreshCw as v, Minus as w, Phone as x, Printer as y, Image as z };

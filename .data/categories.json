@@ -1,0 +1,90 @@
+[
+  {
+    "id": "dresses",
+    "name": "فساتين",
+    "href": "/dresses",
+    "image": "/images/categories/dresses.jpg",
+    "bannerImage": "/images/uploads/chocolate_brown_cape_abaya_1789830195176.jpg",
+    "alt": "فساتين محتشمة وأنيقة - حجاب سول",
+    "description": "فساتين محتشمة وأنيقة بقصات راقية وأقمشة فاخرة تناسب كل المناسبات",
+    "order": 0,
+    "isActive": true
+  },
+  {
+    "id": "isdalat",
+    "name": "اسدالات",
+    "href": "/isdalat",
+    "image": "/images/categories/isdalat.jpg",
+    "bannerImage": "/images/uploads/isdal_pastel_blue_white_1789832048044.jpg",
+    "alt": "إسدالات صلاة وخروج راقية - حجاب سول",
+    "description": "إسدالات صلاة وخروج ساترة ومريحة بخامات قطنية نقية وتصاميم عملية",
+    "order": 2,
+    "isActive": true
+  },
+  {
+    "id": "hijab-supplies",
+    "name": "حجابات",
+    "href": "/hijab-supplies",
+    "image": "/images/categories/hijabs.jpg",
+    "bannerImage": "/images/hijabs/black-silk-chiffon.jpg",
+    "alt": "حجابات وخمارات بأقمشة ناعمة فاخرة - حجاب سول",
+    "description": "شالات وحجابات شيفون وكريب قطني بألوان ساحرة تناسب إطلالتك اليومية",
+    "order": 3,
+    "isActive": true
+  },
+  {
+    "id": "abayas",
+    "name": "عبايات",
+    "href": "/abayas",
+    "image": "/images/categories/abayas.jpg",
+    "bannerImage": "/images/abayas/black-floral-embroidered.jpg",
+    "alt": "عبايات عصرية بتطريز راقٍ - حجاب سول",
+    "description": "عبايات خليجية سوداء وملونة بتطريزات يدوية راقية وكريستال فاخر",
+    "order": 4,
+    "isActive": true
+  },
+  {
+    "id": "accessories",
+    "name": "اكسسوارات",
+    "href": "/accessories",
+    "image": "/images/categories/accessories.jpg",
+    "bannerImage": "/images/accessories/akiki-cream-bag.jpg",
+    "alt": "إكسسوارات وبروشات الحجاب الأنيقة - حجاب سول",
+    "description": "حقائب راقية، مجوهرات مطلية، مشابك شعر، وأطواق لتكتمل أناقتك",
+    "order": 5,
+    "isActive": true
+  },
+  {
+    "id": "sales",
+    "name": "تخفيضات",
+    "href": "/sales",
+    "image": "/images/categories/sale.jpg",
+    "bannerImage": "/images/uploads/black_floral_embroidered_abaya_1789830101193.jpg",
+    "alt": "عروض وتخفيضات حصرية على الأزياء المحتشمة - حجاب سول",
+    "description": "عروض وتخفيضات موسمية استثنائية على تشكيلات حجاب سول المختارة",
+    "order": 6,
+    "isActive": true
+  },
+  {
+    "id": "khimar",
+    "name": "خمارات",
+    "href": "/khimar",
+    "image": "/images/uploads/hijab_pearl_beaded_shawls_1789831343828.jpg",
+    "bannerImage": "/images/hijabs/pearl-beaded-shawls.jpg",
+    "alt": "خمارات شرعية سابغة - حجاب سول",
+    "description": "خمارات فرنسية وتركية سابغة خفيفة الوزن وسهلة الارتداء",
+    "order": 7,
+    "isActive": true
+  },
+  {
+    "id": "shoes",
+    "name": "أحذية",
+    "href": "/shoes",
+    "image": "/images/uploads/akiki_cream_handbag_1789829330238.jpg",
+    "bannerImage": "/images/accessories/lady-white-bag.jpg",
+    "alt": "أحذية وأطقم شرعية مريحة - حجاب سول",
+    "description": "أحذية نسائية طبية ومريحة تتناسق مع الإطلالة المحتشمة",
+    "order": 8,
+    "isActive": true
+  }
+]

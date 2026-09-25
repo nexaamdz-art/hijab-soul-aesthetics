@@ -1,0 +1,1 @@
+import{t as e}from"./SiteLayout-bMg4vLAl.js";import{t}from"./CategoryPage-B42_a1Qi.js";import{_ as n}from"./index-W3HWk8gJ.js";var r=n(),i=()=>(0,r.jsx)(e,{children:(0,r.jsx)(t,{title:`العبايات`,categoryKey:`abayas`})});export{i as component};

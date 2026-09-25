@@ -11,7 +11,7 @@ import {
   Sparkles,
   AlertTriangle,
 } from "lucide-react";
-import { AdminProduct, getProductFallbackImage } from "@/lib/store-data";
+import { AdminProduct, getProductFallbackImage, compressImageFile } from "@/lib/store-data";
 
 interface AdminProductsProps {
   products: AdminProduct[];
@@ -134,16 +134,40 @@ export function AdminProducts({
     setIsModalOpen(true);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          setFormImage(reader.result);
+      setIsUploadingImage(true);
+      try {
+        const compressed = await compressImageFile(file, 1200, 0.88);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: compressed }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) {
+            setFormImage(data.url);
+            showToast("تم رفع وحفظ الصورة بنجاح!");
+            return;
+          }
         }
-      };
-      reader.readAsDataURL(file);
+        setFormImage(compressed);
+      } catch (err) {
+        console.error("Image upload error:", err);
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            setFormImage(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
+      } finally {
+        setIsUploadingImage(false);
+      }
     }
   };
 
@@ -432,11 +456,14 @@ export function AdminProducts({
                     />
                     <button
                       type="button"
+                      disabled={isUploadingImage}
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#EDE0CD] text-xs font-bold text-[#2B2119] hover:bg-[#D5C2AA] transition-all"
+                      className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#EDE0CD] text-xs font-bold text-[#2B2119] hover:bg-[#D5C2AA] transition-all disabled:opacity-50"
                     >
                       <Upload className="h-3.5 w-3.5" />
-                      <span>رفع صورة من الجهاز</span>
+                      <span>
+                        {isUploadingImage ? "جاري رفع الصورة وحفظها..." : "رفع صورة من الجهاز"}
+                      </span>
                     </button>
 
                     <div className="text-[11px] text-[#735A45]">
