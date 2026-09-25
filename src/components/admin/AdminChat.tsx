@@ -364,13 +364,13 @@ export function AdminChat({
                   </span>
                 </div>
 
-                {activeConv.messages.map((msg) => {
+                {activeConv.messages.map((msg, index) => {
                   const isAdmin = msg.sender === "admin";
                   const imageUrl = msg.imageUrl || msg.imageAttachment;
 
                   return (
                     <div
-                      key={msg.id}
+                      key={`${msg.id || "msg"}-${index}`}
                       className={`flex flex-col ${isAdmin ? "items-start" : "items-end"}`}
                     >
                       <div className="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]">

@@ -13,6 +13,8 @@ import {
   INITIAL_CONVERSATIONS,
   deduplicateProducts,
   deduplicateCategories,
+  deduplicateConversations,
+  deduplicateMessages,
 } from "./store-data";
 
 const DATA_DIR = path.resolve(process.cwd(), ".data");
@@ -126,13 +128,17 @@ export function readStoredConversations(
   ensureDirectoryExists(DATA_DIR);
   if (!fs.existsSync(CONVERSATIONS_FILE)) {
     const seed = initialDefaults || INITIAL_CONVERSATIONS;
-    fs.writeFileSync(CONVERSATIONS_FILE, JSON.stringify(seed, null, 2), "utf8");
+    fs.writeFileSync(
+      CONVERSATIONS_FILE,
+      JSON.stringify(deduplicateConversations(seed), null, 2),
+      "utf8",
+    );
     return seed;
   }
   try {
     const raw = fs.readFileSync(CONVERSATIONS_FILE, "utf8");
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
+    if (Array.isArray(parsed)) return deduplicateConversations(parsed);
     return [];
   } catch (err) {
     console.error("Failed to read conversations file:", err);
@@ -143,7 +149,8 @@ export function readStoredConversations(
 export function writeStoredConversations(conversations: CustomerConversation[]): void {
   ensureDirectoryExists(DATA_DIR);
   try {
-    fs.writeFileSync(CONVERSATIONS_FILE, JSON.stringify(conversations, null, 2), "utf8");
+    const deduped = deduplicateConversations(conversations);
+    fs.writeFileSync(CONVERSATIONS_FILE, JSON.stringify(deduped, null, 2), "utf8");
   } catch (err) {
     console.error("Failed to write conversations file:", err);
   }
@@ -430,8 +437,10 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
     // POST /api/categories/reset
     if (isReset && request.method === "POST") {
       // Re-initialize from defaults
-      const categories = readStoredCategories();
-      return new Response(JSON.stringify({ success: true, categories }), { headers: jsonHeaders });
+      writeStoredCategories(INITIAL_CATEGORIES);
+      return new Response(JSON.stringify({ success: true, categories: INITIAL_CATEGORIES }), {
+        headers: jsonHeaders,
+      });
     }
 
     // POST /api/categories (Create)
@@ -743,11 +752,13 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
     if (pathname === "/api/conversations/message" && request.method === "POST") {
       try {
         const body = (await request.json()) as {
+          id?: string;
           conversationId: string;
           text: string;
           sender?: "customer" | "admin";
           imageUrl?: string;
           productAttachment?: { name: string; price: number; image: string };
+          timestamp?: string;
         };
 
         let imageUrl = body.imageUrl;
@@ -757,11 +768,13 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
         }
 
         const newMessage: ChatMessage = {
-          id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          id: body.id || `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           conversationId: body.conversationId,
           sender: body.sender || "admin",
           text: body.text || (imageUrl ? "📷 صورة مرفقة" : ""),
-          timestamp: new Date().toLocaleTimeString("ar-DZ", { hour: "2-digit", minute: "2-digit" }),
+          timestamp:
+            body.timestamp ||
+            new Date().toLocaleTimeString("ar-DZ", { hour: "2-digit", minute: "2-digit" }),
           isRead: body.sender === "admin",
           imageUrl: imageUrl || undefined,
           imageAttachment: imageUrl || undefined,
@@ -773,7 +786,10 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
 
         if (convIdx >= 0) {
           const conv = conversations[convIdx]!;
-          conv.messages.push(newMessage);
+          if (!conv.messages.some((m) => m.id === newMessage.id)) {
+            conv.messages.push(newMessage);
+          }
+          conv.messages = deduplicateMessages(conv.messages);
           conv.lastMessage = newMessage.text;
           conv.lastMessageTime = newMessage.timestamp;
           if (newMessage.sender === "customer") {
@@ -795,9 +811,16 @@ export async function handleStoreApi(request: Request): Promise<Response | null>
 
         writeStoredConversations(conversations);
 
-        return new Response(JSON.stringify({ success: true, message: newMessage, conversations }), {
-          headers: jsonHeaders,
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: newMessage,
+            conversations: deduplicateConversations(conversations),
+          }),
+          {
+            headers: jsonHeaders,
+          },
+        );
       } catch (err) {
         return new Response(
           JSON.stringify({ error: err instanceof Error ? err.message : "فشل إرسال الرسالة" }),

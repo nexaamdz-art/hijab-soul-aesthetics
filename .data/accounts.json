@@ -26,5 +26,14 @@
     "fullName": "فاطمة الزهراء",
     "createdAt": "2026-09-24T18:56:29.881Z",
     "role": "authenticated"
+  },
+  {
+    "email": "meddourialycia09@gmail.com",
+    "passwordHash": "1a233b8e64e510b568acc8a31f8e46b7d554acac6a7e61d398c15ecbe31b71d7",
+    "firstName": "alycia",
+    "lastName": "meddouri",
+    "fullName": "alycia meddouri",
+    "createdAt": "2026-09-25T14:39:16.205Z",
+    "role": "authenticated"
   }
 ]

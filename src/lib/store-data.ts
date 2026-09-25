@@ -1619,6 +1619,27 @@ export function saveStoredOrders(orders: CustomerOrder[]) {
   window.dispatchEvent(new Event("hijab_orders_updated"));
 }
 
+export function deduplicateMessages(messages: ChatMessage[]): ChatMessage[] {
+  const seen = new Set<string>();
+  return (messages || []).filter((m) => {
+    if (!m) return false;
+    const key = m.id || `${m.sender}-${m.text}-${m.timestamp}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function deduplicateConversations(list: CustomerConversation[]): CustomerConversation[] {
+  const seen = new Set<string>();
+  return (list || []).filter((c) => {
+    if (!c || !c.id || seen.has(c.id)) return false;
+    seen.add(c.id);
+    c.messages = deduplicateMessages(c.messages || []);
+    return true;
+  });
+}
+
 export function getStoredConversations(): CustomerConversation[] {
   if (typeof window === "undefined") return INITIAL_CONVERSATIONS;
   try {
@@ -1628,7 +1649,7 @@ export function getStoredConversations(): CustomerConversation[] {
       return INITIAL_CONVERSATIONS;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : INITIAL_CONVERSATIONS;
+    return Array.isArray(parsed) ? deduplicateConversations(parsed) : INITIAL_CONVERSATIONS;
   } catch {
     return INITIAL_CONVERSATIONS;
   }
@@ -1636,7 +1657,8 @@ export function getStoredConversations(): CustomerConversation[] {
 
 export function saveStoredConversations(conversations: CustomerConversation[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
+  const deduped = deduplicateConversations(conversations);
+  localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(deduped));
   window.dispatchEvent(new Event("hijab_conversations_updated"));
 }
 
@@ -1715,8 +1737,9 @@ export function useStoreData() {
         if (convRes.ok && isMounted) {
           const serverConvs = await convRes.json();
           if (Array.isArray(serverConvs)) {
-            setConversations(serverConvs);
-            saveStoredConversations(serverConvs);
+            const deduped = deduplicateConversations(serverConvs);
+            setConversations(deduped);
+            saveStoredConversations(deduped);
           }
         }
       } catch (err) {
@@ -1983,7 +2006,7 @@ export function useStoreData() {
               lastMessage: text || (imageUrl ? "📷 صورة مرفقة" : ""),
               lastMessageTime: newMessage.timestamp,
               unreadCount: sender === "customer" ? c.unreadCount + 1 : c.unreadCount,
-              messages: [...c.messages, newMessage],
+              messages: deduplicateMessages([...(c.messages || []), newMessage]),
             };
           }
           return c;
@@ -1996,11 +2019,13 @@ export function useStoreData() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: newMessage.id,
           conversationId,
           text,
           sender,
           imageUrl,
           productAttachment,
+          timestamp: newMessage.timestamp,
         }),
       }).catch((err) => console.error("Failed to send message to server:", err));
 

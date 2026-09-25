@@ -1,5 +1,28 @@
 [
   {
+    "id": "ord-1790347231147",
+    "orderNumber": "HS-8343",
+    "customerName": "NONONONO",
+    "phone": "124567",
+    "wilaya": "06 - بجاية",
+    "commune": "timzrit",
+    "address": "BLA BLA BLA",
+    "items": [
+      {
+        "productId": "product-1790340198473",
+        "name": "فستان أخضر زيتوني",
+        "price": 3500,
+        "quantity": 1,
+        "image": "/images/uploads/upload_1790340196012_yuga3l.jpg"
+      }
+    ],
+    "totalAmount": 3500,
+    "shippingCost": 700,
+    "grandTotal": 4200,
+    "status": "pending",
+    "createdAt": "الآن"
+  },
+  {
     "id": "ord-1790339138867",
     "orderNumber": "HS-5109",
     "customerName": "زائرة حقيقية",
@@ -19,7 +42,7 @@
     "totalAmount": 4500,
     "shippingCost": 500,
     "grandTotal": 5000,
-    "status": "pending",
+    "status": "delivered",
     "createdAt": "25 سبتمبر 2026"
   },
   {

@@ -56,6 +56,10 @@ export function AdminCategories({
   const [editingCategory, setEditingCategory] = useState<StoreCategory | null>(null);
   const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false);
 
+  // Category Deletion & Reset Confirmation Modals
+  const [deleteTargetCategory, setDeleteTargetCategory] = useState<StoreCategory | null>(null);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+
   // Form states for Create/Edit
   const [formName, setFormName] = useState("");
   const [formHref, setFormHref] = useState("");
@@ -187,7 +191,7 @@ export function AdminCategories({
       showToast("تم تحديث بنر الواجهة الرئيسية بنجاح!");
       setIsHeroModalOpen(false);
     } catch {
-      alert("تعذر رفع الصورة");
+      showToast("تعذر رفع الصورة، يرجى المحاولة مرة أخرى");
     } finally {
       setIsUploading(false);
       if (heroFileInputRef.current) heroFileInputRef.current.value = "";
@@ -224,7 +228,7 @@ export function AdminCategories({
   const handleSaveCategoryForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
-      alert("يرجى إدخال اسم القسم");
+      showToast("يرجى إدخال اسم القسم");
       return;
     }
 
@@ -310,13 +314,9 @@ export function AdminCategories({
           </button>
 
           <button
-            onClick={() => {
-              if (confirm("هل تريدين استعادة الصور والتصنيفات الافتراضية الأصلية للمتجر؟")) {
-                onResetCategories();
-                showToast("تمت استعادة التصنيفات الافتراضية بنجاح!");
-              }
-            }}
-            title="استعادة الصور الافتراضية"
+            type="button"
+            onClick={() => setIsResetModalOpen(true)}
+            title="استعادة الصور والتصنيفات الافتراضية"
             className="p-2 rounded-xl bg-[#FAF6F0] text-[#735A45] border border-[#D5C2AA] hover:text-[#2B2119] hover:bg-[#EDE0CD] transition-all cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
@@ -403,13 +403,9 @@ export function AdminCategories({
 
                   {categories.length > 1 && (
                     <button
-                      onClick={() => {
-                        if (confirm(`هل أنتِ متأكدة من حذف قسم "${cat.name}"؟`)) {
-                          onDeleteCategory(cat.id);
-                          showToast(`تم حذف قسم "${cat.name}"`);
-                        }
-                      }}
-                      className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors"
+                      type="button"
+                      onClick={() => setDeleteTargetCategory(cat)}
+                      className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="حذف القسم"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -909,6 +905,133 @@ export function AdminCategories({
                 {editingCategory ? "حفظ التعديلات" : "إضافة القسم"}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* CONFIRM DELETE CATEGORY MODAL */}
+      {/* ========================================================================= */}
+      {deleteTargetCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div
+            dir="rtl"
+            className="relative w-full max-w-md rounded-3xl bg-[#FAF6F0] p-6 shadow-2xl border border-[#D5C2AA] text-[#2B2119] animate-in fade-in zoom-in-95 my-6"
+          >
+            <button
+              onClick={() => setDeleteTargetCategory(null)}
+              className="absolute top-4 left-4 p-1.5 rounded-full bg-[#EDE0CD] text-[#2B2119] hover:bg-[#E3D4C0]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 text-rose-700">
+              <div className="p-2.5 rounded-2xl bg-rose-100 border border-rose-200 shrink-0">
+                <Trash2 className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-[#2B2119]">تأكيد حذف القسم</h3>
+                <p className="text-xs text-[#735A45]">
+                  هذا الإجراء سيقوم بإزالة هذا القسم من المتجر نهائياً
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#E3D4C0] mb-5">
+              <img
+                src={deleteTargetCategory.image}
+                alt={deleteTargetCategory.name}
+                className="h-14 w-14 rounded-xl object-cover border border-[#D5C2AA] shrink-0"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getProductFallbackImage(
+                    deleteTargetCategory.id,
+                  );
+                }}
+              />
+              <div className="min-w-0">
+                <span className="text-sm font-bold text-[#2B2119] block">
+                  {deleteTargetCategory.name}
+                </span>
+                <span className="text-xs text-[#735A45] block font-mono dir-ltr text-right truncate">
+                  {deleteTargetCategory.href}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetCategory(null)}
+                className="px-4 py-2.5 rounded-xl bg-white border border-[#D5C2AA] text-xs font-bold text-[#735A45] hover:bg-[#EDE0CD] transition-all cursor-pointer"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const catName = deleteTargetCategory.name;
+                  const catId = deleteTargetCategory.id;
+                  onDeleteCategory(catId);
+                  setDeleteTargetCategory(null);
+                  showToast(`تم حذف قسم "${catName}" بنجاح!`);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-rose-700 text-white text-xs font-bold hover:bg-rose-800 transition-all shadow-md cursor-pointer active:scale-95"
+              >
+                نعم، تأكيد الحذف
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* CONFIRM RESET CATEGORIES MODAL */}
+      {/* ========================================================================= */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+          <div
+            dir="rtl"
+            className="relative w-full max-w-md rounded-3xl bg-[#FAF6F0] p-6 shadow-2xl border border-[#D5C2AA] text-[#2B2119] animate-in fade-in zoom-in-95 my-6"
+          >
+            <button
+              onClick={() => setIsResetModalOpen(false)}
+              className="absolute top-4 left-4 p-1.5 rounded-full bg-[#EDE0CD] text-[#2B2119] hover:bg-[#E3D4C0]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 text-[#8C2A3E]">
+              <div className="p-2.5 rounded-2xl bg-[#F5E6D3] border border-[#D5C2AA] shrink-0">
+                <RotateCcw className="h-6 w-6 text-[#8C2A3E]" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-[#2B2119]">استعادة الأقسام الافتراضية</h3>
+                <p className="text-xs text-[#735A45]">
+                  هل تريدين إعادة تعيين الأقسام والصور للوضع الافتراضي؟
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 mt-5">
+              <button
+                type="button"
+                onClick={() => setIsResetModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-white border border-[#D5C2AA] text-xs font-bold text-[#735A45] hover:bg-[#EDE0CD] transition-all cursor-pointer"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onResetCategories();
+                  setIsResetModalOpen(false);
+                  showToast("تمت استعادة التصنيفات الافتراضية بنجاح!");
+                }}
+                className="px-5 py-2.5 rounded-xl bg-[#2B2119] text-white text-xs font-bold hover:bg-[#433225] transition-all shadow-md cursor-pointer active:scale-95"
+              >
+                نعم، استعادة الافتراضي
+              </button>
+            </div>
           </div>
         </div>
       )}

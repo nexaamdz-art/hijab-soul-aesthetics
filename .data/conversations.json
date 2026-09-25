@@ -4,9 +4,9 @@
     "customerName": "أمينة بن ساسي",
     "customerPhone": "0661234589",
     "wilaya": "الجزائر العاصمة",
-    "lastMessage": "السلام عليكم، هل يمكن شحن طلبي اليوم مساءً؟",
-    "lastMessageTime": "10:45 ص",
-    "unreadCount": 1,
+    "lastMessage": "no sorry",
+    "lastMessageTime": "02:33 م",
+    "unreadCount": 0,
     "messages": [
       {
         "id": "m-1",
@@ -32,7 +32,15 @@
         "sender": "customer",
         "text": "السلام عليكم، هل يمكن شحن طلبي اليوم مساءً؟",
         "timestamp": "10:45 ص",
-        "isRead": false
+        "isRead": true
+      },
+      {
+        "id": "msg-1790346833318-87zn",
+        "conversationId": "conv-1",
+        "sender": "admin",
+        "text": "no sorry",
+        "timestamp": "02:33 م",
+        "isRead": true
       }
     ]
   },
